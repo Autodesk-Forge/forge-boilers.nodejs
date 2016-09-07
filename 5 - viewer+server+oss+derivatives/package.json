@@ -57,10 +57,10 @@
   ],
   "license": "MIT",
   "scripts": {
-    "postinstall": "npm run build-prod",
-    "start": "node bin/run.js",
+    "start": "npm run build-prod && node bin/run.js",
     "build-dev": "webpack --watch --progress --colors --config ./webpack/webpack.config.development.js",
-    "build-prod": "webpack --progress --config ./webpack/webpack.config.production.js"
+    "build-prod": "webpack --progress --config ./webpack/webpack.config.production.js",
+    "dev": "node bin/run.js"
   },
   "repository": {
     "type": "git",

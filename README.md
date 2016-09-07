@@ -13,7 +13,7 @@
 ## Description
 A collection of node.js-based boiler projects for the [Autodesk Forge Web Services APIs](http://forge.autodesk.com)
 
-# Prerequisites
+## Prerequisites
 
 To run those samples, you need your own Forge API credentials. Visit the [Forge Developer Portal](https://developer.autodesk.com), sign up for an account, then [create an app](https://developer.autodesk.com/myapps/create). For this new app, you can use <b>http://localhost:3000/callback/forge</b> as Callback URL. Finally take note of the <b>Client ID</b> and <b>Client Secret</b>.
 
@@ -24,18 +24,18 @@ Clone this project or download it. It's recommended to install [GitHub desktop](
     git clone https://github.com/Developer-Autodesk/forge-boilers.nodejs
 
 
-### Boilers Setup
+## Boilers Setup
 
 Below are instructions to setup and run locally each boiler project, they may vary based on which project you want to run.
 
-## 1 - viewer-offline
+## Project #1 - viewer-offline
 
 You can simply open <b>viewer-offline.html</b> in a browser. This project does not require you to run any server on the machine,
 although you may want to server the .html page to get around security restrictions imposed by some browsers, such as Chrome.
 
 In order to do that install a local http server on your machine:
 
-    > npm install http-server
+    > sudo npm install -g http-server
 
 navigate to 1 - viewer-offline/
 
@@ -43,47 +43,35 @@ navigate to 1 - viewer-offline/
 
 note the local address output by the server, ex: and type to your browser
 
-## 2 - viewer-barebone
+## Project #2 - viewer-barebone
 
-## 3 - viewer+server
-## 4 - viewer+server+oss
-## 5 - viewer+server+oss+derivative
+TODO
+
+## Project #3 - viewer+server
+## Project #4 - viewer+server+oss
+## Project #5 - viewer+server+oss+derivative
+
+The setup is similar for those 3 projects and they have to be run independently. Navigate with a command shell or terminal to the project you want to run.
 
 Mac OSX/Linux (Terminal)
 
     npm install
     export FORGE_CLIENTID=<<YOUR CLIENT ID FROM DEVELOPER PORTAL>>
     export FORGE_CLIENTSECRET=<<YOUR CLIENT SECRET>>
-    npm run dev
+    npm run build-dev (this runs a dev build and webpack in --watch mode)
+    npm run dev (runs the node server, do in another terminal if you want to keep the webpack watcher running)
 
 Windows (use <b>Node.js command line</b> from Start menu)
 
     npm install
     set FORGE_CLIENTID=<<YOUR CLIENT ID FROM DEVELOPER PORTAL>>
     set FORGE_CLIENTSECRET=<<YOUR CLIENT SECRET>>
+    npm run build-dev
     npm run dev
 
 Open the browser: [http://localhost:3000](http://localhost:3000).
 
 <b>Important:</b> do not use <b>npm start</b> locally, this is intended for PRODUCTION only with HTTPS (SSL) secure cookies.
-
-### Deploy on Heroku
-
-To deploy this application to Heroku, the <b>Callback URL</b> must use your .herokuapp.com address. After clicking on the button below, at the Heroku Create New App page, set your Client ID & Secret and the correct callback URL.
-
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
-
-# Tips & tricks
-
-For local development/testing, consider use [nodemon](https://www.npmjs.com/package/nodemon) package, which auto restart your node application after any modification on your code. To install it, use:
-
-    sudo npm install -g nodemon
-
-Then, instead of <b>npm run dev</b>, use the following:
-
-    npm run nodemon
-
-Which executes <b>nodemon server.js --ignore www/</b>, where the <b>--ignore</b> parameter indicates that the app should not restart if files under <b>www</b> folder are modified.
 
 ## License
 
