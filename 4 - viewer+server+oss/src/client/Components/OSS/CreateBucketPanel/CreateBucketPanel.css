@@ -1,0 +1,28 @@
+
+.create-bucket {
+    height: 135px;
+    width: 300px;
+}
+
+.create-bucket .bucket-key {
+    border: solid 1px #a7a7a7;
+    background-color: #3c3f40;
+    border-radius: 4px;
+    margin-bottom: 4px;
+    margin-top: 4px;
+    color: white;
+    width: 100%;
+}
+
+.create-bucket .open > .dropdown-menu {
+    background-color: #3c3f40;
+}
+
+.create-bucket .dropdown-menu > li > a {
+    color: #fff;
+}
+
+.create-bucket .lmv-dropdown .btn {
+    width: 100%;
+    height: 27px;
+}
