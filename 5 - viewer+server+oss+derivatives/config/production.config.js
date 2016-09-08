@@ -17,8 +17,8 @@ module.exports = {
 
     forge: {
       oauth: {
-        clientSecret: process.env.FORGE_CLIENTSECRET,
-        clientId: process.env.FORGE_CLIENTID,
+        clientSecret: process.env.FORGE_CLIENT_SECRET,
+        clientId: process.env.FORGE_CLIENT_ID,
 
         scope: [
           'data:read',

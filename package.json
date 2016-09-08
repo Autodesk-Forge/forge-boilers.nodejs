@@ -13,7 +13,7 @@
     "install-boiler3": "npm install --prefix ./3\\ -\\ viewer+server",
     "install-boiler4": "npm install --prefix ./4\\ -\\ viewer+server+oss",
     "install-boiler5": "npm install --prefix ./5\\ -\\ viewer+server+oss+derivatives",
-    "postinstall": "npm run install-boiler3 && npm run install-boiler4 && npm run install-boiler5"
+    "postinstall": "npm run install-boiler5"
   },
   "repository": {
     "type": "git",
