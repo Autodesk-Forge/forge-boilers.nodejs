@@ -24,11 +24,12 @@ Those samples illustrates how to use the following Forge npm packages:
 To run those samples, you need your own Forge API credentials:
 
  * Visit the [Forge Developer Portal](https://developer.autodesk.com), sign up for an account
- * [Create a new app](https://developer.autodesk.com/myapps/create)
- * For this new app, you can use <b>http://localhost:3000/api/forge/callback/oauth</b> as Callback URL.
+ * [Create a new App](https://developer.autodesk.com/myapps/create)
+ * For this new App, you can use <b>http://localhost:3000/api/forge/callback/oauth</b> as Callback URL.
  * Take note of the <b>Client ID</b> and <b>Client Secret</b>, those are your API keys that must remain hidden
  * Install the latest release of [NodeJS](https://nodejs.org)
- * Clone this or download this project. It's recommended to install a git client such as [GitHub desktop](https://desktop.github.com/) or [SourceTree](https://www.sourcetreeapp.com/). To clone it via command line, use the following (<b>Terminal</b> on MacOSX/Linux, <b>Git Shell</b> on Windows):
+ * Clone this or download this project. It's recommended to install a git client such as [GitHub desktop](https://desktop.github.com/) or [SourceTree](https://www.sourcetreeapp.com/)
+ * To clone it via command line, use the following (<b>Terminal</b> on MacOSX/Linux, <b>Git Shell</b> on Windows):
 
     > git clone https://github.com/Developer-Autodesk/forge-boilers.nodejs
 
@@ -39,18 +40,20 @@ Below are instructions to setup and run locally each boiler project, they may va
 
 ## Project #1 - viewer-offline
 
-You can simply open <b>viewer-offline.html</b> in a browser. This project does not require you to run any server on the machine,
+You can simply open <b>viewer-offline.html</b> in a browser. This project will load the local model from <b>/v8</b> directoryand  does not require you to run any server on the machine,
 although you may want to serve the .html page to get around security restrictions imposed by some browsers (such as Chrome) when reading local files.
 
- * In order to do that install a local http server on your machine:
+ * In order to do that install a local http server on your machine, you can use the following:
 
     > sudo npm install -g http-server
 
- * Navigate to <b>"/1 - viewer-offline"</b> directory
+ * Navigate to <b>"/1 - viewer-offline"</b> directory and start the server:
 
     > http-server
 
  * Note the local address output by the server (ex: <b>http://127.0.0.1:8080</b>) and type in your browser: <b>http://127.0.0.1:8080/viewer-offline.html</b>
+
+ * This project does not require any internet connection or Forge API credentials and can be used for testing the viewer API locally
 
 ## Project #2 - viewer-barebone
 
@@ -60,9 +63,9 @@ Samples in this project do not require you to implement a server, but they rely 
 
  * Once you have a token and the URN of your model, replace in the hardcoded fields in <b>viewer.html</b> and <b>viewingApp.html</b>:
 
-     var token = '<< Place your token here >>'
+    var token = '<< Place your token here >>'
 
-     var urn = '<< Place your URN here >>'
+    var urn = '<< Place your URN here >>'
 
  * You can open the files directly in browser or serve similar to project #1. The <b>viewer.html</b> is using the plain JavaScript viewer API,
  whereas <b>viewingApp.html</b> is using an extra layer of code from Autodesk which adds a UI to switch between viewables (for designs translated from Revit .rvt files), see screenshot below:
@@ -73,9 +76,11 @@ Samples in this project do not require you to implement a server, but they rely 
 ## Project #4 - viewer+server+oss
 ## Project #5 - viewer+server+oss+derivatives
 
-The setup is similar for those 3 projects and they have to be run independently. Navigate with a command shell or terminal to the project you want to run.
+The setup is similar for those 3 projects and they have to be run independently.
 
 Those project are using [Webpack](https://webpack.github.io), a module bundler and NPM packages to build the frontend, so an extra build step is required.
+
+Navigate with a command shell or terminal to the project you want to run and type the following commands:
 
 Mac OSX/Linux (Terminal)
 
@@ -93,9 +98,10 @@ Windows (use <b>Node.js command line</b> from Start menu)
     > npm run build-dev
     > npm run dev
 
-Open the browser: [http://localhost:3000](http://localhost:3000).
+Open your browser at:
+[http://localhost:3000](http://localhost:3000)
 
-<b>Important:</b> do not use <b>npm start</b> locally, this is intended for PRODUCTION only with HTTPS (SSL) secure cookies.
+<b>Important:</b> the <b>npm start</b> command, this is intended for <b>PRODUCTION</b> with HTTPS (SSL) secure cookies.
 
 To run a production build, you can use command
 
@@ -109,15 +115,17 @@ Which will run a production build and start the server. A production build code 
 
 ### Deploy on Heroku
 
-To deploy this application to Heroku, the <b>Callback URL</b> must use your .herokuapp.com address. After clicking on the button below, at the Heroku Create New App page, set your Client ID & Secret and the correct callback URL.
+To deploy this application to Heroku, simply click on the button below, at the Heroku Create New App page, set your Client ID & Client Secret with your Forge API keys.
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
+By default project 5 is being deployed and the result should look like below, a treeview of the OSS storage that lets you upload designs, load them in the viewer and perform actions from the context menu.
 
  ![Project5](img/ScreenShot2.png)
 
 # Tips & tricks
 
-For local development/testing, consider use [nodemon](https://www.npmjs.com/package/nodemon) package, which auto restart your node application after any modification on your code. To install it, use:
+For local development/testing, consider use [nodemon](https://www.npmjs.com/package/nodemon) package, which auto restarts your node application after any modification on your code. To install it, use:
 
     sudo npm install -g nodemon
 
@@ -135,5 +143,6 @@ See [nodemon](https://github.com/remy/nodemon) for more details.
 ## Written by 
 
 Written by [Philippe Leefsma](http://twitter.com/F3lipek)
-Autodesk Developer Network.
+Forge Partner Development
+[http://forge.autodesk.com](http://forge.autodesk.com)
 
