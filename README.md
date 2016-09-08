@@ -145,7 +145,7 @@ See [nodemon](https://github.com/remy/nodemon) for more details.
 
 ## License
 
-[MIT License](http://opensource.org/licenses/MIT).
+[MIT License](http://opensource.org/licenses/MIT)
 
 ## Written by 
 
