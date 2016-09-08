@@ -119,7 +119,14 @@ To deploy this application to Heroku, simply click on the button below, at the H
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
-By default project 5 is being deployed and the result should look like below, a treeview of the OSS storage that lets you upload designs, load them in the viewer and perform actions from the context menu.
+By default project 5 is being deployed and the result should look like below: a treeview of the OSS storage that lets you upload designs and perform actions from the context menu.
+
+To load a design in the viewer:
+
+ * Right-click the root node to create a new bucket if you do not have any
+ * Upload the design file to the bucket
+ * Upon successful upload, the file appears in the bucket, right-click and select <b>Generate Viewable</b>
+ * Upon successful translation of the design, double-click the file and it will get loaded in the viewer
 
  ![Project5](img/ScreenShot2.png)
 
