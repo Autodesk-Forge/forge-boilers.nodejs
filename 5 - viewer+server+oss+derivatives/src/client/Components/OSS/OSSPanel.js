@@ -153,9 +153,9 @@ export default class OSSPanel extends EventsEmitter {
           data.node.details.objectId,
           viewerContainer)
 
-        console.log(response)
-
-        this.onObjectNodeAdded (data.node)
+        setTimeout(() => {
+          this.onObjectNodeAddedHandler (data.node)
+        }, 500)
 
       } catch (ex) {
 

@@ -133,6 +133,8 @@ export default class OssSvc extends BaseSvc {
   /////////////////////////////////////////////////////////////////
   putObject (token, bucketKey, objectKey, file) {
 
+    //TODO: Not working yet - need to migrate to SDK
+
     //return new Promise( async(resolve, reject) => {
     //
     //  try {
@@ -190,53 +192,54 @@ export default class OssSvc extends BaseSvc {
   /////////////////////////////////////////////////////////////////
   getObject (token, bucketKey, objectKey) {
 
-    this._APIAuth.accessToken = token
+    //TODO: Not working yet - need to migrate to SDK
+
+    //this._APIAuth.accessToken = token
+    //
+    //return new Promise((resolve, reject) => {
+    //
+    //  this._objectsAPI.getObject (
+    //    bucketKey,
+    //    objectKey,
+    //    { encoding: null },
+    //    function (err, data, response) {
+    //
+    //      //console.log(err)
+    //      //console.log(data)
+    //      //console.log(response)
+    //
+    //      if(err) {
+    //
+    //        return reject(err)
+    //      }
+    //
+    //      resolve(response)
+    //    })
+    //})
 
     return new Promise((resolve, reject) => {
 
-      this._objectsAPI.getObject (
+      var url = util.format(
+        'https://developer.api.autodesk.com/oss/v2/buckets/%s/objects/%s',
         bucketKey,
-        objectKey,
-        { encoding: null },
-        function (err, data, response) {
+        objectKey)
 
-          //console.log(err)
-          //console.log(data)
-          //console.log(response)
+      request({
+        url: url,
+        headers: {
+          'Authorization': 'Bearer ' + token
+        },
+        encoding: null
+      }, function(err, response, body) {
 
-          if(err) {
+        if(err) {
 
-            return reject(err)
-          }
+          return reject(err)
+        }
 
-          resolve(response)
-        })
+        resolve(body)
+      })
     })
-
-    // this works OK
-    //return new Promise((resolve, reject) => {
-    //
-    //  var url = util.format(
-    //    'https://developer.api.autodesk.com/oss/v2/buckets/%s/objects/%s',
-    //    bucketKey,
-    //    objectKey)
-    //
-    //  request({
-    //    url: url,
-    //    headers: {
-    //      'Authorization': 'Bearer ' + token
-    //    },
-    //    encoding: null
-    //  }, function(err, response, body) {
-    //
-    //    if(err) {
-    //
-    //      return reject(err)
-    //    }
-    //
-    //    resolve(body)
-    //  })
-    //})
   }
 
   /////////////////////////////////////////////////////////////////

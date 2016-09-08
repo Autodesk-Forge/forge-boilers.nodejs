@@ -251,3 +251,61 @@ function arrayToBase64(arraybuffer) {
 
   return base64;
 }
+
+/////////////////////////////////////////////////////////////////
+// Utils
+//
+/////////////////////////////////////////////////////////////////
+function requestAsync(params) {
+
+  return new Promise((resolve, reject) => {
+
+    request({
+
+      url: params.url,
+      method: params.method || 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + params.token
+      },
+      json: params.json,
+      body: params.body
+
+    }, (err, response, body) => {
+
+      try {
+
+        if (err) {
+
+          console.log('error: ' + params.url)
+          console.log(err)
+
+          return reject(err)
+        }
+
+        if (body && body.errors) {
+
+          console.log('body error: ' + params.url)
+          console.log(body.errors)
+
+          return reject(body.errors)
+        }
+
+        if([200, 201, 202].indexOf(
+            response.statusCode) < 0){
+
+          return reject(response)
+        }
+
+        return resolve(body.data || body)
+      }
+      catch(ex){
+
+        console.log(params.url)
+        console.log(ex)
+
+        return reject(response)
+      }
+    })
+  })
+}
+
