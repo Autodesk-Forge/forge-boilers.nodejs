@@ -31,7 +31,7 @@ To run those samples, you need your own Forge API credentials:
  * Clone this or download this project. It's recommended to install a git client such as [GitHub desktop](https://desktop.github.com/) or [SourceTree](https://www.sourcetreeapp.com/)
  * To clone it via command line, use the following (<b>Terminal</b> on MacOSX/Linux, <b>Git Shell</b> on Windows):
 
-    > git clone https://github.com/Developer-Autodesk/forge-boilers.nodejs
+    > git clone https://github.com/Autodesk-Forge/forge-boilers.nodejs
 
 
 ## Boilers Setup
@@ -78,7 +78,7 @@ Samples in this project do not require you to implement a server, but they rely 
 
 The setup is similar for those 3 projects and they have to be run independently.
 
-Those project are using [Webpack](https://webpack.github.io), a module bundler and NPM packages to build the frontend, so an extra build step is required.
+Those projects are using [Webpack](https://webpack.github.io), a module bundler and NPM packages to build and generate the frontend code, so an extra build step is required.
 
 Navigate with a command shell or terminal to the project you want to run and type the following commands:
 
