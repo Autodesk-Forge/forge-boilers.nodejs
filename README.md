@@ -150,6 +150,8 @@ See [nodemon](https://github.com/remy/nodemon) for more details.
 ## Written by 
 
 Written by [Philippe Leefsma](http://twitter.com/F3lipek)
+
 Forge Partner Development
+
 [http://forge.autodesk.com](http://forge.autodesk.com)
 
