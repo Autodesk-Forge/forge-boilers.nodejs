@@ -21,12 +21,13 @@ Those samples illustrates how to use the following Forge npm packages:
 
 ## Prerequisites
 
-To run those samples, you need your own Forge API credentials. Visit the [Forge Developer Portal](https://developer.autodesk.com), sign up for an account, then [create an app](https://developer.autodesk.com/myapps/create).
-For this new app, you can use <b>http://localhost:3000/api/forge/callback/oauth</b> as Callback URL. Finally take note of the <b>Client ID</b> and <b>Client Secret</b>.
-
-Install [NodeJS](https://nodejs.org).
-
-Clone this project or download it. It's recommended to install a git client such as [GitHub desktop](https://desktop.github.com/) or [SourceTree](https://www.sourcetreeapp.com/). To clone it via command line, use the following (<b>Terminal</b> on MacOSX/Linux, <b>Git Shell</b> on Windows):
+To run those samples, you need your own Forge API credentials:
+    * Visit the [Forge Developer Portal](https://developer.autodesk.com), sign up for an account
+    * [Create a new app](https://developer.autodesk.com/myapps/create)
+    * For this new app, you can use <b>http://localhost:3000/api/forge/callback/oauth</b> as Callback URL.
+    * Take note of the <b>Client ID</b> and <b>Client Secret</b>, those are your API keys that must remain hidden
+    * Install the latest release of [NodeJS](https://nodejs.org)
+    * Clone this or download this project. It's recommended to install a git client such as [GitHub desktop](https://desktop.github.com/) or [SourceTree](https://www.sourcetreeapp.com/). To clone it via command line, use the following (<b>Terminal</b> on MacOSX/Linux, <b>Git Shell</b> on Windows):
 
     git clone https://github.com/Developer-Autodesk/forge-boilers.nodejs
 
@@ -42,13 +43,13 @@ although you may want to serve the .html page to get around security restriction
 
  * In order to do that install a local http server on your machine:
 
-    > sudo npm install -g http-server
+    >> sudo npm install -g http-server
 
- * Navigate to "1 - viewer-offline/"
+ * Navigate to <b>"/1 - viewer-offline"</b> directory
 
-    > http-server
+    >> http-server
 
- * Note the local address output by the server, ex: <b>http://127.0.0.1:8080</b> and type to your browser: <b>http://127.0.0.1:8080/viewer-offline.html</b>
+ * Note the local address output by the server (ex: <b>http://127.0.0.1:8080</b>) and type in your browser: <b>http://127.0.0.1:8080/viewer-offline.html</b>
 
 ## Project #2 - viewer-barebone
 
@@ -60,12 +61,12 @@ Samples in this project do not require you to implement a server, but they rely 
 
      var token = '<Place your token here>'
 
-     // replace URN with one generated
-     // from corresponding credentials to the token above
      var urn = '<Place your URN here>'
 
  * You can open the files directly in browser or serve similar to project #1. The <b>viewer.html</b> is using the plain JavaScript viewer API,
- whereas <b>viewingApp.html</b> is using an extra layer of code from Autodesk which adds a UI to switch between viewables (for designs translated from Revit .rvt files)
+ whereas <b>viewingApp.html</b> is using an extra layer of code from Autodesk which adds a UI to switch between viewables (for designs translated from Revit .rvt files), see screenshot below:
+
+ ![Multiple Views](img/ScreenShot1.png)
 
 ## Project #3 - viewer+server
 ## Project #4 - viewer+server+oss
@@ -73,31 +74,45 @@ Samples in this project do not require you to implement a server, but they rely 
 
 The setup is similar for those 3 projects and they have to be run independently. Navigate with a command shell or terminal to the project you want to run.
 
+Those project are using [Webpack](https://webpack.github.io), a module bundler and NPM packages to build the frontend, so an extra build step is required.
+
 Mac OSX/Linux (Terminal)
 
-    npm install
-    export FORGE_CLIENT_ID=<<YOUR CLIENT ID FROM DEVELOPER PORTAL>>
-    export FORGE_CLIENT_SECRET=<<YOUR CLIENT SECRET>>
-    npm run build-dev (this runs a dev build and webpack in --watch mode)
-    npm run dev (runs the node server, do in another terminal if you want to keep the webpack watcher running)
+    >> npm install
+    >> export FORGE_CLIENT_ID=<<YOUR CLIENT ID FROM DEVELOPER PORTAL>>
+    >> export FORGE_CLIENT_SECRET=<<YOUR CLIENT SECRET>>
+    >> npm run build-dev (this runs a dev build and webpack in --watch mode)
+    >> npm run dev (runs the node server, do in another terminal if you want to keep the webpack watcher running)
 
 Windows (use <b>Node.js command line</b> from Start menu)
 
-    npm install
-    set FORGE_CLIENT_ID=<<YOUR CLIENT ID FROM DEVELOPER PORTAL>>
-    set FORGE_CLIENT_SECRET=<<YOUR CLIENT SECRET>>
-    npm run build-dev
-    npm run dev
+    >> npm install
+    >> set FORGE_CLIENT_ID=<<YOUR CLIENT ID FROM DEVELOPER PORTAL>>
+    >> set FORGE_CLIENT_SECRET=<<YOUR CLIENT SECRET>>
+    >> npm run build-dev
+    >> npm run dev
 
 Open the browser: [http://localhost:3000](http://localhost:3000).
 
 <b>Important:</b> do not use <b>npm start</b> locally, this is intended for PRODUCTION only with HTTPS (SSL) secure cookies.
+
+To run a production build, you can use command
+
+    >> npm run build-prod
+
+Or simply
+
+    >> nmp start
+
+Which will run a production build and start the server. A production build code is minified and function names are mangled which make it much smaller and impractical for debugging or reverse engineering.
 
 ### Deploy on Heroku
 
 To deploy this application to Heroku, the <b>Callback URL</b> must use your .herokuapp.com address. After clicking on the button below, at the Heroku Create New App page, set your Client ID & Secret and the correct callback URL.
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
+ ![Project5](img/ScreenShot2.png)
 
 # Tips & tricks
 
