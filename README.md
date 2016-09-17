@@ -58,6 +58,8 @@ although you may want to serve the .html page to get around security restriction
 
  * You can also run that sample from [this link](https://autodesk-forge.github.io/forge-boilers.nodejs/1%20-%20viewer-offline/viewer-offline.html), which in that case requires an internet connection
 
+![Project1](img/Project1.png)
+
 ## Project #2 - viewer-barebone
 
 Samples in this project do not require you to implement a server, but they rely on hardcoded token and URN in the JavaScript code, so they are for testing purpose only.
