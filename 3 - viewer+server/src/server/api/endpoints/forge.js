@@ -34,7 +34,7 @@ module.exports = function() {
       var forgeSvc = ServiceManager.getService(
         'ForgeSvc')
 
-      var token = await forgeSvc.requestToken(
+      var token = await forgeSvc.request2LeggedToken(
         'data:read')
 
       res.json(token)

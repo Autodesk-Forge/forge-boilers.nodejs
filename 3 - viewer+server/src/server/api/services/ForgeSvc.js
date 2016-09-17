@@ -80,7 +80,7 @@ export default class ForgeSvc extends BaseSvc {
 
         if (!token) {
 
-          token = await this.requestToken(
+          token = await this.request2LeggedToken(
             this._config.oauth.scope)
 
           this.set2LeggedToken(token)
@@ -88,7 +88,7 @@ export default class ForgeSvc extends BaseSvc {
 
         if (this.getExpiry(token) < 60) {
 
-          token = await this.requestToken(
+          token = await this.request2LeggedToken(
             this._config.oauth.scope)
 
           this.set2LeggedToken(token)
@@ -107,7 +107,7 @@ export default class ForgeSvc extends BaseSvc {
   // Request new 2-legged with specified scope
   //
   /////////////////////////////////////////////////////////////////
-  requestToken (scope) {
+  request2LeggedToken (scope) {
 
     return this._2leggedAPI.authenticate (
       this._config.oauth.clientId,

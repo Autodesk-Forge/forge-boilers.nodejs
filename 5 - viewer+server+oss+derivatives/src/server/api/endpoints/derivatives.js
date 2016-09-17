@@ -139,9 +139,6 @@ module.exports = function() {
 
     try {
 
-      console.log('manifest')
-      console.log(req.params.urn)
-
       var urn = req.params.urn
 
       var forgeSvc = ServiceManager.getService(

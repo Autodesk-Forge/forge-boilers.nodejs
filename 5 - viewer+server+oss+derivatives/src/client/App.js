@@ -24,8 +24,6 @@ import 'splitter.css'
 import 'jquery-ui'
 import 'app.css'
 
-var urn = 'urn:dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bGVlZnNtcC1mb3JnZS1wZXJzL3Rlc3QuZHdm'
-
 export default class App {
 
   constructor() {
@@ -63,14 +61,14 @@ export default class App {
 
         this.viewerPanel.initialize(viewerContainer)
 
-        var ossContainer =
+        var panelContainer =
          document.getElementById('oss')
 
         var appContainer =
           document.getElementById('appContainer')
 
         this.ossPanel.initialize(
-          ossContainer,
+          panelContainer,
           appContainer,
           viewerContainer)
 
@@ -113,7 +111,8 @@ export default class App {
   onToggleOSS () {
 
     $('.oss-panel').css({
-      display: this.$toggleOSS.hasClass('active') ? 'none' : 'block'
+      display: this.$toggleOSS.hasClass('active') ?
+        'none' : 'block'
     })
 
     this.$toggleOSS.toggleClass('active')

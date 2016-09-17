@@ -70,7 +70,7 @@ Samples in this project do not require you to implement a server, but they rely 
  * You can open the files directly in browser or serve similar to project #1. The <b>viewer.html</b> is using the plain JavaScript viewer API,
  whereas <b>viewingApp.html</b> is using an extra layer of code from Autodesk which adds a UI to switch between viewables (for designs translated from Revit .rvt files), see screenshot below:
 
- ![Multiple Views](img/ScreenShot1.png)
+ ![Multiple Views](img/Project2.png)
 
 ## Project #3 - viewer+server
 ## Project #4 - viewer+server+oss
@@ -113,22 +113,49 @@ Or simply
 
 Which will run a production build and start the server. A production build code is minified and function names are mangled which make it much smaller and impractical for debugging or reverse engineering.
 
-### Deploy on Heroku
 
-To deploy this application to Heroku, simply click on the button below, at the Heroku Create New App page, set your Client ID & Client Secret with your Forge API keys.
+### Deploy Project #5 on Heroku
+
+To deploy this project to Heroku, simply click on the button below, at the Heroku Create New App page:
+
+ * Set your Client ID & Client Secret with your Forge API keys
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
-By default project 5 is being deployed and the result should look like below: a treeview of the OSS storage that lets you upload designs and perform actions from the context menu.
+The result will look like below: a treeview of the OSS storage that lets you upload designs and perform actions from the context menu.
 
 To load a design in the viewer:
 
  * Right-click the root node to create a new bucket if you do not have any
  * Upload the design file to the bucket
- * Upon successful upload, the file appears in the bucket, right-click and select <b>Generate Viewable</b>
+ * Upon successful upload, the file appears in the bucket, right-click and select <b>Generate viewable</b>
  * Upon successful translation of the design, double-click the file and it will get loaded in the viewer
 
- ![Project5](img/ScreenShot2.png)
+ ![Project5](img/Project5.png)
+
+## Project #6 - viewer+server+data-mng+derivatives
+
+
+
+### Deploy Project #6 on Heroku
+
+To deploy this project to Heroku, simply click on the button below, at the Heroku Create New App page:
+
+ * Set your Client ID & Client Secret with your Forge API keys
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
+The result will look like below: a treeview of your Autodesk Cloud storage that lets you upload designs and perform actions from the context menu.
+
+To load a design in the viewer:
+
+ * Right-click the nodes to get options from the context menu
+ * Upload a design file to a folder
+ * Upon successful upload, the file appears under the parent node in the tree, right-click and select <b>Generate viewable</b>
+ * Upon successful translation of the design, double-click the file and it will get loaded in the viewer
+
+ ![Project6](img/Project6.png)
+
 
 # Tips & tricks
 

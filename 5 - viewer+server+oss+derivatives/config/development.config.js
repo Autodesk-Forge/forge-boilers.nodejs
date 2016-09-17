@@ -7,8 +7,9 @@
 module.exports = {
 
     clientConfig: {
-
-      token2LeggedUrl: '/api/forge/token/2legged'
+      forge: {
+        token2LeggedUrl: '/api/forge/token/2legged'
+      }
     },
 
     serverConfig: {

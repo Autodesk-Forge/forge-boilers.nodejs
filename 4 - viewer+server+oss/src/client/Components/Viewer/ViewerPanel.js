@@ -21,7 +21,7 @@ export default class ViewerPanel {
 
   constructor() {
 
-    this._tokenURL = config.token2LeggedUrl
+    this._tokenURL = config.forge.token2LeggedUrl
   }
 
   ///////////////////////////////////////////////////////////////////
