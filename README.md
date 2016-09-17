@@ -18,6 +18,7 @@ Those samples illustrates how to use the following Forge npm packages:
  * [forge.oauth2-js](https://github.com/Autodesk-Forge/forge.oauth2-js)
  * [forge.oss-js](https://github.com/Autodesk-Forge/forge.oss-js)
  * [forge.model.derivative-js](https://github.com/Autodesk-Forge/forge.model.derivative-js)
+ * [forge.data.management-js](https://github.com/Autodesk-Forge/forge.data.management-js)
 
 ## Prerequisites
 
@@ -55,6 +56,8 @@ although you may want to serve the .html page to get around security restriction
 
  * This project does not require any internet connection or Forge API credentials and can be used for testing the viewer API locally
 
+ * You can also run that sample from [this link](https://autodesk-forge.github.io/forge-boilers.nodejs/1%20-%20viewer-offline/viewer-offline.html), which in that case requires an internet connection
+
 ## Project #2 - viewer-barebone
 
 Samples in this project do not require you to implement a server, but they rely on hardcoded token and URN in the JavaScript code, so they are for testing purpose only.
@@ -63,9 +66,9 @@ Samples in this project do not require you to implement a server, but they rely 
 
  * Once you have a token and the URN of your model, replace in the hardcoded fields in <b>viewer.html</b> and <b>viewingApp.html</b>:
 
-    var token = '<< Place your token here >>'
+     var token = '<< Place your token here >>'
 
-    var urn = '<< Place your URN here >>'
+     var urn = '<< Place your URN here >>'
 
  * You can open the files directly in browser or serve similar to project #1. The <b>viewer.html</b> is using the plain JavaScript viewer API,
  whereas <b>viewingApp.html</b> is using an extra layer of code from Autodesk which adds a UI to switch between viewables (for designs translated from Revit .rvt files), see screenshot below:
