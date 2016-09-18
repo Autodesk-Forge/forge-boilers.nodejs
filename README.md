@@ -56,7 +56,10 @@ although you may want to serve the .html page to get around security restriction
 
  * This project does not require any internet connection or Forge API credentials and can be used for testing the viewer API locally
 
- * You can also run that sample from [this link](https://autodesk-forge.github.io/forge-boilers.nodejs/1%20-%20viewer-offline/viewer-offline.html), which in that case requires an internet connection
+ * You can also run that sample the following links, which in that case requires an internet connection:
+
+    ** [Engine](http://localhost:63342/forge-boilers.nodejs/1%20-%20viewer-offline/viewer-offline.html)
+    ** [Copter](http://localhost:63342/forge-boilers.nodejs/1%20-%20viewer-offline/viewer-offline.html?path=./copter/0.svf)
 
 ![Project1](img/Project1.png)
 
