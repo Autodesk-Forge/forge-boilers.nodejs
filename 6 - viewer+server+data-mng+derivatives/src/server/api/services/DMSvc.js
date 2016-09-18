@@ -266,16 +266,16 @@ export default class DMSvc extends BaseSvc {
 
         var filename = file.originalname
 
-        console.log('UPLOAD')
-
-        this._APIAuth.accessToken = token
-        this._projectsAPI.postStorage(
-          projectId,
-          JSON.stringify(createStoragePayload (folderId, filename))).then(
-            function (storage) {
-              console.log('STORAGE DM')
-              console.log(storage)
-            })
+        //console.log('UPLOAD')
+        //
+        //this._APIAuth.accessToken = token
+        //this._projectsAPI.postStorage(
+        //  projectId,
+        //  JSON.stringify(createStoragePayload (folderId, filename))).then(
+        //    function (storage) {
+        //      console.log('STORAGE DM')
+        //      console.log(storage)
+        //    })
 
         var storage = await this.createStorage(
           token, projectId, folderId, filename)
