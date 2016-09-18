@@ -15,7 +15,7 @@
     "install-boiler4": "npm install --prefix ./4\\ -\\ viewer+server+oss",
     "install-boiler5": "npm install --prefix ./5\\ -\\ viewer+server+oss+derivatives",
     "install-boiler6": "npm install --prefix ./6\\ -\\ viewer+server+data-mng+derivatives",
-    "postinstall": "npm run install-boiler6"
+    "postinstall": "npm run install-boiler5"
   },
   "repository": {
     "type": "git",
