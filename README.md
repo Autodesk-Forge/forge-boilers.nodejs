@@ -125,7 +125,7 @@ To deploy this project to Heroku, simply click on the button below, at the Herok
 
  * Set your Client ID & Client Secret with your Forge API keys
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/project5)
 
 The result will look like below: a treeview of the OSS storage that lets you upload designs and perform actions from the context menu.
 
@@ -148,7 +148,7 @@ To deploy this project to Heroku, simply click on the button below, at the Herok
 
  * Set your Client ID & Client Secret with your Forge API keys
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/project6)
 
 The result will look like below: a treeview of your Autodesk Cloud storage that lets you upload designs and perform actions from the context menu.
 
