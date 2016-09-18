@@ -3,7 +3,7 @@
 // PRODUCTION configuration
 //
 /////////////////////////////////////////////////////////////////////
-const HOST_URL = 'https://adsk-forge.herokuapp.com'
+const HOST_URL = process.env.HOST_URL
 
 module.exports = {
 
