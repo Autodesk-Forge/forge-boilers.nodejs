@@ -153,6 +153,8 @@ module.exports = function() {
           forgeSvc.set3LeggedTokenMaster(
             req.session, token)
 
+          console.log(req.session)
+
           // request a downgraded token to provide to client App
           // read-only for viewing
 
@@ -219,7 +221,7 @@ module.exports = function() {
     }
     catch (error) {
 
-      console.log(error)
+      console.log(req.session)
 
       res.status(error.statusCode || 404)
       res.json(error)
