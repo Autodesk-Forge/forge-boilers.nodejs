@@ -1,8 +1,8 @@
 {
   "name": "forge-boiler.nodejs",
-  "description": "Forge boiler: viewer + server + oss + derivatives",
+  "description": "Forge boiler: viewer + server",
   "repository": "https://github.com/Autodesk-Forge/forge-boilers.nodejs",
-  "logo": "http://viewer.autodesk.io/node/gallery/img/favicon.png",
+  "logo": "https://autodesk-forge.github.io/forge-boilers.nodejs/img/forge.png",
   "keywords": ["autodesk", "forge", "node", "express"],
   "env": {
     "NODE_ENV": {
