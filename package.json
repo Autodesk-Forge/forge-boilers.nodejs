@@ -10,7 +10,7 @@
   ],
   "license": "MIT",
   "scripts": {
-    "start": "npm start --prefix ./6\\ -\\ viewer+server+data-mng+derivatives",
+    "start": "npm start --prefix ./5\\ -\\ viewer+server+data-mng+derivatives",
     "install-boiler3": "npm install --prefix ./3\\ -\\ viewer+server",
     "install-boiler4": "npm install --prefix ./4\\ -\\ viewer+server+oss",
     "install-boiler5": "npm install --prefix ./5\\ -\\ viewer+server+oss+derivatives",
