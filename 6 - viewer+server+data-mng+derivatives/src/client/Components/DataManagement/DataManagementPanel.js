@@ -607,6 +607,13 @@ class DMTreeDelegate extends BaseTreeDelegate {
 
       case 'hubs':
 
+        node.showLoader(true)
+
+        node.on('childrenLoaded', (children) => {
+
+          node.showLoader(false)
+        })
+
         this.dmAPI.getProjects(
           node.id).then((projects) => {
 

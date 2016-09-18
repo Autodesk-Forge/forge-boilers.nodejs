@@ -16,7 +16,7 @@
       "description": "Your Forge Client Secret API Key"
     },
     "HOST_URL": {
-      "description": "Host url: for heroku App use 'myApp.herokuapp.com', where 'myApp' is name of your app"
+      "description": "Host url: for heroku App use 'myApp.herokuapp.com', where 'myApp' is name of your app. Important: the name of your App needs to match the callback URL you specified on Forge Developer Portal"
     }
   }
 }

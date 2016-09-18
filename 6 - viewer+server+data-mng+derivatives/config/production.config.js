@@ -3,7 +3,6 @@
 // PRODUCTION configuration
 //
 /////////////////////////////////////////////////////////////////////
-const HOST_URL = process.env.HOST_URL
 
 module.exports = {
 
@@ -14,7 +13,7 @@ module.exports = {
       token2LeggedUrl: '/api/forge/token/2legged'
     },
 
-    host: HOST_URL,
+    host: process.env.HOST_URL,
     port: 443
   },
 
@@ -26,7 +25,7 @@ module.exports = {
 
       oauth: {
 
-        redirectUri: `${HOST_URL}/api/forge/oauth/callback`,
+        redirectUri: `${process.env.HOST_URL}/api/forge/oauth/callback`,
         authenticationUri: '/authentication/v1/authenticate',
         refreshTokenUri: '/authentication/v1/refreshtoken',
         authorizationUri: '/authentication/v1/authorize',
