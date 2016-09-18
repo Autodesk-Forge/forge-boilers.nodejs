@@ -58,8 +58,8 @@ although you may want to serve the .html page to get around security restriction
 
  * You can also run that sample the following links, which in that case requires an internet connection:
 
-    ** [Engine](http://localhost:63342/forge-boilers.nodejs/1%20-%20viewer-offline/viewer-offline.html)
-    ** [Copter](http://localhost:63342/forge-boilers.nodejs/1%20-%20viewer-offline/viewer-offline.html?path=./copter/0.svf)
+    * [Engine](http://localhost:63342/forge-boilers.nodejs/1%20-%20viewer-offline/viewer-offline.html)
+    * [Copter](http://localhost:63342/forge-boilers.nodejs/1%20-%20viewer-offline/viewer-offline.html?path=./copter/0.svf)
 
 ![Project1](img/Project1.png)
 
