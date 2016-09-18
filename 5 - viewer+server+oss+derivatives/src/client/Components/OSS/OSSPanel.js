@@ -91,13 +91,13 @@ export default class OSSPanel extends EventsEmitter {
 
           console.log(response)
 
-          let bucketNode = {
+          let bucketNode = new TreeNode({
             bucketKey: response.bucketKey,
             name: response.bucketKey,
             id: response.bucketKey,
             type: 'oss.bucket',
             group: true
-          }
+          })
 
           data.node.addChild(bucketNode)
 

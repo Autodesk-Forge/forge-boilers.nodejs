@@ -109,7 +109,7 @@ export default class OssSvc extends BaseSvc {
   // Creates a new bucket
   //
   /////////////////////////////////////////////////////////////////
-  createBucket (token, bucketCreationData, opts = {}) {
+  createBucket (token, bucketCreationData, headers = {}) {
 
     bucketCreationData.bucketKey = validateBucketKey(
       bucketCreationData.bucketKey)
@@ -117,8 +117,8 @@ export default class OssSvc extends BaseSvc {
     bucketCreationData.policyKey = validatePolicyKey(
       bucketCreationData.policyKey)
 
-    opts = Object.assign({
-      xAdsRegion: 'US'}, opts)
+    headers = Object.assign({
+      xAdsRegion: 'US'}, headers)
 
     this._APIAuth.accessToken = token
 
