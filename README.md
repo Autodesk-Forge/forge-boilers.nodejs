@@ -56,7 +56,10 @@ although you may want to serve the .html page to get around security restriction
 
  * This project does not require any internet connection or Forge API credentials and can be used for testing the viewer API locally
 
- * You can also run that sample from [this link](https://autodesk-forge.github.io/forge-boilers.nodejs/1%20-%20viewer-offline/viewer-offline.html), which in that case requires an internet connection
+ * You can also run that sample the following links, which in that case requires an internet connection:
+
+    * [Engine](https://autodesk-forge.github.io/forge-boilers.nodejs/1%20-%20viewer-offline/viewer-offline.html)
+    * [Copter](https://autodesk-forge.github.io/forge-boilers.nodejs/1%20-%20viewer-offline/viewer-offline.html?path=./copter/0.svf)
 
 ![Project1](img/Project1.png)
 
@@ -125,7 +128,7 @@ To deploy this project to Heroku, simply click on the button below, at the Herok
 
  * Set your Client ID & Client Secret with your Forge API keys
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/project5)
 
 The result will look like below: a treeview of the OSS storage that lets you upload designs and perform actions from the context menu.
 
@@ -148,7 +151,7 @@ To deploy this project to Heroku, simply click on the button below, at the Herok
 
  * Set your Client ID & Client Secret with your Forge API keys
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/project6)
 
 The result will look like below: a treeview of your Autodesk Cloud storage that lets you upload designs and perform actions from the context menu.
 
@@ -184,6 +187,5 @@ See [nodemon](https://github.com/remy/nodemon) for more details.
 Written by [Philippe Leefsma](http://twitter.com/F3lipek)
 
 Forge Partner Development
-
 [http://forge.autodesk.com](http://forge.autodesk.com)
 
