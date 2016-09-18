@@ -231,9 +231,12 @@ module.exports = function() {
         bucketKey,
         objectKey)
 
-      res.end(response)
+      res.json(response)
 
-    } catch(ex) {
+    } catch (ex) {
+
+      console.log('ERROR DELETE')
+      console.log(ex)
 
       res.status(ex.statusCode || 500)
       res.json(ex)

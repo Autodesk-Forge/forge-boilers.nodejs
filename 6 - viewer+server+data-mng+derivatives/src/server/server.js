@@ -48,6 +48,7 @@ import DMSvc from './api/services/DMSvc'
 var app = express()
 
 app.set('trust proxy', 1)
+
 app.use(session({
   secret: 'autodeskforge',
   cookie: {

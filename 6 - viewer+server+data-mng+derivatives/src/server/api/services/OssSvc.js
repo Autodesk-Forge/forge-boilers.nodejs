@@ -124,7 +124,7 @@ export default class OssSvc extends BaseSvc {
 
     return this._bucketsAPI.createBucket(
       bucketCreationData,
-      headers, opts)
+      headers)
   }
 
   /////////////////////////////////////////////////////////////////
@@ -250,7 +250,7 @@ export default class OssSvc extends BaseSvc {
 
     this._APIAuth.accessToken = token
 
-    return this._objectsAPI.getObject(
+    return this._objectsAPI.deleteObject(
       bucketKey,
       objectKey)
   }
@@ -332,7 +332,7 @@ function requestAsync(params) {
           return reject(response.statusMessage)
         }
 
-        return resolve(body.data || body)
+        return resolve(body ? (body.data || body) : {})
       }
       catch(ex){
 

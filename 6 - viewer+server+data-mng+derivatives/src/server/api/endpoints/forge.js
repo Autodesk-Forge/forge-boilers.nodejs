@@ -147,13 +147,8 @@ module.exports = function() {
             scope: config.forge.oauth.scope
           }
 
-          console.log('TOKEN')
-          console.log(token)
-
           forgeSvc.set3LeggedTokenMaster(
             req.session, token)
-
-          console.log(req.session)
 
           // request a downgraded token to provide to client App
           // read-only for viewing
@@ -176,8 +171,6 @@ module.exports = function() {
             })
         }
         catch(ex){
-
-          console.log(ex)
 
           res.status(500)
           res.end(ex)
@@ -220,8 +213,6 @@ module.exports = function() {
       })
     }
     catch (error) {
-
-      console.log(req.session)
 
       res.status(error.statusCode || 404)
       res.json(error)

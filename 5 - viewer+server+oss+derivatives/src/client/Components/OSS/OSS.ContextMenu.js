@@ -26,7 +26,7 @@ export default class OSSContextMenu extends
       case 'oss.root':
 
         menu.push({
-          title: 'Create Bucket',
+          title: 'Create bucket',
           target: () => {
             this.emit('context.oss.createBucket', {
               event,
@@ -55,7 +55,7 @@ export default class OSSContextMenu extends
         if (node.manifest) {
 
           menu.push({
-            title: 'Show Manifest',
+            title: 'Show manifest',
             target: () => {
               this.emit('context.manifest.show', {
                 event, node
@@ -64,23 +64,34 @@ export default class OSSContextMenu extends
           })
 
           menu.push({
-            title: 'Delete Manifest',
+            title: 'Delete manifest',
             target: () => {
               this.emit('context.manifest.delete', {
                 event, node
               })
             }
           })
-        }
 
-        menu.push({
-          title: 'Generate Viewable',
-          target: () => {
-            this.emit('context.viewable', {
-              event, node
-            })
-          }
-        })
+          menu.push({
+            title: 'Re-generate viewable',
+            target: () => {
+              this.emit('context.viewable', {
+                event, node
+              })
+            }
+          })
+
+        } else {
+
+          menu.push({
+            title: 'Generate viewable',
+            target: () => {
+              this.emit('context.viewable', {
+                event, node
+              })
+            }
+          })
+        }
 
         menu.push({
           title: 'Object details',

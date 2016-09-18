@@ -107,15 +107,19 @@ export default class OSSPanel extends EventsEmitter {
       })
     })
 
-    this.contextMenu.on('context.oss.object.delete', async(data) => {
+    this.contextMenu.on('context.oss.object.delete', async(data) =>{
 
       console.log('Deleting object: ' + data.node.objectKey)
+
+      data.node.showLoader(true)
 
       let response = await this.ossAPI.deleteObject(
         data.node.bucketKey,
         data.node.objectKey)
 
       console.log(response)
+
+      data.node.remove()
     })
 
     this.contextMenu.on('context.manifest.show', (data) => {
@@ -490,6 +494,10 @@ class OSSTreeDelegate extends BaseTreeDelegate {
     node.collapse = () => {
       $(parent).parent().removeClass('expanded')
       $(parent).parent().addClass('collapsed')
+    }
+
+    node.remove = () => {
+      $(`group[lmv-nodeid='${node.id}']`).remove()
     }
 
     let loadDivId = guid()

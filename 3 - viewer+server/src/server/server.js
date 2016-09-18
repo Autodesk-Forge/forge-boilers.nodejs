@@ -39,10 +39,11 @@ import ForgeSvc from './api/services/ForgeSvc'
 /////////////////////////////////////////////////////////////////////
 var app = express()
 
+app.set('trust proxy', 1)
+
 app.use(session({
   secret: 'autodeskforge',
   cookie: {
-    httpOnly: true,
     secure: (process.env.NODE_ENV === 'production'), //requires https
     maxAge: 1000 * 60 * 60 * 24 // 24h session
   },

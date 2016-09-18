@@ -68,7 +68,10 @@ export default class OSSAPI extends ClientAPI {
       `${bucketKey}/objects/` +
       `${objectKey}`
 
-    return this.ajax(url)
+    return this.ajax({
+      url: url,
+      type: 'DELETE'
+    })
   }
 
   ///////////////////////////////////////////////////////////////////
@@ -83,13 +86,14 @@ export default class OSSAPI extends ClientAPI {
       bucketCreationData
     }
 
-    return this.fetch(url, {
+    return this.ajax({
+      url: url,
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(payload)
+      data: JSON.stringify(payload)
     })
   }
 
