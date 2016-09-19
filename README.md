@@ -147,10 +147,10 @@ To run the project locally (using the DEV API keys):
  * Run the following commands:
 
     > npm install
-    > set FORGE_DEV_CLIENT_ID=<<YOUR DEV CLIENT ID FROM DEVELOPER PORTAL>
-    > set FORGE_DEV_CLIENT_SECRET=<<YOUR DEV CLIENT SECRET>
-    > npm run build-dev
-    > npm run dev
+    > set HOST_URL=https://mydomain.com
+    > set FORGE_CLIENT_ID=<<YOUR CLIENT ID FROM DEVELOPER PORTAL>
+    > set FORGE_CLIENT_SECRET=<<YOUR CLIENT SECRET>
+    > npm start
 
  ![forge-dev](img/forge-dev.png)
 
