@@ -142,13 +142,37 @@ To load a design in the viewer:
 
 ## Project #6 - viewer+server+data-mng+derivatives
 
+Same setup than for projects #3, #4, #5 but you also need a valid callback url to achieve 3-legged oauth authentication.
+I recommend you create 2 sets of Forge API keys, one for DEVELOPMENT and one for PRODUCTION because each set has a different callback url
 
+To run the project locally (using the DEV API keys):
+
+ * Make sure the callback url for your DEV Forge API Keys is set to <b>http://localhost:3000/api/forge/callback/oauth</b>
+ * Run the following commands:
+
+     > npm install
+     > set FORGE_DEV_CLIENT_ID=<<YOUR DEV CLIENT ID FROM DEVELOPER PORTAL>
+     > set FORGE_DEV_CLIENT_SECRET=<<YOUR DEV CLIENT SECRET>
+     > npm run build-dev
+     > npm run dev
+
+ ![forge-dev](img/forge-dev.png)
+
+To run in production, the callback url defined in your Forge App needs to match the host url, so if you run your app from <b>mydomain.com</b>:
+
+    > npm install
+    > set HOST_URL=mydomain.com
+    > set FORGE_CLIENT_ID=<<YOUR CLIENT ID FROM DEVELOPER PORTAL>
+    > set FORGE_CLIENT_SECRET=<<YOUR CLIENT SECRET>
+    > npm run build-dev
+    > npm run dev
 
 ### Deploy Project #6 on Heroku
 
 To deploy this project to Heroku, simply click on the button below, at the Heroku Create New App page:
 
  * Set your Client ID & Client Secret with your Forge API keys
+ * Specify HOST_URL env variable based on the name of your Heroku App: ex You used "MyApp" -> HOST_URL=https://MyApp.herokuapp.com
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/project6)
 

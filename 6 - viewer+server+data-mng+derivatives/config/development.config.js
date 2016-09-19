@@ -3,7 +3,7 @@
 // DEVELOPMENT configuration
 //
 /////////////////////////////////////////////////////////////////////
-const HOST_URL = 'http://local.dev.com'
+const HOST_URL = 'http://localhost'
 
 module.exports = {
 
@@ -14,7 +14,7 @@ module.exports = {
         token2LeggedUrl: '/api/forge/token/2legged'
       },
 
-      host: 'http://local.dev.com',
+      host: `${HOST_URL}`,
       port: 3000
     },
 
