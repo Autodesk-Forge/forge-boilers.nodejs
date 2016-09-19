@@ -146,11 +146,16 @@ To run the project locally (using the DEV API keys):
  * Make sure the callback url for your DEV Forge API Keys is set to <b>http://localhost:3000/api/forge/callback/oauth</b>
  * Run the following commands:
 
-  
+
+
     > npm install
+
     > set HOST_URL=https://mydomain.com
+
     > set FORGE_CLIENT_ID=<<YOUR CLIENT ID FROM DEVELOPER PORTAL>
+
     > set FORGE_CLIENT_SECRET=<<YOUR CLIENT SECRET>
+
     > npm start
 
  ![forge-dev](img/forge-dev.png)
@@ -170,6 +175,7 @@ To deploy this project to Heroku, simply click on the button below, at the Herok
  * Set your Client ID & Client Secret with your Forge API keys
  * Specify HOST_URL env variable based on the name of your Heroku App:
  ex You used "MyApp" -> HOST_URL=https://MyApp.herokuapp.com
+ * Your Forge App callback must be set to <b>https://MyApp.herokuapp.com/api/forge/callback/oauth</b>
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/project6)
 
@@ -207,5 +213,6 @@ See [nodemon](https://github.com/remy/nodemon) for more details.
 Written by [Philippe Leefsma](http://twitter.com/F3lipek)
 
 Forge Partner Development
+
 [http://forge.autodesk.com](http://forge.autodesk.com)
 
