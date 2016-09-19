@@ -28,9 +28,8 @@ export default class OSSContextMenu extends
         menu.push({
           title: 'Create bucket',
           target: () => {
-            this.emit('context.oss.createBucket', {
-              event,
-              node
+            this.emit('context.oss.bucket.create', {
+              event, node
             })
           }
         })
@@ -42,8 +41,17 @@ export default class OSSContextMenu extends
         menu.push({
           title: 'Bucket details',
           target: () => {
-            this.emit('context.details', {
-              event, node, title: 'Bucket Details'
+            this.emit('context.oss.details', {
+              event, node
+            })
+          }
+        })
+
+        menu.push({
+          title: 'Delete bucket',
+          target: () => {
+            this.emit('context.oss.bucket.delete', {
+              event, node
             })
           }
         })
@@ -57,7 +65,7 @@ export default class OSSContextMenu extends
           menu.push({
             title: 'Show manifest',
             target: () => {
-              this.emit('context.manifest.show', {
+              this.emit('context.derivatives.manifest.show', {
                 event, node
               })
             }
@@ -66,7 +74,7 @@ export default class OSSContextMenu extends
           menu.push({
             title: 'Delete manifest',
             target: () => {
-              this.emit('context.manifest.delete', {
+              this.emit('context.derivatives.manifest.delete', {
                 event, node
               })
             }
@@ -75,7 +83,7 @@ export default class OSSContextMenu extends
           menu.push({
             title: 'Re-generate viewable',
             target: () => {
-              this.emit('context.viewable', {
+              this.emit('context.derivatives.viewable.create', {
                 event, node
               })
             }
@@ -86,7 +94,7 @@ export default class OSSContextMenu extends
           menu.push({
             title: 'Generate viewable',
             target: () => {
-              this.emit('context.viewable', {
+              this.emit('context.derivatives.viewable.create', {
                 event, node
               })
             }
@@ -96,8 +104,8 @@ export default class OSSContextMenu extends
         menu.push({
           title: 'Object details',
           target: () => {
-            this.emit('context.details', {
-              event, node, title: 'Object Details'
+            this.emit('context.oss.details', {
+              event, node
             })
           }
         })

@@ -204,6 +204,39 @@ module.exports = function() {
   })
 
   /////////////////////////////////////////////////////////////////////////////
+  // DELETE /buckets/:bucketKey
+  //
+  //
+  /////////////////////////////////////////////////////////////////////////////
+  router.delete('/buckets/:bucketKey', async (req, res) =>{
+
+    try {
+
+      var bucketKey = req.params.bucketKey
+
+      var forgeSvc = ServiceManager.getService(
+        'ForgeSvc')
+
+      var ossSvc = ServiceManager.getService(
+        'OssSvc')
+
+      var token = await forgeSvc.request2LeggedToken(
+        'bucket:delete')
+
+      var response = await ossSvc.deleteBucket(
+        token.access_token,
+        bucketKey)
+
+      res.json(response)
+
+    } catch (ex) {
+
+      res.status(ex.statusCode || 500)
+      res.json(ex)
+    }
+  })
+
+  /////////////////////////////////////////////////////////////////////////////
   // DELETE /buckets/:bucketKey/objects/:objectKey
   //
   //
@@ -232,9 +265,6 @@ module.exports = function() {
       res.json(response)
 
     } catch (ex) {
-
-      console.log('ERROR DELETE')
-      console.log(ex)
 
       res.status(ex.statusCode || 500)
       res.json(ex)

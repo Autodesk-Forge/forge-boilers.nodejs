@@ -59,7 +59,7 @@ export default class OSSPanel extends EventsEmitter {
       container: domContainer
     })
 
-    this.contextMenu.on('context.details', (data) => {
+    this.contextMenu.on('context.oss.details', (data) => {
 
       if(data.node.details) {
 
@@ -67,7 +67,7 @@ export default class OSSPanel extends EventsEmitter {
       }
     })
 
-    this.contextMenu.on('context.oss.createBucket', (data) => {
+    this.contextMenu.on('context.oss.bucket.create', (data) => {
 
       let modal = new CreateBucketPanel(appContainer)
 
@@ -107,6 +107,20 @@ export default class OSSPanel extends EventsEmitter {
       })
     })
 
+    this.contextMenu.on('context.oss.bucket.delete', async(data) =>{
+
+      console.log('Deleting bucket: ' + data.node.bucketKey)
+
+      data.node.showLoader(true)
+
+      let response = await this.ossAPI.deleteBucket(
+        data.node.bucketKey)
+
+      console.log(response)
+
+      data.node.remove()
+    })
+
     this.contextMenu.on('context.oss.object.delete', async(data) =>{
 
       console.log('Deleting object: ' + data.node.objectKey)
@@ -122,7 +136,7 @@ export default class OSSPanel extends EventsEmitter {
       data.node.remove()
     })
 
-    this.contextMenu.on('context.manifest.show', (data) => {
+    this.contextMenu.on('context.derivatives.manifest.show', (data) => {
 
       let urn = window.btoa(data.node.details.objectId).replace(
         new RegExp('=', 'g'), '')
@@ -134,7 +148,7 @@ export default class OSSPanel extends EventsEmitter {
       link.click()
     })
 
-    this.contextMenu.on('context.manifest.delete', (data) => {
+    this.contextMenu.on('context.derivatives.manifest.delete', (data) => {
 
       let urn = window.btoa(data.node.details.objectId).replace(
         new RegExp('=', 'g'), '')
@@ -147,7 +161,7 @@ export default class OSSPanel extends EventsEmitter {
       })
     })
 
-    this.contextMenu.on('context.viewable', async(data) => {
+    this.contextMenu.on('context.derivatives.viewable.create', async(data) => {
 
       try {
 

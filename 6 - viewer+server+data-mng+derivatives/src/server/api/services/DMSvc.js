@@ -16,17 +16,15 @@ export default class DMSvc extends BaseSvc {
     super(opts)
     
     this._config.endPoints = {
-
-        user:            'https://developer.api.autodesk.com' + '/userprofile/'    + 'v1' + '/users/@me',
-
-        hubs:            'https://developer.api.autodesk.com' + '/project/'        + 'v1' + '/hubs',
-        projects:        'https://developer.api.autodesk.com' + '/project/'        + 'v1' + '/hubs/%s/projects',
-        project:         'https://developer.api.autodesk.com' + '/project/'        + 'v1' + '/hubs/%s/projects/%s',
-        storage:         'https://developer.api.autodesk.com' + '/data/'           + 'v1' + '/projects/%s/storage',
-        folderContent:   'https://developer.api.autodesk.com' + '/data/'           + 'v1' + '/projects/%s/folders/%s/contents',
-        itemVersions:    'https://developer.api.autodesk.com' + '/data/'           + 'v1' + '/projects/%s/items/%s/versions',
-        versions:        'https://developer.api.autodesk.com' + '/data/'           + 'v1' + '/projects/%s/versions',
-        items:           'https://developer.api.autodesk.com' + '/data/'           + 'v1' + '/projects/%s/items'
+        user:            'https://developer.api.autodesk.com' + '/userprofile/' + 'v1' + '/users/@me',
+        hubs:            'https://developer.api.autodesk.com' + '/project/'     + 'v1' + '/hubs',
+        projects:        'https://developer.api.autodesk.com' + '/project/'     + 'v1' + '/hubs/%s/projects',
+        project:         'https://developer.api.autodesk.com' + '/project/'     + 'v1' + '/hubs/%s/projects/%s',
+        storage:         'https://developer.api.autodesk.com' + '/data/'        + 'v1' + '/projects/%s/storage',
+        folderContent:   'https://developer.api.autodesk.com' + '/data/'        + 'v1' + '/projects/%s/folders/%s/contents',
+        itemVersions:    'https://developer.api.autodesk.com' + '/data/'        + 'v1' + '/projects/%s/items/%s/versions',
+        versions:        'https://developer.api.autodesk.com' + '/data/'        + 'v1' + '/projects/%s/versions',
+        items:           'https://developer.api.autodesk.com' + '/data/'        + 'v1' + '/projects/%s/items'
     }
 
     this._APIAuth =
@@ -34,6 +32,10 @@ export default class DMSvc extends BaseSvc {
         'oauth2_application']
 
     this._projectsAPI = new ForgeDataManagement.ProjectsApi()
+    this._versionsAPI = new ForgeDataManagement.VersionsApi()
+    this._foldersAPI = new ForgeDataManagement.FoldersApi()
+    this._itemsAPI = new ForgeDataManagement.ItemsApi()
+    this._hubsAPI = new ForgeDataManagement.HubsApi()
   }
 
   /////////////////////////////////////////////////////////////////
