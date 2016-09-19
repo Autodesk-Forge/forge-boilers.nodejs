@@ -110,13 +110,9 @@ Open your browser at:
 
 <b>Important:</b> the <b>npm start</b> command, this is intended for <b>PRODUCTION</b> with HTTPS (SSL) secure cookies.
 
-To run a production build, you can use command
+To run a production build you can use start command:
 
-    > npm run build-prod
-
-Or simply
-
-    > nmp start
+    > npm start
 
 Which will run a production build and start the server. A production build code is minified and function names are mangled which make it much smaller and impractical for debugging or reverse engineering.
 
