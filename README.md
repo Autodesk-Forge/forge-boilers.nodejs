@@ -139,13 +139,14 @@ To load a design in the viewer:
 ## Project #6 - viewer+server+data-mng+derivatives
 
 Same setup than for projects #3, #4, #5 but you also need a valid callback url to achieve 3-legged oauth authentication.
-I recommend you create 2 sets of Forge API keys, one for DEVELOPMENT and one for PRODUCTION because each set has a different callback url
+I recommend you create 2 sets of Forge API keys, one for DEVELOPMENT and one for PRODUCTION because each set has a different callback url.
 
 To run the project locally (using the DEV API keys):
 
  * Make sure the callback url for your DEV Forge API Keys is set to <b>http://localhost:3000/api/forge/callback/oauth</b>
  * Run the following commands:
 
+  
     > npm install
     > set HOST_URL=https://mydomain.com
     > set FORGE_CLIENT_ID=<<YOUR CLIENT ID FROM DEVELOPER PORTAL>
