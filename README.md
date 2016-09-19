@@ -144,21 +144,17 @@ I recommend you create 2 sets of Forge API keys, one for DEVELOPMENT and one for
 To run the project locally (using the DEV API keys):
 
  * Make sure the callback url for your DEV Forge API Keys is set to <b>http://localhost:3000/api/forge/callback/oauth</b>
- * Run the following commands:
 
+![forge-dev](img/forge-dev.png)
 
+Run the following commands:
 
     > npm install
-
     > set HOST_URL=https://mydomain.com
-
     > set FORGE_CLIENT_ID=<<YOUR CLIENT ID FROM DEVELOPER PORTAL>
-
     > set FORGE_CLIENT_SECRET=<<YOUR CLIENT SECRET>
-
     > npm start
 
- ![forge-dev](img/forge-dev.png)
 
 To run in production, the callback url defined in your Forge App needs to match the host url, so if you run your app from <b>https://mydomain.com</b>:
 
