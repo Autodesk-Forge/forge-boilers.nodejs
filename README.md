@@ -150,29 +150,29 @@ To run the project locally (using the DEV API keys):
  * Make sure the callback url for your DEV Forge API Keys is set to <b>http://localhost:3000/api/forge/callback/oauth</b>
  * Run the following commands:
 
-     > npm install
-     > set FORGE_DEV_CLIENT_ID=<<YOUR DEV CLIENT ID FROM DEVELOPER PORTAL>
-     > set FORGE_DEV_CLIENT_SECRET=<<YOUR DEV CLIENT SECRET>
-     > npm run build-dev
-     > npm run dev
+    > npm install
+    > set FORGE_DEV_CLIENT_ID=<<YOUR DEV CLIENT ID FROM DEVELOPER PORTAL>
+    > set FORGE_DEV_CLIENT_SECRET=<<YOUR DEV CLIENT SECRET>
+    > npm run build-dev
+    > npm run dev
 
  ![forge-dev](img/forge-dev.png)
 
-To run in production, the callback url defined in your Forge App needs to match the host url, so if you run your app from <b>mydomain.com</b>:
+To run in production, the callback url defined in your Forge App needs to match the host url, so if you run your app from <b>https://mydomain.com</b>:
 
     > npm install
-    > set HOST_URL=mydomain.com
+    > set HOST_URL=https://mydomain.com
     > set FORGE_CLIENT_ID=<<YOUR CLIENT ID FROM DEVELOPER PORTAL>
     > set FORGE_CLIENT_SECRET=<<YOUR CLIENT SECRET>
-    > npm run build-dev
-    > npm run dev
+    > npm start
 
 ### Deploy Project #6 on Heroku
 
 To deploy this project to Heroku, simply click on the button below, at the Heroku Create New App page:
 
  * Set your Client ID & Client Secret with your Forge API keys
- * Specify HOST_URL env variable based on the name of your Heroku App: ex You used "MyApp" -> HOST_URL=https://MyApp.herokuapp.com
+ * Specify HOST_URL env variable based on the name of your Heroku App:
+ ex You used "MyApp" -> HOST_URL=https://MyApp.herokuapp.com
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/project6)
 
