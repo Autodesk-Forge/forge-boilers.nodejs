@@ -60,7 +60,7 @@ although you may want to serve the .html page to get around security restriction
     * [Engine](https://autodesk-forge.github.io/forge-boilers.nodejs/1%20-%20viewer-offline/viewer-offline.html)
     * [Copter](https://autodesk-forge.github.io/forge-boilers.nodejs/1%20-%20viewer-offline/viewer-offline.html?path=./copter/0.svf)
 
-![Project1](img/Project1.png)
+![Project1](resources/img/Project1.png)
 
 ## Project #2 - viewer-barebone
 
@@ -77,7 +77,7 @@ Samples in this project do not require you to implement a server, but they rely 
  * You can open the files directly in browser or serve similar to project #1. The <b>viewer.html</b> is using the plain JavaScript viewer API,
  whereas <b>viewingApp.html</b> is using an extra layer of code from Autodesk which adds a UI to switch between viewables (for designs translated from Revit .rvt files), see screenshot below:
 
- ![Multiple Views](img/Project2.png)
+ ![Multiple Views](resources/img/Project2.png)
 
 ## Project #3 - viewer+server
 ## Project #4 - viewer+server+oss
@@ -134,7 +134,7 @@ To load a design in the viewer:
  * Upon successful upload, the file appears in the bucket, right-click and select <b>Generate viewable</b>
  * Upon successful translation of the design, double-click the file and it will get loaded in the viewer
 
- ![Project5](img/Project5.png)
+ ![Project5](resources/img/Project5.png)
 
 ## Project #6 - viewer+server+data-mng+derivatives
 
@@ -143,9 +143,9 @@ I recommend you create 2 sets of Forge API keys, one for DEVELOPMENT and one for
 
 To run the project locally (using the DEV API keys):
 
- * Make sure the callback url for your DEV Forge API Keys is set to <b>http://localhost:3000/api/forge/callback/oauth</b>
+ * Make sure the callback url for your DEV Forge API Keys is set to <b>http://localhost:3000/api/forge/oauth/callback</b>
 
-![forge-dev](img/forge-dev.png)
+![forge-dev](resources/img/forge-dev.png)
 
 Run the following commands (mind the DEV!):
 
@@ -184,7 +184,7 @@ To load a design in the viewer:
  * Upon successful upload, the file appears under the parent node in the tree, right-click and select <b>Generate viewable</b>
  * Upon successful translation of the design, double-click the file and it will get loaded in the viewer
 
- ![Project6](img/Project6.png)
+ ![Project6](resources/img/Project6.png)
 
 
 # Tips & tricks
