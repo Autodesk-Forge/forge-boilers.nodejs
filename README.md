@@ -143,7 +143,7 @@ I recommend you create 2 sets of Forge API keys, one for DEVELOPMENT and one for
 
 To run the project locally (using the DEV API keys):
 
- * Make sure the callback url for your DEV Forge API Keys is set to <b>http://localhost:3000/api/forge/oauth/callback</b>
+ * Make sure the callback url for your DEV Forge API Keys is set to <b>http://localhost:3000/api/forge/callback/oauth</b>
 
 ![forge-dev](resources/img/forge-dev.png)
 

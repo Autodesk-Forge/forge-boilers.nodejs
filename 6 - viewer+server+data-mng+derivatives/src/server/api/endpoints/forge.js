@@ -100,7 +100,7 @@ module.exports = function() {
   //  }
   //
   /////////////////////////////////////////////////////////////////////////////
-  router.get('/oauth/callback', (req, res) => {
+  router.get('/callback/oauth', (req, res) => {
 
     var socketSvc = ServiceManager.getService(
       'SocketSvc')

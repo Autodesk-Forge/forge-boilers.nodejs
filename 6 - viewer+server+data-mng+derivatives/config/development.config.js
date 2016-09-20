@@ -26,7 +26,7 @@ module.exports = {
 
           oauth: {
 
-              redirectUri: `${HOST_URL}:3000/api/forge/oauth/callback`,
+              redirectUri: `${HOST_URL}:3000/api/forge/callback/oauth`,
               authenticationUri: '/authentication/v1/authenticate',
               refreshTokenUri: '/authentication/v1/refreshtoken',
               authorizationUri: '/authentication/v1/authorize',
