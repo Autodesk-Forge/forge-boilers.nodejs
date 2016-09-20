@@ -80,8 +80,6 @@ module.exports = function() {
   /////////////////////////////////////////////////////////////////////////////
   router.post('/logout', (req, res) => {
 
-    console.log('LOGOUT')
-
     var forgeSvc = ServiceManager.getService(
       'ForgeSvc')
 

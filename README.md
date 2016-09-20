@@ -130,7 +130,7 @@ The result will look like below: a treeview of the OSS storage that lets you upl
 To load a design in the viewer:
 
  * Right-click the root node to create a new bucket if you do not have any
- * Upload the design file to the bucket
+ * Upload the design file to the bucket (supports file selection dialog or drag & drop)
  * Upon successful upload, the file appears in the bucket, right-click and select <b>Generate viewable</b>
  * Upon successful translation of the design, double-click the file and it will get loaded in the viewer
 
@@ -147,13 +147,13 @@ To run the project locally (using the DEV API keys):
 
 ![forge-dev](img/forge-dev.png)
 
-Run the following commands:
+Run the following commands (mind the DEV!):
 
     > npm install
-    > set HOST_URL=https://mydomain.com
-    > set FORGE_CLIENT_ID=<<YOUR CLIENT ID FROM DEVELOPER PORTAL>
-    > set FORGE_CLIENT_SECRET=<<YOUR CLIENT SECRET>
-    > npm start
+    > set FORGE_DEV_CLIENT_ID=<<YOUR DEV CLIENT ID FROM DEVELOPER PORTAL>
+    > set FORGE_DEV_CLIENT_SECRET=<<YOUR DEV CLIENT SECRET>
+    > npm run build-dev
+    > npm run dev
 
 
 To run in production, the callback url defined in your Forge App needs to match the host url, so if you run your app from <b>https://mydomain.com</b>:
@@ -180,7 +180,7 @@ The result will look like below: a treeview of your Autodesk Cloud storage that 
 To load a design in the viewer:
 
  * Right-click the nodes to get options from the context menu
- * Upload a design file to a folder
+ * Upload a design file to a folder (supports file selection dialog or drag & drop)
  * Upon successful upload, the file appears under the parent node in the tree, right-click and select <b>Generate viewable</b>
  * Upon successful translation of the design, double-click the file and it will get loaded in the viewer
 
@@ -208,7 +208,5 @@ See [nodemon](https://github.com/remy/nodemon) for more details.
 
 Written by [Philippe Leefsma](http://twitter.com/F3lipek)
 
-Forge Partner Development
-
-[http://forge.autodesk.com](http://forge.autodesk.com)
+Forge Partner Development - [http://forge.autodesk.com](http://forge.autodesk.com)
 

@@ -323,18 +323,20 @@ export default class App {
 
     if(this.user) {
 
+      $('#dm-user').text('User Data')
+      $('#dm-toggle').removeClass('active')
+
+      $('.dm-panel').css({
+        display: 'none'
+      })
+
+      this.dmPanel.clear()
+
+      this.viewerPanel.onResize()
+
       this.logout().then(() => {
 
         this.user = null
-
-        $('#dm-user').text('User Data')
-        $('#dm-toggle').removeClass('active')
-
-        $('.dm-panel').css({
-          display: 'none'
-        })
-
-        this.viewerPanel.onResize()
       })
 
     } else {

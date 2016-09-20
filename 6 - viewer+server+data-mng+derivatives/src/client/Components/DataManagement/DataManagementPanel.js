@@ -180,7 +180,7 @@ export default class DataManagementPanel extends EventsEmitter {
         this.dmAPI.getVersions(
           node.projectId, node.id).then((versions) => {
 
-            node.versions = versions
+            node.versions = versions.data
 
             parent.addChild(node)
 
@@ -308,7 +308,7 @@ export default class DataManagementPanel extends EventsEmitter {
 
     const hubs = await this.dmAPI.getHubs()
 
-    hubs.forEach((hub) => {
+    hubs.data.forEach((hub) => {
 
       let treeContainerId = guid()
 
@@ -498,6 +498,9 @@ class DMTreeDelegate extends BaseTreeDelegate {
           })
 
           dropzone.on('addedfile', (file) => {
+
+            node.showLoader(true)
+
             console.log(file)
           })
 
@@ -508,6 +511,8 @@ class DMTreeDelegate extends BaseTreeDelegate {
         success: (file, response) => {
 
           console.log(response)
+
+          node.showLoader(false)
 
           this.createItemNode(
             node,
@@ -617,7 +622,7 @@ class DMTreeDelegate extends BaseTreeDelegate {
         this.dmAPI.getProjects(
           node.id).then((projects) => {
 
-            let projectTasks = projects.map((project) => {
+            let projectTasks = projects.data.map((project) => {
 
               return new Promise((resolve, reject) => {
 
@@ -666,12 +671,12 @@ class DMTreeDelegate extends BaseTreeDelegate {
         this.dmAPI.getProject(
           node.hubId, node.id).then((project) => {
 
-            let rootId = project.relationships.rootFolder.data.id
+            let rootId = project.data.relationships.rootFolder.data.id
 
             this.dmAPI.getFolderContent(
               node.id, rootId).then((folderItems) => {
 
-                let folderItemTasks = folderItems.map((folderItem) => {
+                let folderItemTasks = folderItems.data.map((folderItem) => {
 
                   return new Promise((resolve, reject) => {
 
@@ -736,7 +741,7 @@ class DMTreeDelegate extends BaseTreeDelegate {
         this.dmAPI.getFolderContent(
           node.projectId, node.id).then((folderItems) => {
 
-            let folderItemTasks = folderItems.map((folderItem) => {
+            let folderItemTasks = folderItems.data.map((folderItem) => {
 
               return new Promise((resolve, reject) => {
 

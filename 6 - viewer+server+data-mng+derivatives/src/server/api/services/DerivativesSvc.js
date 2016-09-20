@@ -310,7 +310,7 @@ function requestAsync(params) {
           return reject(response)
         }
 
-        return resolve(body.data || body)
+        return resolve(body || {})
       }
       catch(ex){
 

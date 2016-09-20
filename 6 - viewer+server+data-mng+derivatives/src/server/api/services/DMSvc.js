@@ -14,22 +14,10 @@ export default class DMSvc extends BaseSvc {
   constructor(opts) {
 
     super(opts)
-    
-    this._config.endPoints = {
-        user:            'https://developer.api.autodesk.com' + '/userprofile/' + 'v1' + '/users/@me',
-        hubs:            'https://developer.api.autodesk.com' + '/project/'     + 'v1' + '/hubs',
-        projects:        'https://developer.api.autodesk.com' + '/project/'     + 'v1' + '/hubs/%s/projects',
-        project:         'https://developer.api.autodesk.com' + '/project/'     + 'v1' + '/hubs/%s/projects/%s',
-        storage:         'https://developer.api.autodesk.com' + '/data/'        + 'v1' + '/projects/%s/storage',
-        folderContent:   'https://developer.api.autodesk.com' + '/data/'        + 'v1' + '/projects/%s/folders/%s/contents',
-        itemVersions:    'https://developer.api.autodesk.com' + '/data/'        + 'v1' + '/projects/%s/items/%s/versions',
-        versions:        'https://developer.api.autodesk.com' + '/data/'        + 'v1' + '/projects/%s/versions',
-        items:           'https://developer.api.autodesk.com' + '/data/'        + 'v1' + '/projects/%s/items'
-    }
 
     this._APIAuth =
       ForgeDataManagement.ApiClient.instance.authentications[
-        'oauth2_application']
+        'oauth2_access_code']
 
     this._projectsAPI = new ForgeDataManagement.ProjectsApi()
     this._versionsAPI = new ForgeDataManagement.VersionsApi()
@@ -53,11 +41,8 @@ export default class DMSvc extends BaseSvc {
   /////////////////////////////////////////////////////////////////
   getUser (token) {
 
-    this._APIAuth.accessToken = token
-
-    //TODO: change to SDK code
-
-    var url = this._config.endPoints.user
+    let url = 'https://developer.api.autodesk.com' +
+      '/userprofile/v1/users/@me'
 
     return requestAsync({
       token: token,
@@ -70,40 +55,22 @@ export default class DMSvc extends BaseSvc {
   // Returns list of Hubs
   //
   /////////////////////////////////////////////////////////////////
-  getHubs (token) {
+  getHubs (token, opts = {}) {
 
     this._APIAuth.accessToken = token
 
-    //TODO: change to SDK code
-
-    var url = this._config.endPoints.hubs
-
-    return requestAsync({
-      token: token,
-      json: true,
-      url: url
-    })
+    return this._hubsAPI.getHubs(opts)
   }
 
   /////////////////////////////////////////////////////////////////
   // Returns list of Projects for specific Hub
   //
   /////////////////////////////////////////////////////////////////
-  getProjects (token, hubId) {
+  getProjects (token, hubId, opts = {}) {
 
     this._APIAuth.accessToken = token
 
-    //TODO: change to SDK code
-
-    var url = util.format(
-      this._config.endPoints.projects,
-      hubId)
-
-    return requestAsync({
-      token: token,
-      json: true,
-      url: url
-    })
+    return this._hubsAPI.getHubProjects(hubId, opts)
   }
 
   /////////////////////////////////////////////////////////////////
@@ -114,59 +81,31 @@ export default class DMSvc extends BaseSvc {
 
     this._APIAuth.accessToken = token
 
-    //TODO: change to SDK code
-
-    var url = util.format(
-      this._config.endPoints.project,
-      hubId, projectId)
-
-    return requestAsync({
-      token: token,
-      json: true,
-      url: url
-    })
+    return this._projectsAPI.getProject(hubId, projectId)
   }
 
   /////////////////////////////////////////////////////////////////
   // Returns Folder content
   //
   /////////////////////////////////////////////////////////////////
-  getFolderContent (token, projectId, folderId) {
+  getFolderContent (token, projectId, folderId, opts = {}) {
 
     this._APIAuth.accessToken = token
 
-    //TODO: change to SDK code
-
-    var url = util.format(
-      this._config.endPoints.folderContent,
-      projectId, folderId)
-
-    return requestAsync({
-      token: token,
-      json: true,
-      url: url
-    })
+    return this._foldersAPI.getFolderContents(
+      projectId, folderId, opts)
   }
 
   /////////////////////////////////////////////////////////////////
   // Returns Versions for specific Item
   //
   /////////////////////////////////////////////////////////////////
-  getVersions (token, projectId, itemId) {
+  getVersions (token, projectId, itemId, opts = {}) {
 
     this._APIAuth.accessToken = token
 
-    //TODO: change to SDK code
-
-    var url = util.format(
-      this._config.endPoints.itemVersions,
-      projectId, itemId)
-
-    return requestAsync({
-      token: token,
-      json: true,
-      url: url
-    })
+    return this._itemsAPI.getItemVersions(
+      projectId, itemId, opts)
   }
 
   /////////////////////////////////////////////////////////////////
@@ -177,23 +116,11 @@ export default class DMSvc extends BaseSvc {
 
     this._APIAuth.accessToken = token
 
-    //TODO: change to SDK code
+    let payload = createStoragePayload (
+      folderId, filename)
 
-    var url = util.format(
-      this._config.endPoints.storage,
-      projectId)
-
-    return requestAsync({
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/vnd.api+json',
-        'Accept': 'application/vnd.api+json',
-        'Authorization': 'Bearer ' + token
-      },
-      body: createStoragePayload(folderId, filename),
-      json: true,
-      url: url
-    })
+    return this._projectsAPI.postStorage(
+      projectId, JSON.stringify(payload))
   }
 
   /////////////////////////////////////////////////////////////////
@@ -205,24 +132,11 @@ export default class DMSvc extends BaseSvc {
 
     this._APIAuth.accessToken = token
 
-    //TODO: change to SDK code
+    let payload = createItemPayload(
+      folderId, objectId, filename)
 
-    var url = util.format(
-      this._config.endPoints.items,
-      projectId)
-
-    return requestAsync({
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/vnd.api+json',
-        'Accept': 'application/vnd.api+json',
-        'Authorization': 'Bearer ' + token
-      },
-      body: createItemPayload(
-        folderId, objectId, filename),
-      json: true,
-      url: url
-    })
+    return this._projectsAPI.postItem(
+      projectId, JSON.stringify(payload))
   }
 
   /////////////////////////////////////////////////////////////////
@@ -234,24 +148,11 @@ export default class DMSvc extends BaseSvc {
 
     this._APIAuth.accessToken = token
 
-    //TODO: change to SDK code
+    let payload = createVersionPayload(
+      itemId, objectId, filename)
 
-    var url = util.format(
-      this._config.endPoints.versions,
-      projectId)
-
-    return requestAsync({
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/vnd.api+json',
-        'Accept': 'application/vnd.api+json',
-        'Authorization': 'Bearer ' + token
-      },
-      body: createVersionPayload(
-        itemId, objectId, filename),
-      json: true,
-      url: url
-    })
+    return this._projectsAPI.postVersion(
+      projectId, JSON.stringify(payload))
   }
 
   /////////////////////////////////////////////////////////////////
@@ -260,33 +161,18 @@ export default class DMSvc extends BaseSvc {
   /////////////////////////////////////////////////////////////////
   upload (token, projectId, folderId, file, displayName = null) {
 
-    //TODO: change to SDK code
-
     return new Promise(async(resolve, reject) => {
 
       try {
 
         var filename = file.originalname
 
-        //console.log('UPLOAD')
-        //
-        //this._APIAuth.accessToken = token
-        //this._projectsAPI.postStorage(
-        //  projectId,
-        //  JSON.stringify(createStoragePayload (folderId, filename))).then(
-        //    function (storage) {
-        //      console.log('STORAGE DM')
-        //      console.log(storage)
-        //    })
-
         var storage = await this.createStorage(
           token, projectId, folderId, filename)
 
         var ossSvc = ServiceManager.getService('OssSvc')
 
-        var objectId = ossSvc.parseObjectId(storage.id)
-
-        console.log('PUT OBJ')
+        var objectId = ossSvc.parseObjectId(storage.data.id)
 
         var object = await ossSvc.putObject(
           token,
@@ -310,14 +196,14 @@ export default class DMSvc extends BaseSvc {
             token,
             projectId,
             item.id,
-            storage.id,
+            storage.data.id,
             filename)
 
           var response = {
-            version,
-            storage,
-            object,
-            item
+            version: version.data,
+            storage: storage.data,
+            item: item,
+            object
           }
 
           resolve(response)
@@ -328,14 +214,14 @@ export default class DMSvc extends BaseSvc {
             token,
             projectId,
             folderId,
-            storage.id,
+            storage.data.id,
             filename,
             displayName)
 
           var response = {
-            storage,
-            object,
-            item
+            storage: storage.data,
+            item: item.data,
+            object
           }
 
           resolve(response)
@@ -362,7 +248,7 @@ export default class DMSvc extends BaseSvc {
         var folderItems = await this.getFolderContent(
           token, projectId, folderId)
 
-        var tasks = folderItems.map((folderItem) => {
+        var tasks = folderItems.data.map((folderItem) => {
 
           if(folderItem.type === 'items') {
 
@@ -416,67 +302,6 @@ export default class DMSvc extends BaseSvc {
 }
 
 /////////////////////////////////////////////////////////////////
-// Utils
-//
-/////////////////////////////////////////////////////////////////
-function requestAsync(params) {
-
-  return new Promise( function(resolve, reject) {
-
-    request({
-
-      url: params.url,
-      method: params.method || 'GET',
-      headers: params.headers || {
-        'Authorization': 'Bearer ' + params.token
-      },
-      json: params.json,
-      body: params.body
-
-    }, function (err, response, body) {
-
-      try {
-
-        if (err) {
-
-          console.log('error: ' + params.url)
-          console.log(err)
-
-          return reject(err)
-        }
-
-        if (body && body.errors) {
-
-          console.log('body error: ' + params.url)
-          console.log(body.errors)
-
-          var error = Array.isArray(body.errors) ?
-            body.errors[0] :
-            body.errors
-
-          return reject(error)
-        }
-
-        if (response && [200, 201, 202].indexOf(
-            response.statusCode) < 0) {
-
-          return reject(response.statusMessage)
-        }
-
-        return resolve(body.data || body)
-
-      } catch(ex){
-
-        console.log(params.url)
-        console.log(ex)
-
-        return reject(ex)
-      }
-    })
-  })
-}
-
-/////////////////////////////////////////////////////////////////
 // Creates storage payload
 //
 /////////////////////////////////////////////////////////////////
@@ -484,7 +309,7 @@ function createStoragePayload (folderId, filename) {
 
   return {
     data: {
-      type: 'object',
+      type: 'objects',
       attributes: {
         name: filename
       },
@@ -594,4 +419,65 @@ function createVersionPayload (
       }
     }
   }
+}
+
+/////////////////////////////////////////////////////////////////
+// Utils
+//
+/////////////////////////////////////////////////////////////////
+function requestAsync(params) {
+
+  return new Promise( function(resolve, reject) {
+
+    request({
+
+      url: params.url,
+      method: params.method || 'GET',
+      headers: params.headers || {
+        'Authorization': 'Bearer ' + params.token
+      },
+      json: params.json,
+      body: params.body
+
+    }, function (err, response, body) {
+
+      try {
+
+        if (err) {
+
+          console.log('error: ' + params.url)
+          console.log(err)
+
+          return reject(err)
+        }
+
+        if (body && body.errors) {
+
+          console.log('body error: ' + params.url)
+          console.log(body.errors)
+
+          var error = Array.isArray(body.errors) ?
+            body.errors[0] :
+            body.errors
+
+          return reject(error)
+        }
+
+        if (response && [200, 201, 202].indexOf(
+            response.statusCode) < 0) {
+
+          return reject(response.statusMessage)
+        }
+
+        return resolve(body.data || body)
+
+      } catch(ex){
+
+        console.log(params.url)
+        console.log(ex)
+
+        return reject(ex)
+      }
+    })
+  })
 }

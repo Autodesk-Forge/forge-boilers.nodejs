@@ -61,6 +61,8 @@ module.exports = function() {
     }
     catch (ex) {
 
+      console.log(ex)
+
       res.status(ex.status || 500)
       res.json(ex)
     }
