@@ -109,6 +109,9 @@ export default class ForgeSvc extends BaseSvc {
   /////////////////////////////////////////////////////////////////
   request2LeggedToken (scope) {
 
+    console.log('scope')
+    console.log(scope)
+
     return this._2leggedAPI.authenticate (
       this._config.oauth.clientId,
       this._config.oauth.clientSecret,
