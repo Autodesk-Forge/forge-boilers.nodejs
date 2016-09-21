@@ -26,7 +26,6 @@ module.exports = {
           'data:create',
           'data:write',
           'bucket:read',
-          'bucket:write',
           'bucket:create'
         ]
       }
