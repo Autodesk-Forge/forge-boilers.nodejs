@@ -7,43 +7,42 @@ const HOST_URL = 'http://localhost'
 
 module.exports = {
 
-    clientConfig: {
+  clientConfig: {
 
-      forge: {
-        token3LeggedUrl: '/api/forge/token/3legged',
-        token2LeggedUrl: '/api/forge/token/2legged'
-      },
-
-      host: `${HOST_URL}`,
-      port: 3000
+    forge: {
+      token3LeggedUrl: '/api/forge/token/3legged',
+      token2LeggedUrl: '/api/forge/token/2legged'
     },
 
-    serverConfig: {
+    host: `${HOST_URL}`,
+    port: 3000
+  },
 
-        port: 3000,
-        
-        forge: {
+  serverConfig: {
 
-          oauth: {
+    port: 3000,
+    
+    forge: {
 
-              redirectUri: `${HOST_URL}:3000/api/forge/callback/oauth`,
-              authenticationUri: '/authentication/v1/authenticate',
-              refreshTokenUri: '/authentication/v1/refreshtoken',
-              authorizationUri: '/authentication/v1/authorize',
-              accessTokenUri: '/authentication/v1/gettoken',
-              baseUri: 'https://developer.api.autodesk.com',
-              clientSecret: process.env.FORGE_DEV_CLIENT_SECRET,
-              clientId: process.env.FORGE_DEV_CLIENT_ID,
+      oauth: {
 
-              scope: [
-                'data:read',
-                'data:create',
-                'data:write',
-                'bucket:read',
-                'bucket:create'
-              ]
-            }
-        }
+        redirectUri: `${HOST_URL}:3000/api/forge/callback/oauth`,
+        authenticationUri: '/authentication/v1/authenticate',
+        refreshTokenUri: '/authentication/v1/refreshtoken',
+        authorizationUri: '/authentication/v1/authorize',
+        accessTokenUri: '/authentication/v1/gettoken',
+        baseUri: 'https://developer.api.autodesk.com',
+        clientSecret: process.env.FORGE_DEV_CLIENT_SECRET,
+        clientId: process.env.FORGE_DEV_CLIENT_ID,
+
+        scope: [
+          'data:read',
+          'data:create',
+          'data:write',
+          'bucket:read',
+          'bucket:create'
+        ]
+      }
     }
+  }
 }
-
