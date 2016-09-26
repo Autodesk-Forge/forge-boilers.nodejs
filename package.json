@@ -1,27 +1,24 @@
 {
-  "name": "forge-boilers.nodejs",
-  "description": "A collection of node.js based boiler projects for the Autodesk Forge Web Services APIs",
+  "name": "roomedit3dv3",
+  "description": "Forge Viewer extension to move building elements and update the Revit BIM in real-time",
   "version": "1.0.0",
   "engines": {
     "node": ">= 0.10.0"
   },
   "contributors": [
-    "Philippe Leefsma <philippe.leefsma@autodesk.com>"
+    "Philippe Leefsma <philippe.leefsma@autodesk.com>",
+    "Jeremy Tammik <jeremy.tammik@autodesk.com>"
   ],
   "license": "MIT",
   "scripts": {
     "start": "npm start --prefix ./6\\ -\\ viewer+server+data-mng+derivatives",
-    "install-boiler3": "npm install --prefix ./3\\ -\\ viewer+server",
-    "install-boiler4": "npm install --prefix ./4\\ -\\ viewer+server+oss",
-    "install-boiler5": "npm install --prefix ./5\\ -\\ viewer+server+oss+derivatives",
     "install-boiler6": "npm install --prefix ./6\\ -\\ viewer+server+data-mng+derivatives",
     "postinstall": "npm run install-boiler6"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Developer-Autodesk/forge-boilers.nodejs"
+    "url": "https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/roomedit3d"
   },
   "dependencies": {
-
   }
 }
