@@ -10,6 +10,21 @@
 [![Model-Derivative](https://img.shields.io/badge/Model%20Derivative-v2-green.svg)](http://developer.autodesk.com/)
 
 ## Description
+
+Forge Viewer extension to move building elements and update the Revit BIM in real-time using [socket.io](http://socket.io).
+
+This is a [node.js](https://nodejs.org) web server implementing a Forge Viewer extension.
+
+- [Forge Components](#1)
+- [Prerequisites and Sample Setup](#2)
+- [Round-Trip BIM Manipulaton via Forge and Roomedit3dv3](#3)
+- [Connecting desktop and cloud](#4)
+- [Interactive model modification in the Forge Viewer](#5)
+- [Communication Back from Viewer Client to Node.js Web Server to Desktop BIM](#6)
+- [Authors](#98)
+- [License](#99)
+
+## Description
 A collection of node.js-based boiler projects for the [Autodesk Forge Web Services APIs](http://forge.autodesk.com).
 
 Those samples illustrates how to use the following Forge npm packages:
