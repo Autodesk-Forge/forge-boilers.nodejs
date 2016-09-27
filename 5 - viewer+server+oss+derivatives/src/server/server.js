@@ -98,25 +98,24 @@ function runServer() {
               ' reason: ', reason)
         })
 
-        var server = app.listen(
-          process.env.PORT || config.port || 3000, () => {
 
-          var forgeSvc = new ForgeSvc({
-            config: config.forge
-          })
+      var forgeSvc = new ForgeSvc(config.forge)
 
-          var derivativesSvc = new DerivativesSvc()
+      var derivativesSvc = new DerivativesSvc()
 
-          var ossSvc = new OssSvc()
+      var ossSvc = new OssSvc()
 
-          ServiceManager.registerService(derivativesSvc)
-          ServiceManager.registerService(forgeSvc)
-          ServiceManager.registerService(ossSvc)
+      ServiceManager.registerService(derivativesSvc)
+      ServiceManager.registerService(forgeSvc)
+      ServiceManager.registerService(ossSvc)
 
-          console.log('Server listening on: ')
-          console.log(server.address())
-          console.log('ENV: ' + process.env.NODE_ENV)
-        })
+      var server = app.listen(
+        process.env.PORT || config.port || 3000, () => {
+
+        console.log('Server listening on: ')
+        console.log(server.address())
+        console.log('ENV: ' + process.env.NODE_ENV)
+      })
 
     } catch (ex) {
 

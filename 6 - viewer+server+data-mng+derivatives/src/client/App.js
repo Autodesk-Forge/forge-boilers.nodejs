@@ -17,14 +17,18 @@
 /////////////////////////////////////////////////////////////////////
 import DMPanel from 'Components/DataManagement/DataManagementPanel'
 import ViewerPanel from 'Components/Viewer/ViewerPanel'
+import ServiceManager from 'Services/SvcManager'
 import {clientConfig as config} from 'c0nfig'
 import 'jquery-ui/themes/base/resizable.css'
+import SocketSvc from 'Services/SocketSvc'
 import 'jquery-ui/ui/widgets/resizable'
-import ioClient from 'socket.io-client'
 import 'bootstrap-webpack'
 import 'splitter.css'
 import 'jquery-ui'
 import 'app.css'
+
+
+import ioClient from 'socket.io-client'
 
 export default class App {
 
@@ -244,37 +248,45 @@ export default class App {
           })
         })
 
-        this.socket = ioClient.connect(
-          `${config.host}:${config.port}`, {
-            reconnect: true
+        let socketSvc = new SocketSvc({
+          host: config.host,
+          port: config.port
         })
 
-        this.socket.on('connect', ()=> {
+        socketSvc.connect().then(()=>{
 
-          console.log('client socket connected')
-        })
+          ServiceManager.registerService(socketSvc)
 
-        this.socket.on('connection.data', (data)=> {
+          socketSvc.on('test', (data) => {
 
-          this.register(data.socketId)
-        })
+            console.log(data)
 
-        this.socket.on('callback', (msg)=> {
+          })
 
-          if(this.popup) {
+          socketSvc.on('connection.data', (data)=> {
 
-            this.loggedIn = true
-            this.popup.close()
-            this.popup = null
-          }
+            this.register(data.socketId)
+          })
 
-          if(msg === 'success') {
+          socketSvc.on('callback', (msg)=> {
 
-            $.get('/api/dm/user', (user) => {
+            if(this.popup) {
 
-              this.onUserLoggedIn(user)
-            })
-          }
+              this.loggedIn = true
+              this.popup.close()
+              this.popup = null
+            }
+
+            if(msg === 'success') {
+
+              $.get('/api/dm/user', (user) => {
+
+                this.onUserLoggedIn(user)
+              })
+            }
+          })
+
+          socketSvc.broadcast('test', {test: 'data'})
         })
 
         $.get('/api/dm/user', (user) => {
