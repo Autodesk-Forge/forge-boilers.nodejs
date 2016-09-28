@@ -10,9 +10,9 @@ export default class DerivativeSvc extends BaseSvc {
   //
   //
   /////////////////////////////////////////////////////////////////
-  constructor (config) {
+  constructor (opts) {
 
-    super(config)
+    super(opts)
 
     this._APIAuth =
       ForgeModelDerivative.ApiClient.instance.authentications[

@@ -11,9 +11,9 @@ export default class OssSvc extends BaseSvc {
   //
   //
   /////////////////////////////////////////////////////////////////
-  constructor(config) {
+  constructor(opts) {
 
-    super(config)
+    super(opts)
 
     this._APIAuth =
       ForgeOSS.ApiClient.instance.authentications[

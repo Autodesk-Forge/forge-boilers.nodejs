@@ -7,11 +7,11 @@ export default class BaseSvc extends EventEmitter {
   //
   //
   /////////////////////////////////////////////////////////////////
-  constructor(config = {}) {
+  constructor(opts = {}) {
 
     super()
 
-    this._config = config
+    this._config = opts.config || {}
   }
 
   /////////////////////////////////////////////////////////////////
