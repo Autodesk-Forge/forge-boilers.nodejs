@@ -55,6 +55,7 @@
                 <li id="dm-toggle"><a id="dm-user" href="#">User Data</a></li>
               </ul>
               <ul class="nav navbar-nav navbar-right">
+                <!--
                 <li class="dropdown">
 
                   <a href="#" class="dropdown-toggle"
@@ -64,9 +65,8 @@
                     Roomedit3d
                     <span class="caret"></span></a>
                   <ul class="dropdown-menu">
-                    <li><a id="loadBtn">Start Roomedit3d</a></li>
-                    <li><a id="unloadBtn">Stop Roomedit3d</a></li>
-                    <!--
+                    <li><a id="loadBtn" onclick="loadExtension(viewer)">Start Roomedit3d</a></li>
+                    <li><a id="unloadBtn onclick="unloadExtension(viewer)">Stop Roomedit3d</a></li>
                     <li><a href="#">Load roomedit3dv3</a></li>
                     <li><a href="#">Another action</a></li>
                     <li><a href="#">Something else here</a></li>
@@ -74,10 +74,12 @@
                     <li class="dropdown-header">Nav header</li>
                     <li><a href="#">Separated link</a></li>
                     <li><a href="#">One more separated link</a></li>
-                    -->
                   </ul>
                 </li>
-                <li><a href="https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/roomedit3d">About...</a></li>
+                -->
+                <li><a href="https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/roomedit3d">About Roomedit3d...</a></li>
+                <li><a id="loadBtn">Start</a></li>
+                <li><a id="unloadBtn">Stop</a></li>
               </ul>
             </div>
           </div>
