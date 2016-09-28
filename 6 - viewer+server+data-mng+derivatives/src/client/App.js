@@ -27,9 +27,6 @@ import 'splitter.css'
 import 'jquery-ui'
 import 'app.css'
 
-
-import ioClient from 'socket.io-client'
-
 export default class App {
 
   constructor() {
@@ -257,16 +254,12 @@ export default class App {
 
           ServiceManager.registerService(socketSvc)
 
-          socketSvc.on('test', (data) => {
-
-            console.log(data)
-
-          })
-
           socketSvc.on('connection.data', (data)=> {
 
             this.register(data.socketId)
           })
+
+          socketSvc.emit('request.connection.data')
 
           socketSvc.on('callback', (msg)=> {
 
@@ -285,8 +278,6 @@ export default class App {
               })
             }
           })
-
-          socketSvc.broadcast('test', {test: 'data'})
         })
 
         $.get('/api/dm/user', (user) => {

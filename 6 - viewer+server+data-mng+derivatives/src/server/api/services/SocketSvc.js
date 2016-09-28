@@ -48,8 +48,10 @@ export default class SocketSvc extends BaseSvc {
 
     _thisSvc._connections[socket.id] = socket;
 
-    socket.emit('connection.data', {
-      socketId: socket.id
+    socket.on('request.connection.data', ()=> {
+      socket.emit('connection.data', {
+        socketId: socket.id
+      });
     });
 
     socket.on('disconnect', ()=> {

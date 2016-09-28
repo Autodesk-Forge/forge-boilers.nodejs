@@ -48,12 +48,13 @@ module.exports = function() {
           break
       }
 
-
       var input = {
+        compressedUrn: payload.compressedUrn,
+        rootFilename: payload.rootFilename,
         urn: payload.urn
       }
 
-      if(payload.fileExtType === 'versions:autodesk.a360:CompositeDesign') {
+      if (payload.fileExtType === 'versions:autodesk.a360:CompositeDesign') {
           input.rootFilename = payload.rootFilename
           input.compressedUrn = true
       }
