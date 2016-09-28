@@ -1,39 +1,34 @@
+import ServiceManager from './SvcManager'
+import EventEmitter from 'events'
 
-class SvcManager {
+export default class BaseSvc extends EventEmitter {
 
   /////////////////////////////////////////////////////////////////
   //
   //
   /////////////////////////////////////////////////////////////////
-  constructor() {
+  constructor(opts = {}) {
 
-    this._services = {}
+    super()
+
+    this._config = opts.config || {}
   }
 
   /////////////////////////////////////////////////////////////////
   //
   //
   /////////////////////////////////////////////////////////////////
-  registerService(svc) {
+  name() {
 
-    this._services[svc.name()] = svc
+    return this._name
   }
 
   /////////////////////////////////////////////////////////////////
   //
   //
   /////////////////////////////////////////////////////////////////
-  getService(name) {
+  config() {
 
-    if(this._services[name]){
-
-      return this._services[name]
-    }
-
-    return null
+    return this._config
   }
 }
-
-var TheSvcManager = new SvcManager()
-
-export default TheSvcManager

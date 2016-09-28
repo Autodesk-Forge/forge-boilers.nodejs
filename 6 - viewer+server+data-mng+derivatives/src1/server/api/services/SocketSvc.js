@@ -2,15 +2,16 @@
 import BaseSvc from './BaseSvc'
 import io from 'socket.io'
 
+
 export default class SocketSvc extends BaseSvc {
 
   /////////////////////////////////////////////////////////////////
   //
   //
   /////////////////////////////////////////////////////////////////
-  constructor(config) {
+  constructor(opts) {
 
-    super (config);
+    super(opts);
 
     this._connections = {};
 
@@ -20,7 +21,7 @@ export default class SocketSvc extends BaseSvc {
     this.handleDisconnection =
       this.handleDisconnection.bind(this);
 
-    this._io = io(config.server);
+    this._io = io(opts.config.server);
 
     this._io.sockets.on(
       'connection',
@@ -56,17 +57,6 @@ export default class SocketSvc extends BaseSvc {
 
       _thisSvc.handleDisconnection(socket.id);
     });
-
-    socket.on('broadcast', (data) => {
-
-      let socketIds = Object.keys(_thisSvc._connections)
-
-      let filter = socketIds.filter((socketId) => {
-        return socketId !== socket.id
-      })
-
-      _thisSvc.broadcast(data.msgId, data.msg, filter)
-    })
 
     _thisSvc.emit('SocketSvc.Connection', {
       id: socket.id

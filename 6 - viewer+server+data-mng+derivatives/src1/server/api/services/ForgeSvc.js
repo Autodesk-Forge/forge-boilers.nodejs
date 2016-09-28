@@ -26,9 +26,9 @@ export default class ForgeSvc extends BaseSvc {
   //
   //
   /////////////////////////////////////////////////////////////////
-  constructor (config) {
+  constructor (opts) {
 
-    super (config)
+    super (opts)
 
     this._2leggedAPI = new ForgeOAuth.TwoLeggedApi()
   }
