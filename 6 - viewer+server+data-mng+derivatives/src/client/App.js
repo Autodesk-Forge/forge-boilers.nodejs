@@ -17,10 +17,11 @@
 /////////////////////////////////////////////////////////////////////
 import DMPanel from 'Components/DataManagement/DataManagementPanel'
 import ViewerPanel from 'Components/Viewer/ViewerPanel'
+import ServiceManager from 'Services/SvcManager'
 import {clientConfig as config} from 'c0nfig'
 import 'jquery-ui/themes/base/resizable.css'
+import SocketSvc from 'Services/SocketSvc'
 import 'jquery-ui/ui/widgets/resizable'
-import ioClient from 'socket.io-client'
 import 'bootstrap-webpack'
 import 'splitter.css'
 import 'jquery-ui'
@@ -244,37 +245,39 @@ export default class App {
           })
         })
 
-        this.socket = ioClient.connect(
-          `${config.host}:${config.port}`, {
-            reconnect: true
+        let socketSvc = new SocketSvc({
+          host: config.host,
+          port: config.port
         })
 
-        this.socket.on('connect', ()=> {
+        socketSvc.connect().then(()=>{
 
-          console.log('client socket connected')
-        })
+          ServiceManager.registerService(socketSvc)
 
-        this.socket.on('connection.data', (data)=> {
+          socketSvc.on('connection.data', (data)=> {
 
-          this.register(data.socketId)
-        })
+            this.register(data.socketId)
+          })
 
-        this.socket.on('callback', (msg)=> {
+          socketSvc.emit('request.connection.data')
 
-          if(this.popup) {
+          socketSvc.on('callback', (msg)=> {
 
-            this.loggedIn = true
-            this.popup.close()
-            this.popup = null
-          }
+            if(this.popup) {
 
-          if(msg === 'success') {
+              this.loggedIn = true
+              this.popup.close()
+              this.popup = null
+            }
 
-            $.get('/api/dm/user', (user) => {
+            if(msg === 'success') {
 
-              this.onUserLoggedIn(user)
-            })
-          }
+              $.get('/api/dm/user', (user) => {
+
+                this.onUserLoggedIn(user)
+              })
+            }
+          })
         })
 
         $.get('/api/dm/user', (user) => {

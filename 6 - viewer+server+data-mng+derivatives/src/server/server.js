@@ -29,6 +29,7 @@ import path from 'path'
 //Endpoints
 import DerivativesAPI from './api/endpoints/derivatives'
 import UploadAPI from './api/endpoints/upload'
+import SocketAPI from './api/endpoints/socket'
 import ForgeAPI from './api/endpoints/forge'
 import AppAPI from './api/endpoints/app'
 import DMAPI from './api/endpoints/dm'
@@ -72,6 +73,7 @@ app.use(helmet())
 //
 /////////////////////////////////////////////////////////////////////
 app.use('/api/derivatives', DerivativesAPI())
+app.use('/api/socket', SocketAPI())
 app.use('/api/upload', UploadAPI())
 app.use('/api/forge', ForgeAPI())
 app.use('/api/app', AppAPI())
@@ -83,50 +85,52 @@ app.use('/api/dm', DMAPI())
 /////////////////////////////////////////////////////////////////////
 function runServer() {
 
+  return new Promise((resolve, reject) => {
+
     try {
 
-        process.on('exit', () => {
+      process.on('exit', () => {
 
-        })
+      })
 
-        process.on('uncaughtException', (err) => {
+      process.on('uncaughtException', (err) => {
 
-            console.log('uncaughtException')
-            console.log(err)
-            console.error(err.stack)
-        })
+        console.log('uncaughtException')
+        console.log(err)
+        console.error(err.stack)
+      })
 
-        process.on('unhandledRejection', (reason, p) => {
+      process.on('unhandledRejection', (reason, p) => {
 
-            console.log('Unhandled Rejection at: Promise ', p,
-              ' reason: ', reason)
-        })
+        console.log('Unhandled Rejection at: Promise ', p,
+          ' reason: ', reason)
+      })
 
-        var server = app.listen(
-          process.env.PORT || config.port || 3000, () => {
+      var forgeSvc = new ForgeSvc(
+        config.forge)
+
+      var derivativesSvc = new DerivativesSvc()
+
+      var ossSvc = new OssSvc()
+
+      var dmSvc = new DMSvc()
+
+      ServiceManager.registerService(derivativesSvc)
+      ServiceManager.registerService(forgeSvc)
+      ServiceManager.registerService(ossSvc)
+      ServiceManager.registerService(dmSvc)
+
+      var server = app.listen(
+        process.env.PORT || config.port || 3000, () => {
 
           var socketSvc = new SocketSvc({
-            config: {
-              server,
-              session
-            }
+            session,
+            server
           })
 
-          var forgeSvc = new ForgeSvc({
-            config: config.forge
-          })
-
-          var derivativesSvc = new DerivativesSvc()
-
-          var ossSvc = new OssSvc()
-
-          var dmSvc = new DMSvc()
-
-          ServiceManager.registerService(derivativesSvc)
           ServiceManager.registerService(socketSvc)
-          ServiceManager.registerService(forgeSvc)
-          ServiceManager.registerService(ossSvc)
-          ServiceManager.registerService(dmSvc)
+
+          resolve(server)
 
           console.log('Server listening on: ')
           console.log(server.address())
@@ -135,9 +139,11 @@ function runServer() {
 
     } catch (ex) {
 
-        console.log('Failed to run server... ')
-        console.log(ex)
+      console.log('Failed to run server... ')
+      console.log(ex)
+      reject(ex)
     }
+  })
 }
 
 /////////////////////////////////////////////////////////////////////

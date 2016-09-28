@@ -11,9 +11,9 @@ export default class DMSvc extends BaseSvc {
   // DataManagement Service
   //
   /////////////////////////////////////////////////////////////////
-  constructor(opts) {
+  constructor(config) {
 
-    super(opts)
+    super(config)
 
     this._APIAuth =
       ForgeDataManagement.ApiClient.instance.authentications[
