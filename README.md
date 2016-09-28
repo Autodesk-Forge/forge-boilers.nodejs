@@ -60,6 +60,8 @@ In brief:
 
 This project uses [Webpack](https://webpack.github.io) and NPM packages to build and generate the frontend code, so an extra build step is required.
 
+First, `cd` to the appropriate subfolder, in this case `6 - viewer+server+data-mng+derivatives`.
+
 On Mac OSX and Linux, run the following in Terminal:
 
     > npm install
