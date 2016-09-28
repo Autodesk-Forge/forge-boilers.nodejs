@@ -17,6 +17,10 @@
 /////////////////////////////////////////////////////////////////////
 import {clientConfig as config} from 'c0nfig'
 
+import './extensions/Viewing.Extension.Transform.js'
+
+var jtviewer = null;
+
 export default class ViewerPanel {
 
   constructor (tokenUrl) {
@@ -126,7 +130,7 @@ export default class ViewerPanel {
       domContainer)
 
     this.viewer.initialize()
-
+    
     $('#loader, .spinner').remove()
 
     $('.progressbg').hide()
@@ -136,19 +140,21 @@ export default class ViewerPanel {
       219, 219, 219)
     
     // Load and unload extension events
-   
+       
     var loadBtn = document.getElementById('loadBtn');
  
     loadBtn.addEventListener("click", function(){
       //alert("hi");
-      loadExtension(this.viewer);
+      //loadExtension(this.viewer);
+      this.viewer.loadExtension('Viewing.Extension.Transform')
     });
  
     var unloadBtn = document.getElementById('unloadBtn');
  
     unloadBtn.addEventListener("click", function(){
       //alert("bye");
-      unloadExtension(this.viewer);
+      //unloadExtension(this.viewer);
+      this.viewer.unloadExtension('Viewing.Extension.Transform')
     });
   }
 
