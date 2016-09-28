@@ -134,6 +134,20 @@ export default class ViewerPanel {
     this.viewer.setBackgroundColor(
       255, 207, 13,
       219, 219, 219)
+    
+    //Button events
+    var loadBtn = document.getElementById('loadBtn');
+
+    loadBtn.addEventListener("click", function(){
+      loadExtension(viewer);
+    });
+
+    var unloadBtn = document.getElementById('unloadBtn');
+
+    unloadBtn.addEventListener("click", function(){
+      unloadExtension(viewer);
+    });
+    
   }
 
   ///////////////////////////////////////////////////////////////////
