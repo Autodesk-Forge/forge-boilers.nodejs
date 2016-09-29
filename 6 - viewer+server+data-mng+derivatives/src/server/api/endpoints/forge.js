@@ -167,8 +167,8 @@ module.exports = function() {
 
               res.end('success')
             })
-        }
-        catch(ex){
+
+        } catch (ex) {
 
           res.status(500)
           res.end(ex)
