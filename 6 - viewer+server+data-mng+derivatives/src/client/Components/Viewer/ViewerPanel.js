@@ -19,8 +19,6 @@ import {clientConfig as config} from 'c0nfig'
 
 import './extensions/Viewing.Extension.Transform.js'
 
-var jtviewer = null;
-
 export default class ViewerPanel {
 
   constructor (tokenUrl) {
@@ -146,7 +144,7 @@ export default class ViewerPanel {
     loadBtn.addEventListener("click", () => {
       //alert("hi");
       //loadExtension(this.viewer);
-      this.viewer.loadExtension('Viewing.Extension.Transform')
+      this.viewer.loadExtension('Viewing.Extension.Transform', {})
     });
  
     var unloadBtn = document.getElementById('unloadBtn');

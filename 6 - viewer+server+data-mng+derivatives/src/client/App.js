@@ -16,13 +16,13 @@
 // UNINTERRUPTED OR ERROR FREE.
 /////////////////////////////////////////////////////////////////////
 import DMPanel from 'Components/DataManagement/DataManagementPanel'
-//import Roomedit3dTranslationTool from 'Components/Viewer/Roomedit3dTranslationTool'
 import ViewerPanel from 'Components/Viewer/ViewerPanel'
 import ServiceManager from 'Services/SvcManager'
 import {clientConfig as config} from 'c0nfig'
 import 'jquery-ui/themes/base/resizable.css'
 import SocketSvc from 'Services/SocketSvc'
 import 'jquery-ui/ui/widgets/resizable'
+import 'font-awesome-webpack'
 import 'bootstrap-webpack'
 import 'splitter.css'
 import 'jquery-ui'
