@@ -143,7 +143,7 @@ export default class ViewerPanel {
        
     var loadBtn = document.getElementById('loadBtn');
  
-    loadBtn.addEventListener("click", function(){
+    loadBtn.addEventListener("click", () => {
       //alert("hi");
       //loadExtension(this.viewer);
       this.viewer.loadExtension('Viewing.Extension.Transform')
@@ -151,7 +151,7 @@ export default class ViewerPanel {
  
     var unloadBtn = document.getElementById('unloadBtn');
  
-    unloadBtn.addEventListener("click", function(){
+    unloadBtn.addEventListener("click", () => {
       //alert("bye");
       //unloadExtension(this.viewer);
       this.viewer.unloadExtension('Viewing.Extension.Transform')
