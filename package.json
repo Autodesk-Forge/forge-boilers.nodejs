@@ -12,8 +12,8 @@
   "license": "MIT",
   "scripts": {
     "start": "npm start --prefix ./7\\ -\\ viewer+extension+server+data-mng+derivatives",
-    "install-boiler6": "npm install --prefix ./7\\ -\\ viewer+extension+server+data-mng+derivatives",
-    "postinstall": "npm run install-boiler6"
+    "install-boiler7": "npm install --prefix ./7\\ -\\ viewer+extension+server+data-mng+derivatives",
+    "postinstall": "npm run install-boiler7"
   },
   "repository": {
     "type": "git",
