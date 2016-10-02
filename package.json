@@ -1,7 +1,7 @@
 {
   "name": "roomedit3dv3",
   "description": "Forge Viewer extension to move building elements and update the Revit BIM in real-time",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "engines": {
     "node": ">= 0.10.0"
   },
@@ -11,8 +11,8 @@
   ],
   "license": "MIT",
   "scripts": {
-    "start": "npm start --prefix ./6\\ -\\ viewer+server+data-mng+derivatives",
-    "install-boiler6": "npm install --prefix ./6\\ -\\ viewer+server+data-mng+derivatives",
+    "start": "npm start --prefix ./7\\ -\\ viewer+extension+server+data-mng+derivatives",
+    "install-boiler6": "npm install --prefix ./7\\ -\\ viewer+extension+server+data-mng+derivatives",
     "postinstall": "npm run install-boiler6"
   },
   "repository": {
