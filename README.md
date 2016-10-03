@@ -104,7 +104,7 @@ Run the following commands (mind the DEV!):
 
 To run in production, the callback url defined for your Forge App needs to match the host url, so, for example, if you run your app from <b>https://mydomain.com</b>:
 
-![forge_app_settings_prod](resources/img/forge_app_settings_prod.png)
+![forge_app_settings_prod](7 - viewer+extension+server+data-mng+derivatives/resources/img/forge_app_settings_prod.png)
 
     > npm install
     > set HOST_URL=https://mydomain.com
