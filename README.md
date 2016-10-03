@@ -131,9 +131,9 @@ To load and edit a design in the viewer and see the modifications applied in rea
 - Right-click the nodes to get options from the context menu.
 - If not already done:
     - Upload a design file to a folder (supports file selection dialog or drag & drop).
-    - Upon successful upload, the file appears under the parent node in the tree, right-click and select <b>Generate viewable</b>.
+    - Upon successful upload, the file appears under the parent node in the tree; right-click it and select <b>Generate viewable</b>.
 - Upon successful translation of the design, double-click the file to load it into the viewer.
-- Click `Start` to load the roomedit3d viewer extension. An icon appears.
+- Click `Start` to load the roomedit3d viewer extension. Its icon appears with a pull-up menu.
 - In Revit, launch the Roomedit3dApp command to subscribe to `transform` notifications.
 - Select the transform pull-up icon to start the translate tool.
 - Select an element and move it on the screen.
