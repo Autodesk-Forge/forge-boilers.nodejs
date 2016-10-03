@@ -120,7 +120,7 @@ To deploy this project to Heroku, click on the button below at the Heroku Create
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/roomedit3d)
 
-The result will look like this, displaying a treeview of your Autodesk Cloud storage that lets you upload designs and perform actions from the context menu:
+The result will look like this, displaying a treeview of your Autodesk Cloud storage that lets you upload designs, perform actions from the context menu, start the roomedit3d viewer extension, select and translate model elements:
 
 ![roomedit3dv3_running](7 - viewer+extension+server+data-mng+derivatives/resources/img/roomedit3dv3_running.png)
 
