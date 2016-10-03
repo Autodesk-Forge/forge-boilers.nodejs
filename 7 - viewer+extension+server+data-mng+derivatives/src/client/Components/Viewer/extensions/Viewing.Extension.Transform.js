@@ -3,6 +3,7 @@
 // by Philippe Leefsma, April 2016
 //
 /////////////////////////////////////////////////////////////////////
+import ServiceManager from 'Services/SvcManager'
 import TranslateTool from './Viewing.Tool.Translate'
 import RotateTool from './Viewing.Tool.Rotate'
 import ExtensionBase from 'ExtensionBase'
@@ -27,6 +28,23 @@ class TransformExtension extends ExtensionBase {
 
     this._viewer.toolController.registerTool(
       this.rotateTool)
+    
+    this.translateTool.on('transform.translate.complete', (data) => {
+
+      console.log( 'broadcast transform of '
+        + data.externalId
+        + ': ' + data.translation.x.toFixed( 2 )
+        + ','+ data.translation.y.toFixed( 2 )
+        + ','+ data.translation.z.toFixed( 2 ) );
+      
+      var socketSvc = ServiceManager.getService('SocketSvc')
+  
+      // external id == Revit UniqueId
+      // THREE.Vector3 offset x y z
+    
+      socketSvc.broadcast('transform', data)
+      
+    })    
   }
 
   /////////////////////////////////////////////////////////////////
