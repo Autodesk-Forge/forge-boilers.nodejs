@@ -185,7 +185,7 @@ The `Roomedit3dTranslationTool` implements a viewer extension that enables the u
 
 ## <a name="5"></a>Communication Back from Viewer Client to Node.js Web Server to Desktop BIM
 
-![Roomedit3dv3 architecture](img/roomedit3dv3_architecture.png "Roomedit3dv3 architecture and communication path")
+![Roomedit3dv3 architecture](7 - viewer+extension+server+data-mng+derivatives/resources/img/roomedit3dv3_architecture.png "Roomedit3dv3 architecture and communication path")
 
 The Forge Viewer itself provides viewing functionality only, no editing.
 
