@@ -92,7 +92,7 @@ To run the project locally (using the DEV API keys):
 
 - Make sure the callback url for your DEV Forge API Keys is set to <b>http://localhost:3000/api/forge/callback/oauth</b>.
 
-![forge_app_settings_dev](7 - viewer+extension+server+data-mng+derivatives/rresources/img/forge_app_settings_dev.png)
+![forge_app_settings_dev](7 - viewer+extension+server+data-mng+derivatives/resources/img/forge_app_settings_dev.png)
 
 Run the following commands (mind the DEV!):
 
@@ -122,7 +122,7 @@ To deploy this project to Heroku, click on the button below at the Heroku Create
 
 The result will look like this, displaying a treeview of your Autodesk Cloud storage that lets you upload designs and perform actions from the context menu:
 
-![roomedit3dv3_running](7 - viewer+extension+server+data-mng+derivatives/rresources/img/roomedit3dv3_running.png)
+![roomedit3dv3_running](7 - viewer+extension+server+data-mng+derivatives/resources/img/roomedit3dv3_running.png)
 
 To load a design in the viewer:
 
