@@ -142,7 +142,7 @@ The element position will be updated accordingly in the BIM.
 
 
 
-## <a name="2"></a>Round-Trip BIM Manipulaton via Forge and Roomedit3dv3
+## <a name="3"></a>Round-Trip BIM Manipulaton via Forge and Roomedit3dv3
 
 The `roomedit3dv3` viewer extension enables interactive selection and movement of selected BIM elements in the model on screen.
 
@@ -161,7 +161,7 @@ Todo: add a project identifier to the broadcasts to enable the C# add-in broadco
 The selected element is identified via its Revit UniqueId.
 
 
-## <a name="3"></a>Connecting Desktop and Cloud
+## <a name="4"></a>Connecting Desktop and Cloud
 
 `Roomedit3dv3` is a member of the suite of samples connecting the desktop and the cloud.
 
@@ -187,12 +187,12 @@ Each of the samples consists of a C# .NET Revit API desktop add-in and a web ser
   to demonstrate translation of BIM element instances in the viewer and updating the Revit model in real time via a `socket.io` broadcast.
 
 
-## <a name="4"></a>Interactive Model Modification in the Forge Viewer
+## <a name="5"></a>Interactive Model Modification in the Forge Viewer
 
 The `Roomedit3dTranslationTool` implements a viewer extension that enables the user to select a component and interactively move it around on the screen, defining a translation to be applied to it and communicated back to the source CAD model.
 
 
-## <a name="5"></a>Communication Back from Viewer Client to Node.js Web Server to Desktop BIM
+## <a name="6"></a>Communication Back from Viewer Client to Node.js Web Server to Desktop BIM
 
 ![Roomedit3dv3 architecture](7 - viewer+extension+server+data-mng+derivatives/resources/img/roomedit3dv3_architecture.png "Roomedit3dv3 architecture and communication path")
 
