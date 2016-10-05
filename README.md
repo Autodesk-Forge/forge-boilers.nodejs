@@ -128,6 +128,8 @@ The result will look like this, displaying a treeview of your Autodesk Cloud sto
 
 ![roomedit3dv3_running](7 - viewer+extension+server+data-mng+derivatives/resources/img/roomedit3dv3_running.png)
 
+You can also test run my own web server instance directly at [roomedit3dv3.herokuapp.com](https://roomedit3dv3.herokuapp.com).
+
 To load and edit a design in the viewer and see the modifications applied in real-time to the Revit BIM:
 
 - Install the [Roomedit3dApp](https://github.com/jeremytammik/Roomedit3dApp) Revit add-in and ensure it is running.
