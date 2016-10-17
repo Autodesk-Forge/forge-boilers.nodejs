@@ -50,7 +50,7 @@ module.exports = function() {
 
       var input = {
         compressedUrn: payload.compressedUrn,
-        rootFilename: payload.rootFilename,
+        //rootFilename: payload.rootFilename,
         urn: payload.urn
       }
 
