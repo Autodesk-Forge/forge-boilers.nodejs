@@ -107,12 +107,29 @@ export default class DataManagementPanel extends EventsEmitter {
 
         data.node.showLoader(true)
 
-        let urn = this.getLastVersionURN(data.node)
+        var version = data.node.versions[ data.node.versions.length - 1 ]
 
-        console.log('Posting SVF Job: ' + urn)
+        let input = {
+          urn: this.getLastVersionURN(data.node)
+        }
+
+        const fileExtType = (version.attributes && version.attributes.extension) ?
+          version.attributes.extension.type : null
+
+        if (fileExtType === 'versions:autodesk.a360:CompositeDesign') {
+
+          input.rootFilename = version.attributes ?
+            version.attributes.name :
+            null
+
+          input.compressedUrn = true
+        }
+
+        console.log('Posting SVF Job: ')
+        console.log(input)
 
         let response = await this.derivativesAPI.postSVFJob(
-          urn,
+          input,
           data.node.name,
           viewerContainer)
 

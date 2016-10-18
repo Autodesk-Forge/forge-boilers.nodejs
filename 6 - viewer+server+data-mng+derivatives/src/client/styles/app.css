@@ -41,6 +41,11 @@ body{
     border-bottom-width: 4px;
 }
 
+.navbar .container {
+    width: calc(100% - 50px);
+    margin-left: 15px;
+}
+
 .app-logo {
     position: relative;
     top: 2px;

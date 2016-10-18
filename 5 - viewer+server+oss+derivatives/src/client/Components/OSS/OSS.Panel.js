@@ -22,7 +22,7 @@ import ContextMenu from './OSS.ContextMenu'
 import EventsEmitter from 'EventsEmitter'
 import Dropzone from 'dropzone'
 import OSSAPI from './OSS.API'
-import './OSSPanel.css'
+import './OSS.Panel.css'
 
 export default class OSSPanel extends EventsEmitter {
 
@@ -150,6 +150,8 @@ export default class OSSPanel extends EventsEmitter {
 
     this.contextMenu.on('context.derivatives.manifest.delete', (data) => {
 
+      data.node.showLoader(true)
+
       let urn = window.btoa(data.node.details.objectId).replace(
         new RegExp('=', 'g'), '')
 
@@ -158,6 +160,8 @@ export default class OSSPanel extends EventsEmitter {
         data.node.manifest = null
 
         data.node.parent.classList.remove('derivated')
+
+        data.node.showLoader(false)
       })
     })
 
@@ -165,12 +169,18 @@ export default class OSSPanel extends EventsEmitter {
 
       try {
 
-        console.log('Posting SVF Job: ' + data.node.objectKey)
-
         data.node.showLoader(true)
 
+        let input = {
+          urn: data.node.details.objectId
+        }
+
+        console.log('Posting SVF Job: ')
+        console.log(input)
+
         let response = await this.derivativesAPI.postSVFJob(
-          data.node.details.objectId,
+          input,
+          data.node.details.objectKey,
           viewerContainer)
 
         setTimeout(() => {

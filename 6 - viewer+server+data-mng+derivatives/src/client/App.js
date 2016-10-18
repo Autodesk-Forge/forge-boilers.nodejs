@@ -15,8 +15,8 @@
 // DOES NOT WARRANT THAT THE OPERATION OF THE PROGRAM WILL BE
 // UNINTERRUPTED OR ERROR FREE.
 /////////////////////////////////////////////////////////////////////
-import DMPanel from 'Components/DataManagement/DataManagementPanel'
-import ViewerPanel from 'Components/Viewer/ViewerPanel'
+import DMPanel from 'Components/DataManagement/DataManagement.Panel'
+import ViewerPanel from 'Components/Viewer/Viewer.Panel'
 import ServiceManager from 'Services/SvcManager'
 import {clientConfig as config} from 'c0nfig'
 import 'jquery-ui/themes/base/resizable.css'

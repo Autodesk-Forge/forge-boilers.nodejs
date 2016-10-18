@@ -51,7 +51,7 @@ export default class DerivativeSvc extends BaseSvc {
         }
       },
 
-      obj: (opts) => {
+      obj: (opts = {}) => {
 
         return {
           destination: {

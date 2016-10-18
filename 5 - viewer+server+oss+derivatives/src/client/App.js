@@ -16,7 +16,7 @@
 // UNINTERRUPTED OR ERROR FREE.
 /////////////////////////////////////////////////////////////////////
 import ViewerPanel from 'Components/Viewer/ViewerPanel'
-import OSSPanel from 'Components/OSS/OSSPanel'
+import OSSPanel from 'Components/OSS/OSS.Panel'
 import 'jquery-ui/themes/base/resizable.css'
 import 'jquery-ui/ui/widgets/resizable'
 import 'bootstrap-webpack'

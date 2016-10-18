@@ -32,33 +32,30 @@ export default class DerivativesAPI extends ClientAPI {
   //
   //
   /////////////////////////////////////////////////////////////////
-  postSVFJob(objectId, panelContainer) {
+  postSVFJob(input, designName, panelContainer) {
 
     return new Promise(async(resolve, reject) => {
 
-      let urn = window.btoa(objectId).replace(
-        new RegExp('=', 'g'), '')
-
-      console.log('SVF Job: ' + urn)
-
       var jobPanel = new JobPanel(
         panelContainer,
-        objectId.split('/')[1])
+        designName)
 
       jobPanel.setVisible(true)
 
       try {
 
+        const output = {
+          type: 'svf'
+        }
+
         var job = await this.postJob({
-          fileExtType: null,
-          rootFilename: null,
-          outputType: 'svf',
-          urn: urn
+          input,
+          output
         })
 
         if (job.result === 'success' || job.result === 'created') {
 
-          var manifest = await this.waitJob(urn,
+          var manifest = await this.waitJob(input.urn,
             (progress) => {
 
               return jobPanel.updateProgress(progress)

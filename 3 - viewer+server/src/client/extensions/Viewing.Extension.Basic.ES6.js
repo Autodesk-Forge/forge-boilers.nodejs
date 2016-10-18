@@ -35,7 +35,7 @@ class BasicES6 extends Autodesk.Viewing.Extension {
   load() {
 
     alert("BasicES6 extension Loaded")
-    
+
     return true
   }
 

@@ -51,7 +51,7 @@ export default class DerivativeSvc extends BaseSvc {
         }
       },
 
-      obj: (opts) => {
+      obj: (opts = {}) => {
 
         return {
           destination: {
@@ -164,7 +164,19 @@ export default class DerivativeSvc extends BaseSvc {
 
     this._APIAuth.accessToken = token
 
-    return this._derivativesAPI.deleteManifest (urn)
+    //TODO: not working?
+    //return this._derivativesAPI.deleteManifest (urn)
+
+    var url = util.format(
+      'https://developer.api.autodesk.com/modelderivative/v2/designdata/%s/manifest',
+      urn)
+
+    return requestAsync({
+      url: url,
+      token: token,
+      method: 'DELETE',
+      json: false
+    })
   }
 
   /////////////////////////////////////////////////////////////////
@@ -184,6 +196,8 @@ export default class DerivativeSvc extends BaseSvc {
   //
   /////////////////////////////////////////////////////////////////
   getThumbnail (token, urn, options = {width: 100, height: 100}) {
+
+    //TODO: change to SDK code
 
     var url = util.format(
       'https://developer.api.autodesk.com/modelderivative/v2/designdata/%s/thumbnail?width=%s&height=%s',
@@ -296,7 +310,7 @@ function requestAsync(params) {
           return reject(response)
         }
 
-        return resolve(body.data || body)
+        return resolve(body || {})
       }
       catch(ex){
 
