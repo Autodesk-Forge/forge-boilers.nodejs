@@ -171,8 +171,11 @@ export default class OSSPanel extends EventsEmitter {
 
         data.node.showLoader(true)
 
+        const urn = window.btoa(data.node.details.objectId).replace(
+            new RegExp('=', 'g'), '')
+
         let input = {
-          urn: data.node.details.objectId
+          urn: urn
         }
 
         console.log('Posting SVF Job: ')
