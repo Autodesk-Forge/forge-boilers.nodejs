@@ -1,8 +1,8 @@
 
-import { EventsEmitterComposer } from 'EventsEmitter'
+import EventsEmitter from 'EventsEmitter'
 
 export default class OSSContextMenu extends
-  EventsEmitterComposer (Autodesk.Viewing.UI.ObjectContextMenu) {
+  EventsEmitter.Composer (Autodesk.Viewing.UI.ObjectContextMenu) {
 
   /////////////////////////////////////////////////////////////////
   // Class constructor

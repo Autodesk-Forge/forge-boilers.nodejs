@@ -80,6 +80,7 @@ module.exports = {
           presets: ['es2015', 'stage-0']
         }
       },
+      { test: /\.scss$/, loaders: ["style", "css", "sass"] },
       { test: /\.less$/, loader: "style!css!less" },
       { test: /\.css$/, loader: "style-loader!css-loader" },
       { test: /\.(woff|woff2)(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=10000&mimetype=application/font-woff' },

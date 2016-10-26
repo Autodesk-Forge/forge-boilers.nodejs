@@ -3,10 +3,10 @@
 //
 /////////////////////////////////////////////////////////////
 import UIComponent from 'UIComponent'
-import './Dropdown.css'
+import './Dropdown.scss'
 
 export default class Dropdown extends UIComponent {
-  
+
   /////////////////////////////////////////////////////////////
   // opts = {
   //   container: viewer.container,
@@ -45,7 +45,7 @@ export default class Dropdown extends UIComponent {
     var html = `
       <div id="${this.dropdownId}" class="dropdown lmv-dropdown">
       <button id="${this.buttonId}" class="btn dropdown-toggle"
-        type="button" 
+        type="button"
         data-toggle="dropdown" disabled>
         <div class="label-container">
           <label id="${this.labelId}" class="label">${this.title}</label>
@@ -202,7 +202,7 @@ export default class Dropdown extends UIComponent {
   //
   /////////////////////////////////////////////////////////////
   setVisible(show) {
-    
+
     $('#' + this.dropdownId).css({
       display: show ? 'block' : 'none'
     })

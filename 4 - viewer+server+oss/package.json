@@ -39,8 +39,10 @@
     "moment": "^2.14.1",
     "multer": "1.2.0",
     "mz": "2.4.0",
+    "node-sass": "^3.10.1",
     "raw-loader": "^0.5.1",
     "request": "^2.72.0",
+    "sass-loader": "^4.0.2",
     "serve-favicon": "^2.3.0",
     "socket.io": "^1.4.6",
     "socket.io-client": "^1.4.6",
@@ -48,7 +50,7 @@
     "style-loader": "^0.13.0",
     "url-loader": "^0.5.7",
     "util": "^0.10.3",
-    "webpack": "^1.12.13",
+    "webpack": "^1.13.2",
     "webpack-combine-loaders": "^2.0.0"
   },
   "engines": {
