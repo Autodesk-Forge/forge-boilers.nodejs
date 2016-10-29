@@ -18,6 +18,9 @@
 .dockingPanel .dockingPanelTitle .dockingPanelTitleText {
     margin-top: 4px;
     text-transform: none;
+    width: calc(100% - 55px);
+    position: relative;
+    overflow: hidden;
 }
 
 .dockingPanel .dockingPanelTitle img,

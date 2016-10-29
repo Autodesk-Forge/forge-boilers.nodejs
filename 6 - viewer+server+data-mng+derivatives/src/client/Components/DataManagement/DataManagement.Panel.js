@@ -6,9 +6,9 @@
 import DerivativesAPI from '../Derivatives/Derivatives.API'
 import ContextMenu from './DataManagement.ContextMenu'
 import { BaseTreeDelegate, TreeNode } from 'TreeView'
-import TabManager from 'TabManager/TabManager'
 import EventsEmitter from 'EventsEmitter'
 import DMAPI from './DataManagement.API'
+import TabManager from 'TabManager'
 import Dropzone from 'dropzone'
 import './DataManagement.css'
 
@@ -57,6 +57,32 @@ export default class DataManagementPanel extends EventsEmitter {
       if(data.node.details) {
 
         console.log(data.node.details)
+
+        switch(data.node.type) {
+
+          case 'hubs':
+            this.showPayload(
+              `api/dm/hubs/${data.node.hubId}/projects`)
+            break
+
+          case 'projects':
+            this.showPayload(
+              `api/dm/hubs/${data.node.hubId}/projects/` +
+                `${data.node.projectId}`)
+            break
+
+          case 'folders':
+            this.showPayload(
+              `api/dm/projects/${data.node.projectId}/folders/` +
+                `${data.node.folderId}`)
+            break
+
+          case 'items':
+            this.showPayload(
+              `api/dm/projects/${data.node.projectId}/folders/` +
+                `${data.node.folderId}/items/${data.node.itemId}`)
+            break
+        }
       }
     })
 
@@ -67,41 +93,14 @@ export default class DataManagementPanel extends EventsEmitter {
         console.log({
           versions: data.node.versions
         })
+
+        this.showPayload(
+          `api/dm/projects/${data.node.projectId}/items/` +
+            `${data.node.itemId}/versions`)
       }
     })
 
-    this.contextMenu.on('context.manifest.show', (data) => {
-
-      let urn = this.getLastVersionURN(data.node)
-
-      var uri = `api/derivatives/manifest/${urn}`
-      var link = document.createElement("a")
-      link.target = '_blank'
-      link.href = uri
-      link.click()
-    })
-
-    this.contextMenu.on('context.manifest.delete', (data) => {
-
-      let urn = this.getLastVersionURN(data.node)
-
-      data.node.showLoader(true)
-
-      this.derivativesAPI.deleteManifest(urn).then(() => {
-
-        data.node.manifest = null
-
-        data.node.parent.classList.remove('derivated')
-
-        data.node.showLoader(false)
-
-      }, (err) => {
-
-        data.node.showLoader(false)
-      })
-    })
-
-    this.contextMenu.on('context.viewable', async(data) => {
+    this.contextMenu.on('context.viewable.create', async(data) => {
 
       try {
 
@@ -145,6 +144,62 @@ export default class DataManagementPanel extends EventsEmitter {
         data.node.showLoader(false)
       }
     })
+
+    this.contextMenu.on('context.viewable.delete', (data) => {
+
+      let urn = this.getLastVersionURN(data.node)
+
+      data.node.showLoader(true)
+
+      this.derivativesAPI.deleteManifest(urn).then(() => {
+
+        data.node.manifest = null
+
+        data.node.parent.classList.remove('derivated')
+
+        data.node.showLoader(false)
+
+      }, (err) => {
+
+        data.node.showLoader(false)
+      })
+    })
+
+    this.contextMenu.on('context.derivatives.manage', (data) => {
+
+      try {
+
+        const dlg = new ToolPanelModal(appContainer, {
+          title: 'Model Derivatives: ' + data.node.objectKey,
+          height: 'calc(100% - 100px)',
+          width: 'calc(100% - 100px)'
+        })
+
+        const pane = new DerivativesManagerPane()
+
+        dlg.bodyContent(pane.domElement)
+
+        pane.load()
+
+        dlg.setVisible(true)
+
+      } catch (ex) {
+
+        console.log(ex)
+      }
+    })
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////
+  showPayload (uri, target = '_blank') {
+
+    var link = document.createElement('a')
+    link.target = target
+    link.href = uri
+    link.click()
   }
 
   ///////////////////////////////////////////////////////////////////
@@ -185,9 +240,10 @@ export default class DataManagementPanel extends EventsEmitter {
         node = new TreeNode({
           name: item.attributes.displayName,
           projectId: parent.projectId,
+          folderId: parent.folderId,
           hubId: parent.hubId,
-          folderId: item.id,
           type: item.type,
+          itemId: item.id,
           details: item,
           tooltip: true,
           id: item.id,
@@ -425,20 +481,22 @@ class DMTreeDelegate extends BaseTreeDelegate {
     if (node.tooltip) {
 
       let html = `
-        <label class="${node.type}" id="${labelId}"
-          ${options && options.localize?"data-i18n=" + text : ''}
-            data-placement="right"
-            data-toggle="tooltip"
-            data-delay='{"show":"1000", "hide":"100"}'
-            title="loading item ...">
-          ${text}
-        </label>
+        <div class="label-container">
+            <label class="${node.type}" id="${labelId}"
+              ${options && options.localize?"data-i18n=" + text : ''}
+                data-placement="right"
+                data-toggle="tooltip"
+                data-delay='{"show":"1000", "hide":"100"}'
+                title="loading item ...">
+              ${text}
+            </label>
+        </div>
       `
 
       $(parent).append(html)
 
       $(parent).find('label[data-toggle="tooltip"]').tooltip({
-        container: 'body',
+        container: $(parent),
         animated: 'fade',
         html: true
       })
@@ -454,10 +512,12 @@ class DMTreeDelegate extends BaseTreeDelegate {
     } else {
 
       let label = `
-        <label class="${node.type}" id="${labelId}"
-          ${options && options.localize?"data-i18n=" + text : ''}>
-          ${text}
-        </label>
+        <div class="label-container">
+            <label class="${node.type}" id="${labelId}"
+              ${options && options.localize?"data-i18n=" + text : ''}>
+              ${text}
+            </label>
+        </div>
       `
 
       $(parent).append(label)
@@ -769,8 +829,8 @@ class DMTreeDelegate extends BaseTreeDelegate {
                     folderItem)
 
                   resolve(itemNode)
-                }
-                else {
+
+                } else {
 
                   let child = new TreeNode({
                     name: folderItem.attributes.displayName,

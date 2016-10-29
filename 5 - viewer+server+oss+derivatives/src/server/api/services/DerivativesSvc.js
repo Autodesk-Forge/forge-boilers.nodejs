@@ -6,6 +6,12 @@ import util from 'util'
 
 export default class DerivativeSvc extends BaseSvc {
 
+  static get SERVICE_BASE_URL () {
+
+    return 'https://developer.api.autodesk.com/modelderivative/v2'
+
+  }
+
   /////////////////////////////////////////////////////////////////
   //
   //
@@ -168,14 +174,14 @@ export default class DerivativeSvc extends BaseSvc {
     //return this._derivativesAPI.deleteManifest (urn)
 
     var url = util.format(
-      'https://developer.api.autodesk.com/modelderivative/v2/designdata/%s/manifest',
+      `${DerivativeSvc.SERVICE_BASE_URL}/designdata/%s/manifest`,
       urn)
 
     return requestAsync({
-      url: url,
-      token: token,
       method: 'DELETE',
-      json: false
+      token: token,
+      json: false,
+      url: url
     })
   }
 
@@ -188,7 +194,7 @@ export default class DerivativeSvc extends BaseSvc {
     this._APIAuth.accessToken = token
 
     return this._derivativesAPI.getDerivativeManifest(
-      urn, encodeURIComponent(derivativeURN), opts)
+      urn, derivativeURN, opts)
   }
 
   /////////////////////////////////////////////////////////////////
@@ -200,7 +206,7 @@ export default class DerivativeSvc extends BaseSvc {
     //TODO: change to SDK code
 
     var url = util.format(
-      'https://developer.api.autodesk.com/modelderivative/v2/designdata/%s/thumbnail?width=%s&height=%s',
+      `${DerivativeSvc.SERVICE_BASE_URL}/designdata/%s/thumbnail?width=%s&height=%s`,
       urn, options.width, options.height)
 
     return new Promise((resolve, reject) => {
@@ -311,8 +317,8 @@ function requestAsync(params) {
         }
 
         return resolve(body || {})
-      }
-      catch(ex){
+
+      } catch(ex){
 
         console.log(params.url)
         console.log(ex)

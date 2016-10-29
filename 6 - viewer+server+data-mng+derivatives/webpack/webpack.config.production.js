@@ -51,8 +51,8 @@ module.exports = {
 
     new webpack.ProvidePlugin({
       'window.jQuery': 'jquery',
-      _ : 'underscore',
       jQuery: 'jquery',
+      _ : 'lodash',
       $: 'jquery'
     }),
 
@@ -78,6 +78,7 @@ module.exports = {
   resolve: {
     extensions: ['', '.js', '.jsx', '.json'],
     root: [
+      path.resolve('./src/client/utils/Viewing.Extensions'),
       path.resolve('./src/client/Components'),
       path.resolve('./src/client/styles'),
       path.resolve('./src/client/utils'),

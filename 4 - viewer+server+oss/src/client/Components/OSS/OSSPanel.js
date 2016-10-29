@@ -109,7 +109,7 @@ export default class OSSPanel {
 
     let rootNode = {
       id: guid(),
-      name: 'OSS Root Storage',
+      name: 'Root Storage',
       type: 'oss.root',
       group: true
     }

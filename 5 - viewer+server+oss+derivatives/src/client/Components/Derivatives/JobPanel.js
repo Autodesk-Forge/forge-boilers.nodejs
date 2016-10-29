@@ -4,7 +4,7 @@
 //
 /////////////////////////////////////////////////////////////////////
 import ToolPanelBase from 'ToolPanelBase/ToolPanelBase'
-import './Derivatives.css'
+import './Derivatives.scss'
 
 export default class JobPanel extends ToolPanelBase {
 

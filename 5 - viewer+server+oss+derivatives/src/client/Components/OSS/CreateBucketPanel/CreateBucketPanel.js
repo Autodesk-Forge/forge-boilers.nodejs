@@ -5,7 +5,7 @@
 /////////////////////////////////////////////////////////////////////
 import ToolPanelModal from 'ToolPanelModal/ToolPanelModal'
 import Dropdown from 'Dropdown/Dropdown'
-import './CreateBucketPanel.css'
+import './CreateBucketPanel.scss'
 
 export default class CreateBucketPanel extends ToolPanelModal {
 

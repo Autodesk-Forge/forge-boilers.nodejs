@@ -1,8 +1,8 @@
 
-import { EventsEmitterComposer } from 'EventsEmitter'
+import EventsEmitter from 'EventsEmitter'
 
 export default class DataManagementContextMenu extends
-  EventsEmitterComposer (Autodesk.Viewing.UI.ObjectContextMenu) {
+  EventsEmitter.Composer (Autodesk.Viewing.UI.ObjectContextMenu) {
 
   /////////////////////////////////////////////////////////////////
   // Class constructor
@@ -86,27 +86,18 @@ export default class DataManagementContextMenu extends
         if (node.manifest) {
 
           menu.push({
-            title: 'Show manifest',
-            target: () => {
-              this.emit('context.manifest.show', {
-                event, node
-              })
-            }
-          })
-
-          menu.push({
-            title: 'Delete manifest',
-            target: () => {
-              this.emit('context.manifest.delete', {
-                event, node
-              })
-            }
-          })
-
-          menu.push({
             title: 'Re-generate viewable',
             target: () => {
-              this.emit('context.viewable', {
+              this.emit('context.viewable.create', {
+                event, node
+              })
+            }
+          })
+
+          menu.push({
+            title: 'Delete viewable',
+            target: () => {
+              this.emit('context.viewable.delete', {
                 event, node
               })
             }
@@ -117,7 +108,7 @@ export default class DataManagementContextMenu extends
           menu.push({
             title: 'Generate viewable',
             target: () => {
-              this.emit('context.viewable', {
+              this.emit('context.viewable.create', {
                 event, node
               })
             }

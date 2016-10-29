@@ -49,7 +49,12 @@
 
             <div class="navbar-collapse collapse">
               <ul class="nav navbar-nav">
-                <li id="oss-toggle" class="active"><a href="#">OSS</a></li>
+                <li id="oss-toggle" class="active">
+                    <a href="#">
+                        <span class="forge-span fa fa-database"></span>
+                        &nbsp;Storage
+                    </a>
+                </li>
               </ul>
               <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
@@ -57,9 +62,11 @@
                      data-toggle="dropdown"
                      role="button" aria-haspopup="true"
                      aria-expanded="false">
-                    Dropdown
-                    <span class="caret"></span></a>
+                     <span class="forge-span fa fa-gear"></span>
+                      &nbsp;Settings
+                      <span class="caret"></span></a>
                   <ul class="dropdown-menu">
+                    <li class="dropdown-header">Nav header</li>
                     <li><a href="#">Action</a></li>
                     <li><a href="#">Another action</a></li>
                     <li><a href="#">Something else here</a></li>
@@ -69,26 +76,33 @@
                     <li><a href="#">One more separated link</a></li>
                   </ul>
                 </li>
-                <li><a href="#">About</a></li>
+                <li>
+                    <a href="#">
+                        <span class="forge-span fa fa-question-circle"></span>
+                        &nbsp;About
+                    </a>
+                </li>
               </ul>
             </div>
           </div>
         </nav>
 
-        <div id="appContainer" class="AppContainer">
-          <div class="panel-container">
-
-            <div class="panel-left oss-panel">
-              <div id="oss" class="storage"></div>
+        <div id="app-panel" class="ui-panel app-panel">
+            <div class="ui-panel left-panel data-panel">
+                <div class="ui-panel top-panel">
+                    <div id="oss-panel" class="ui-panel storage">
+                    </div>
+                </div>
+                <div class="horizontal-splitter">
+                </div>
+                <div id="derivatives-panel" class="ui-panel bottom-panel derivatives"></div>
             </div>
-
-            <div class="splitter oss-panel">
+            <div class="vertical-splitter">
             </div>
-
-            <div class="panel-right">
-              <div id="viewer" class="viewer"></div>
+            <div class="ui-panel right-panel">
+              <div id="viewer-panel" class="ui-panel viewer-panel">
+              </div>
             </div>
-          </div>
         </div>
     </body>
 </html>

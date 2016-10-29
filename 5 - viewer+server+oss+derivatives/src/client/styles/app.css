@@ -3,11 +3,102 @@ body{
     margin:0;
 }
 
-.app-container {
-    position: relative;
+.ui-panel {
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
 }
 
-.viewer {
+.app-panel {
+    height: calc(100vh - 65px);
+    display: flex;
+    flex-direction: row;
+    border: 1px solid silver;
+    overflow: hidden;
+    /* avoid browser level touch actions */
+    xtouch-action: none;
+}
+
+.data-panel {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid silver;
+    overflow: hidden;
+    /* avoid browser level touch actions */
+    xtouch-action: none;
+}
+
+.left-panel {
+    flex: 1 0 auto;
+    /* only manually resize */
+    width: 30%;
+    min-height: 200px;
+    min-width: 150px;
+    white-space: nowrap;
+    background: #e7e7e7;
+}
+
+.top-panel {
+    flex: 0 0 auto;
+    /* only manually resize */
+    min-height: 100px;
+    min-width: 100px;
+    white-space: nowrap;
+    background: #e7e7e7;
+    color: white;
+    height: 40%;
+}
+
+.vertical-splitter {
+    z-index: 10;
+    margin-left: -4px;
+    flex: 0 0 auto;
+    width: 5px;
+    height: 100%;
+    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAhCAQAAABOpSL+AAAAIklEQVR4AWMwbb/PdR+JZDD9f1/oPhI5sgVGBSruc9xHIgGdSQqqQJGkRgAAAABJRU5ErkJggg==') center center no-repeat #b4b4b4;
+    cursor: ew-resize;
+    pointer-events: none;
+}
+
+.ui-resizable-e {
+    cursor: col-resize;
+}
+
+.ui-resizable-s {
+    cursor: row-resize;
+}
+
+.horizontal-splitter {
+    z-index: 10;
+    margin-top: -4px;
+    flex: 0 0 auto;
+    height: 5px;
+    width: 100%;
+    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAhCAQAAABOpSL+AAAAIklEQVR4AWMwbb/PdR+JZDD9f1/oPhI5sgVGBSruc9xHIgGdSQqqQJGkRgAAAABJRU5ErkJggg==') center center no-repeat #b4b4b4;
+    cursor: ns-resize;
+    pointer-events: none;
+}
+
+.right-panel {
+    flex: 1 1 auto;
+    /* resizable */
+    background: #eee;
+}
+
+.bottom-panel {
+    flex: 1 1 auto;
+    min-height: 200px;
+    min-width: 200px;
+    margin-top: 25px;
+    margin-left: 4px;
+    width: calc(100% - 12px);
+}
+
+.ui-panel .storage {
+    overflow-y: auto;
+}
+
+.viewer-panel {
     position: relative;
     height: calc(100vh - 69px);
     width: 100%;
@@ -39,7 +130,7 @@ body{
     padding-top: 0;
 }
 
-.dropdown-menu>li>a {
+.dropdown-menu > li > a {
     height: 30px;
     line-height: 23px;
     padding: 3px 20px;
@@ -47,12 +138,18 @@ body{
 
 .navbar-default {
     border-color: #F5C70A;
-    border-bottom-width: 4px;
+    border-bottom-width: 2px;
 }
 
 .navbar .container {
     width: calc(100% - 50px);
     margin-left: 15px;
+}
+
+.navbar .forge-span {
+    position: relative;
+    font-size: 20px;
+    top: 3px;
 }
 
 .app-logo {

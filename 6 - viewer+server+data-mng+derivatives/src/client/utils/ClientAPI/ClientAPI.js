@@ -5,7 +5,7 @@ export default class ClientAPI {
   // constructor
   //
   /////////////////////////////////////////////////////////////
-  constructor(apiUrl) {
+  constructor (apiUrl) {
 
     this.apiUrl = apiUrl
   }

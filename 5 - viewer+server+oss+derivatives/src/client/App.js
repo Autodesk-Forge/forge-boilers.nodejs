@@ -16,17 +16,20 @@
 // UNINTERRUPTED OR ERROR FREE.
 /////////////////////////////////////////////////////////////////////
 import ViewerPanel from 'Components/Viewer/ViewerPanel'
+import {DerivativesManagerPanel} from 'Derivatives'
 import OSSPanel from 'Components/OSS/OSS.Panel'
 import 'jquery-ui/themes/base/resizable.css'
 import 'jquery-ui/ui/widgets/resizable'
+import 'font-awesome-webpack'
 import 'bootstrap-webpack'
-import 'splitter.css'
 import 'jquery-ui'
 import 'app.css'
 
 export default class App {
 
   constructor() {
+
+    this.derivativesPanel = new DerivativesManagerPanel()
 
     this.viewerPanel = new ViewerPanel()
 
@@ -46,61 +49,99 @@ export default class App {
   ///////////////////////////////////////////////////////////////////
   initialize () {
 
-    $(".panel-left").resizable({
-      handles: 'e, w',
+    $('.left-panel').resizable({
+      handles: 'e',
       resize : (event, ui) => {
 
         this.viewerPanel.onResize()
       },
-      create: async(event, ui) => {
+      create: (event, ui) => {
 
-        $(".ui-resizable-e").css("cursor","col-resize")
+        $('.top-panel').resizable({
+          handles: 's',
+          create: (event, ui) => {
 
-        var viewerContainer =
-          document.getElementById('viewer')
-
-        this.viewerPanel.initialize(viewerContainer)
-
-        var panelContainer =
-         document.getElementById('oss')
-
-        var appContainer =
-          document.getElementById('appContainer')
-
-        this.ossPanel.initialize(
-          panelContainer,
-          appContainer,
-          viewerContainer)
-
-        this.ossPanel.on('loadObject', (details) => {
-
-          return new Promise(async(resolve, reject) => {
-
-            let urn = 'urn:' + window.btoa(details.objectId)
-
-            let doc = await this.viewerPanel.loadDocument(urn)
-
-            let viewer = this.viewerPanel.viewer
-
-            if (viewer.model) {
-
-              viewer.impl.unloadModel(
-                viewer.model)
-
-              viewer.impl.sceneUpdated(true)
+            this.panelContainers = {
+              derivatives: document.getElementById('derivatives-panel'),
+              viewer: document.getElementById('viewer-panel'),
+              app: document.getElementById('app-panel'),
+              oss: document.getElementById('oss-panel')
             }
 
-            let path = this.viewerPanel.getDefaultViewablePath(doc)
+            this.derivativesPanel.initialize(
+              this.panelContainers.derivatives)
 
-            let options = {}
+            this.viewerPanel.initialize(
+              this.panelContainers.viewer)
 
-            viewer.loadModel(path, options, (model) => {
+            this.ossPanel.initialize(
+              this.panelContainers.oss,
+              this.panelContainers.app,
+              this.panelContainers.viewer)
 
-              resolve(model)
+            this.ossPanel.on('loadObject', (item) => {
+
+              const urn = 'urn:' + window.btoa(item.objectId)
+
+              return this.onLoadItem(urn)
             })
-          })
+
+            this.ossPanel.on('loadDerivatives', (item) => {
+
+              const urn = window.btoa(item.objectId).replace(
+                new RegExp('=', 'g'), '')
+
+              return this.onLoadDerivatives(
+                item.objectkey, urn)
+            })
+          }
         })
       }
+    })
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////
+  onLoadItem (urn) {
+
+    return new Promise(async(resolve, reject) => {
+
+      let doc = await this.viewerPanel.loadDocument(urn)
+
+      let viewer = this.viewerPanel.viewer
+
+      if (viewer.model) {
+
+        viewer.impl.unloadModel(
+          viewer.model)
+
+        viewer.impl.sceneUpdated(true)
+      }
+
+      let path = this.viewerPanel.getDefaultViewablePath(doc)
+
+      let loadOptions = {}
+
+      viewer.loadModel(path, loadOptions, (model) => {
+
+        resolve(model)
+      })
+    })
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////
+  onLoadDerivatives (objectKey, urn) {
+
+    return new Promise((resolve, reject) => {
+
+      this.derivativesPanel.load(urn)
+
+      resolve()
     })
   }
 
@@ -110,7 +151,7 @@ export default class App {
   ///////////////////////////////////////////////////////////////////
   onToggleOSS () {
 
-    $('.oss-panel').css({
+    $('.left-panel').css({
       display: this.$toggleOSS.hasClass('active') ?
         'none' : 'block'
     })

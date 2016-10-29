@@ -5,7 +5,7 @@ export default class ClientAPI {
   // constructor
   //
   /////////////////////////////////////////////////////////////
-  constructor(apiUrl) {
+  constructor (apiUrl) {
 
     this.apiUrl = apiUrl
   }
@@ -45,7 +45,7 @@ export default class ClientAPI {
     return new Promise((resolve, reject) => {
 
       Object.assign(params, {
-        success: (response)=> {
+        success: (response) => {
 
           resolve(response)
         },

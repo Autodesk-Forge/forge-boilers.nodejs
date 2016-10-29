@@ -1,4 +1,16 @@
 
+.storage .treeview .label-container {
+    pointer-events: none;
+    overflow-x: hidden;
+}
+
+.storage .treeview .oss.object .label-container {
+  pointer-events: auto;
+  overflow-y: visible;
+  position: relative;
+  top: 2px;
+}
+
 .storage .treeview label {
     text-decoration: none;
     color: black;
@@ -20,7 +32,7 @@
     margin-left: 6px;
     height: 19px;
     width: 19px;
-    top: -1px;
+    top: 0px;
 }
 
 .storage .treeview .label-loader-2 {
@@ -63,7 +75,7 @@
 }
 
 .storage .treeview header {
-    width: calc(100% - 34px);
+    width: calc(100% - 20px);
     height: 35px;
 }
 
@@ -142,4 +154,10 @@
 
 .storage .glyphicon-cloud-download {
     color: #0ecc1f
+}
+
+.storage .tooltip-inner {
+    border: 1px solid #b4b4b4;
+    background-color: #f8f8f8;
+    color: #000000;
 }

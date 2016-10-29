@@ -15,6 +15,7 @@
 // DOES NOT WARRANT THAT THE OPERATION OF THE PROGRAM WILL BE
 // UNINTERRUPTED OR ERROR FREE.
 /////////////////////////////////////////////////////////////////////
+import ModelTransformerExtension from 'Viewing.Extension.ModelTransformer'
 import DMPanel from 'Components/DataManagement/DataManagement.Panel'
 import ViewerPanel from 'Components/Viewer/Viewer.Panel'
 import ServiceManager from 'Services/SvcManager'
@@ -24,7 +25,6 @@ import SocketSvc from 'Services/SocketSvc'
 import 'jquery-ui/ui/widgets/resizable'
 import 'font-awesome-webpack'
 import 'bootstrap-webpack'
-import 'splitter.css'
 import 'jquery-ui'
 import 'app.css'
 
@@ -185,105 +185,105 @@ export default class App {
   ///////////////////////////////////////////////////////////////////
   initialize () {
 
-    $(".panel-left").resizable({
-      handles: 'e, w',
+    $(".left-panel").resizable({
+      handles: 'e',
       resize : (event, ui) => {
 
         this.viewerPanel.onResize()
       },
       create: (event, ui) => {
 
-        $(".ui-resizable-e").css("cursor","col-resize")
+        $('.top-panel').resizable({
+          handles: 's',
+          create: (event, ui) => {
 
-        var panelContainer =
-         document.getElementById('dm')
-
-        var appContainer =
-          document.getElementById('appContainer')
-
-        var viewerContainer =
-          document.getElementById('viewer')
-
-        this.dmPanel.initialize(
-          panelContainer,
-          appContainer,
-          viewerContainer)
-
-        this.dmPanel.on('loadItem', (item) => {
-
-          return new Promise(async(resolve, reject) => {
-
-            var version = item.versions[ item.versions.length - 1 ]
-
-            let urn = window.btoa(
-              version.relationships.storage.data.id)
-
-            urn = 'urn:' + urn.replace(new RegExp('=', 'g'), '')
-
-            this.viewerPanel.setTokenUrl(
-              config.forge.token3LeggedUrl)
-
-            let doc = await this.viewerPanel.loadDocument(urn)
-
-            let viewer = this.viewerPanel.viewer
-
-            if (viewer.model) {
-
-              viewer.impl.unloadModel(
-                viewer.model)
-
-              viewer.impl.sceneUpdated(true)
+            this.panelContainers = {
+              derivatives: document.getElementById('derivatives-panel'),
+              viewer: document.getElementById('viewer-panel'),
+              app: document.getElementById('app-panel'),
+              dm: document.getElementById('dm-panel')
             }
 
-            let path = this.viewerPanel.getDefaultViewablePath(doc)
+            this.dmPanel.initialize(
+              this.panelContainers.dm,
+              this.panelContainers.app,
+              this.panelContainers.viewer)
 
-            let options = {}
+            //this.dmPanel.on('loadItem', (item) => {
+            //
+            //  return new Promise(async(resolve, reject) => {
+            //
+            //    var version = item.versions[ item.versions.length - 1 ]
+            //
+            //    let urn = window.btoa(
+            //      version.relationships.storage.data.id)
+            //
+            //    urn = 'urn:' + urn.replace(new RegExp('=', 'g'), '')
+            //
+            //    this.viewerPanel.setTokenUrl(
+            //      config.forge.token3LeggedUrl)
+            //
+            //    let doc = await this.viewerPanel.loadDocument(urn)
+            //
+            //    let viewer = this.viewerPanel.viewer
+            //
+            //    let path = this.viewerPanel.getDefaultViewablePath(doc)
+            //
+            //    let options = {}
+            //
+            //    viewer.loadExtension(ModelTransformerExtension, {
+            //      autoload: true
+            //    })
+            //
+            //    viewer.loadModel(path, options, (model) => {
+            //
+            //      model.name = item.name
+            //
+            //      resolve(model)
+            //    })
+            //  })
+            //})
 
-            viewer.loadModel(path, options, (model) => {
-
-              resolve(model)
+            let socketSvc = new SocketSvc({
+              host: config.host,
+              port: config.port
             })
-          })
-        })
 
-        let socketSvc = new SocketSvc({
-          host: config.host,
-          port: config.port
-        })
+            socketSvc.connect().then(()=> {
 
-        socketSvc.connect().then(()=>{
+              ServiceManager.registerService(socketSvc)
 
-          ServiceManager.registerService(socketSvc)
+              socketSvc.on('connection.data', (data)=> {
 
-          socketSvc.on('connection.data', (data)=> {
-
-            this.register(data.socketId)
-          })
-
-          socketSvc.emit('request.connection.data')
-
-          socketSvc.on('callback', (msg)=> {
-
-            if(this.popup) {
-
-              this.loggedIn = true
-              this.popup.close()
-              this.popup = null
-            }
-
-            if(msg === 'success') {
-
-              $.get('/api/dm/user', (user) => {
-
-                this.onUserLoggedIn(user)
+                this.register(data.socketId)
               })
-            }
-          })
-        })
 
-        $.get('/api/dm/user', (user) => {
+              socketSvc.emit('request.connection.data')
 
-          this.onUserLoggedIn(user)
+              socketSvc.on('callback', (msg)=> {
+
+                if (this.popup) {
+
+                  this.loggedIn = true
+                  this.popup.close()
+                  this.popup = null
+                }
+
+                if (msg === 'success') {
+
+                  $.get('/api/dm/user', (user) => {
+
+                    this.onUserLoggedIn(user)
+                  })
+                }
+              })
+            })
+
+            $.get('/api/dm/user', (user) => {
+
+              this.onUserLoggedIn(user)
+            })
+          }
         })
       }
     })
@@ -304,15 +304,12 @@ export default class App {
     $('#dm-user').text(' ' + username)
     $('#dm-toggle').addClass('active')
 
-    $('.dm-panel').css({
+    $('.left-panel').css({
       display: 'block'
     })
 
-    var viewerContainer =
-      document.getElementById('viewer')
-
     this.viewerPanel.initialize(
-      viewerContainer)
+      this.panelContainers.viewer)
 
     this.viewerPanel.onResize()
 

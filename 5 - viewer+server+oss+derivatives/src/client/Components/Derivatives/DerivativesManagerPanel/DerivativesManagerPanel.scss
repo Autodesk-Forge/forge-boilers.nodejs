@@ -1,0 +1,34 @@
+
+.derivatives-tab-container {
+  overflow: auto;
+  height: 100%;
+}
+
+.manifest .json-view {
+  overflow: auto;
+  height: 100%;
+}
+
+.manifest  .json-view .string,
+.manifest  .json-view .num {
+  user-select: text;
+}
+
+.manifest .controls {
+  position: absolute;
+  width: 160px;
+  right: -22px;
+  top: 4px;
+}
+
+.manifest .controls .btn {
+  margin-top: 4px;
+  width: 122px;
+  font-size: 10px;
+  padding: 4px;
+}
+
+.manifest .controls .btn span {
+ top: 2px;
+}
+

@@ -1,4 +1,8 @@
 
+.storage .treeview .label-container {
+    overflow-x: hidden;
+}
+
 .storage .treeview label {
     text-decoration: none;
     color: black;
@@ -63,7 +67,7 @@
 }
 
 .storage .treeview header {
-    width: calc(100% - 34px);
+    width: calc(100% - 20px);
     height: 35px;
 }
 

@@ -60,47 +60,6 @@ export default class OSSContextMenu extends
 
       case 'oss.object':
 
-        if (node.manifest) {
-
-          menu.push({
-            title: 'Show manifest',
-            target: () => {
-              this.emit('context.derivatives.manifest.show', {
-                event, node
-              })
-            }
-          })
-
-          menu.push({
-            title: 'Delete manifest',
-            target: () => {
-              this.emit('context.derivatives.manifest.delete', {
-                event, node
-              })
-            }
-          })
-
-          menu.push({
-            title: 'Re-generate viewable',
-            target: () => {
-              this.emit('context.derivatives.viewable.create', {
-                event, node
-              })
-            }
-          })
-
-        } else {
-
-          menu.push({
-            title: 'Generate viewable',
-            target: () => {
-              this.emit('context.derivatives.viewable.create', {
-                event, node
-              })
-            }
-          })
-        }
-
         menu.push({
           title: 'Object details',
           target: () => {
@@ -118,6 +77,38 @@ export default class OSSContextMenu extends
             })
           }
         })
+
+        if (node.manifest) {
+
+          menu.push({
+            title: 'Re-generate viewable',
+            target: () => {
+              this.emit('context.viewable.create', {
+                event, node
+              })
+            }
+          })
+
+          menu.push({
+            title: 'Delete viewable',
+            target: () => {
+              this.emit('context.viewable.delete', {
+                event, node
+              })
+            }
+          })
+
+        } else {
+
+          menu.push({
+            title: 'Generate viewable',
+            target: () => {
+              this.emit('context.viewable.create', {
+                event, node
+              })
+            }
+          })
+        }
 
         break
     }

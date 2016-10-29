@@ -16,13 +16,14 @@
 // UNINTERRUPTED OR ERROR FREE.
 /////////////////////////////////////////////////////////////////////
 import CreateBucketPanel from './CreateBucketPanel/CreateBucketPanel'
-import DerivativesAPI from '../Derivatives/Derivatives.API'
+import DerivativesAPI from 'Derivatives/Derivatives.API'
 import { BaseTreeDelegate, TreeNode } from 'TreeView'
+import ToolPanelModal from 'ToolPanelModal'
 import ContextMenu from './OSS.ContextMenu'
 import EventsEmitter from 'EventsEmitter'
 import Dropzone from 'dropzone'
 import OSSAPI from './OSS.API'
-import './OSS.Panel.css'
+import './OSS.Panel.scss'
 
 export default class OSSPanel extends EventsEmitter {
 
@@ -38,6 +39,11 @@ export default class OSSPanel extends EventsEmitter {
     this.onNodeDblClickHandler = (node) => {
 
       this.onNodeDblClick (node)
+    }
+
+    this.onNodeIconClickHandler = (node) => {
+
+      this.onNodeIconClick (node)
     }
   }
 
@@ -64,6 +70,20 @@ export default class OSSPanel extends EventsEmitter {
       if(data.node.details) {
 
         console.log(data.node.details)
+
+        switch(data.node.type) {
+
+          case 'oss.bucket':
+            this.showPayload(
+              `api/oss/buckets/${data.node.bucketKey}/details`)
+            break
+
+          case 'oss.object':
+            this.showPayload(
+              `api/oss/buckets/${data.node.bucketKey}/objects/` +
+                `${data.node.objectKey}/details`)
+            break
+        }
       }
     })
 
@@ -88,8 +108,6 @@ export default class OSSPanel extends EventsEmitter {
 
           let response = await this.ossAPI.createBucket(
             bucketCreationData)
-
-          console.log(response)
 
           let bucketNode = new TreeNode({
             bucketKey: response.bucketKey,
@@ -136,23 +154,11 @@ export default class OSSPanel extends EventsEmitter {
       data.node.remove()
     })
 
-    this.contextMenu.on('context.derivatives.manifest.show', (data) => {
-
-      let urn = window.btoa(data.node.details.objectId).replace(
-        new RegExp('=', 'g'), '')
-
-      var uri = `api/derivatives/manifest/${urn}`
-      var link = document.createElement("a")
-      link.target = '_blank'
-      link.href = uri
-      link.click()
-    })
-
-    this.contextMenu.on('context.derivatives.manifest.delete', (data) => {
+    this.contextMenu.on('context.viewable.delete', (data) => {
 
       data.node.showLoader(true)
 
-      let urn = window.btoa(data.node.details.objectId).replace(
+      const urn = window.btoa(data.node.details.objectId).replace(
         new RegExp('=', 'g'), '')
 
       this.derivativesAPI.deleteManifest(urn).then(() => {
@@ -165,7 +171,7 @@ export default class OSSPanel extends EventsEmitter {
       })
     })
 
-    this.contextMenu.on('context.derivatives.viewable.create', async(data) => {
+    this.contextMenu.on('context.viewable.create', async(data) => {
 
       try {
 
@@ -210,9 +216,12 @@ export default class OSSPanel extends EventsEmitter {
     delegate.on('node.dblClick',
       this.onNodeDblClickHandler)
 
+    delegate.on('node.iconClick',
+      this.onNodeIconClickHandler)
+
     let rootNode = {
       id: guid(),
-      name: 'OSS Root Storage',
+      name: 'Root Storage',
       type: 'oss.root',
       group: true
     }
@@ -227,9 +236,21 @@ export default class OSSPanel extends EventsEmitter {
   //
   //
   ///////////////////////////////////////////////////////////////////
+  showPayload (uri, target = '_blank') {
+
+    var link = document.createElement('a')
+    link.target = target
+    link.href = uri
+    link.click()
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////
   onObjectNodeAdded (node) {
 
-    let urn = window.btoa(node.details.objectId).replace(
+    const urn = window.btoa(node.details.objectId).replace(
       new RegExp('=', 'g'), '')
 
     this.derivativesAPI.getManifest(
@@ -306,6 +327,23 @@ export default class OSSPanel extends EventsEmitter {
       }
     }
   }
+
+  ///////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////
+  onNodeIconClick (node) {
+
+    if (node.type === 'oss.object' && node.manifest) {
+
+      node.showLoader(true)
+
+      this.emit('loadDerivatives', node.details).then(() => {
+
+        node.showLoader(false)
+      })
+    }
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -351,20 +389,22 @@ class OSSTreeDelegate extends BaseTreeDelegate {
     if (node.tooltip) {
 
       let html = `
-        <label class="${node.type}" id="${labelId}"
-          ${options && options.localize?"data-i18n=" + text : ''}
-            data-placement="right"
-            data-toggle="tooltip"
-            data-delay='{"show":"1000", "hide":"100"}'
-            title="loading item ...">
-          ${text}
-        </label>
+        <div class="label-container">
+            <label class="${node.type}" id="${labelId}"
+              ${options && options.localize?"data-i18n=" + text : ''}
+                data-placement="right"
+                data-toggle="tooltip"
+                data-delay='{"show":"1000", "hide":"100"}'
+                title="loading item ...">
+              ${text}
+            </label>
+        </div>
       `
 
       $(parent).append(html)
 
       $(parent).find('label[data-toggle="tooltip"]').tooltip({
-        container: 'body',
+        container: $(parent),
         animated: 'fade',
         html: true
       })
@@ -380,10 +420,12 @@ class OSSTreeDelegate extends BaseTreeDelegate {
     } else {
 
       let label = `
-        <label class="${node.type}" id="${labelId}"
-          ${options && options.localize?"data-i18n=" + text : ''}>
-          ${text}
-        </label>
+        <div class="label-container">
+            <label class="${node.type}" id="${labelId}"
+              ${options && options.localize?"data-i18n=" + text : ''}>
+              ${text}
+            </label>
+        </div>
       `
 
       $(parent).append(label)

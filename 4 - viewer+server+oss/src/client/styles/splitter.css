@@ -20,9 +20,9 @@
 
 .splitter {
     z-index: 10;
-    margin-left: -3px;
+    margin-left: 0px;
     flex: 0 0 auto;
-    width: 6px;
+    width: 5px;
     background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAhCAQAAABOpSL+AAAAIklEQVR4AWMwbb/PdR+JZDD9f1/oPhI5sgVGBSruc9xHIgGdSQqqQJGkRgAAAABJRU5ErkJggg==') center center no-repeat #b4b4b4;
     min-height: 200px;
     /*cursor: col-resize;*/

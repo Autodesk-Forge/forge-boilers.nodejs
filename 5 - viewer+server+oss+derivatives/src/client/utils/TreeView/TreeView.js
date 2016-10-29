@@ -52,6 +52,8 @@ export class BaseTreeDelegate extends
 
       tree.setCollapsed(node, !tree.isCollapsed(node))
 
+      this.emit('node.iconClick', node)
+
     }, 200)
   }
 
@@ -103,6 +105,9 @@ export class BaseTreeDelegate extends
   //
   ///////////////////////////////////////////////////////////////////
   onTreeNodeRightClick (tree, node, event) {
+
+    event.stopPropagation()
+    event.preventDefault()
 
     if (this.nodeClickSelector(event)) {
 

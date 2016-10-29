@@ -50,8 +50,8 @@ module.exports = {
 
     new webpack.ProvidePlugin({
       'window.jQuery': 'jquery',
-      _ : 'underscore',
       jQuery: 'jquery',
+      _ : 'lodash',
       $: 'jquery'
     }),
 

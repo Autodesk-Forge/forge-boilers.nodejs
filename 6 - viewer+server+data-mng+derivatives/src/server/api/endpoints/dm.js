@@ -166,6 +166,39 @@ module.exports = function() {
   })
 
   /////////////////////////////////////////////////////////////////////////////
+  // GET /projects/{projectId}/folders/{folderId}/items/{itemId}
+  // Get item details
+  //
+  /////////////////////////////////////////////////////////////////////////////
+  router.get('/projects/:projectId/folders/:folderId/items/:itemId', async (req, res) => {
+
+    try {
+
+      var projectId = req.params.projectId
+
+      var folderId = req.params.folderId
+
+      var forgeSvc = ServiceManager.getService(
+        'ForgeSvc');
+
+      var token = await forgeSvc.get3LeggedTokenMaster(
+        req.session)
+
+      var dmSvc = ServiceManager.getService('DMSvc')
+
+      var response = await dmSvc.getFolderContent(
+        token.access_token, projectId, folderId)
+
+      res.json(response)
+    }
+    catch (ex) {
+
+      res.status(ex.status || 500)
+      res.json(ex)
+    }
+  })
+
+  /////////////////////////////////////////////////////////////////////////////
   // GET /project/{projectId}/items/{itemId}/versions
   // Get all item versions
   //
