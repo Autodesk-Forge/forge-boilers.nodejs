@@ -16,16 +16,16 @@
 // UNINTERRUPTED OR ERROR FREE.
 /////////////////////////////////////////////////////////////////////
 import CreateBucketPanel from './CreateBucketPanel/CreateBucketPanel'
-import DerivativesAPI from 'Derivatives/Derivatives.API'
 import { BaseTreeDelegate, TreeNode } from 'TreeView'
+import {API as DerivativesAPI} from 'Derivatives'
 import ToolPanelModal from 'ToolPanelModal'
 import ContextMenu from './OSS.ContextMenu'
-import EventsEmitter from 'EventsEmitter'
+import UIComponent from 'UIComponent'
 import Dropzone from 'dropzone'
 import OSSAPI from './OSS.API'
 import './OSS.Panel.scss'
 
-export default class OSSPanel extends EventsEmitter {
+export default class OSSPanel extends UIComponent {
 
   constructor () {
 
@@ -205,7 +205,7 @@ export default class OSSPanel extends EventsEmitter {
       }
     })
 
-    let delegate = new OSSTreeDelegate(
+    const delegate = new OSSTreeDelegate(
       domContainer,
       this.ossAPI,
       this.contextMenu)
@@ -230,18 +230,6 @@ export default class OSSPanel extends EventsEmitter {
       delegate, rootNode, domContainer, {
         excludeRoot: false
       })
-  }
-
-  ///////////////////////////////////////////////////////////////////
-  //
-  //
-  ///////////////////////////////////////////////////////////////////
-  showPayload (uri, target = '_blank') {
-
-    var link = document.createElement('a')
-    link.target = target
-    link.href = uri
-    link.click()
   }
 
   ///////////////////////////////////////////////////////////////////
@@ -334,11 +322,11 @@ export default class OSSPanel extends EventsEmitter {
   ///////////////////////////////////////////////////////////////////
   onNodeIconClick (node) {
 
-    if (node.type === 'oss.object' && node.manifest) {
+    if (node.type === 'oss.object') {
 
       node.showLoader(true)
 
-      this.emit('loadDerivatives', node.details).then(() => {
+      this.emit('loadDerivatives', node).then(() => {
 
         node.showLoader(false)
       })
@@ -404,7 +392,7 @@ class OSSTreeDelegate extends BaseTreeDelegate {
       $(parent).append(html)
 
       $(parent).find('label[data-toggle="tooltip"]').tooltip({
-        container: $(parent),
+        container: 'body',
         animated: 'fade',
         html: true
       })

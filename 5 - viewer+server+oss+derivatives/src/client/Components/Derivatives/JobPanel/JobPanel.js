@@ -3,8 +3,8 @@
 // by Philippe Leefsma, June 2016
 //
 /////////////////////////////////////////////////////////////////////
-import ToolPanelBase from 'ToolPanelBase/ToolPanelBase'
-import './Derivatives.scss'
+import ToolPanelBase from 'ToolPanelBase'
+import './JobPanel.scss'
 
 export default class JobPanel extends ToolPanelBase {
 

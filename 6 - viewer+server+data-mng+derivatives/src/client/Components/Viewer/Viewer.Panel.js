@@ -132,7 +132,7 @@ export default class ViewerPanel {
     $('.progressbg').hide()
 
     this.viewer.setBackgroundColor(
-      255, 207, 13,
+      255, 226, 110,
       219, 219, 219)
   }
 

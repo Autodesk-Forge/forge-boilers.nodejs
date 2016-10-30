@@ -52,6 +52,8 @@ export class BaseTreeDelegate extends
 
       tree.setCollapsed(node, !tree.isCollapsed(node))
 
+      this.emit('node.iconClick', node)
+
     }, 200)
   }
 

@@ -3,16 +3,16 @@
 // by Philippe Leefsma, September 2016
 //
 /////////////////////////////////////////////////////////////////////
-import DerivativesAPI from '../Derivatives/Derivatives.API'
 import ContextMenu from './DataManagement.ContextMenu'
 import { BaseTreeDelegate, TreeNode } from 'TreeView'
-import EventsEmitter from 'EventsEmitter'
+import {API as DerivativesAPI} from 'Derivatives'
 import DMAPI from './DataManagement.API'
+import UIComponent from 'UIComponent'
 import TabManager from 'TabManager'
 import Dropzone from 'dropzone'
 import './DataManagement.css'
 
-export default class DataManagementPanel extends EventsEmitter {
+export default class DataManagementPanel extends UIComponent {
 
   constructor () {
 
@@ -26,6 +26,11 @@ export default class DataManagementPanel extends EventsEmitter {
     this.onNodeDblClickHandler = (node) => {
 
       this.onNodeDblClick (node)
+    }
+
+    this.onNodeIconClickHandler = (node) => {
+
+      this.onNodeIconClick (node)
     }
   }
 
@@ -188,18 +193,6 @@ export default class DataManagementPanel extends EventsEmitter {
         console.log(ex)
       }
     })
-  }
-
-  ///////////////////////////////////////////////////////////////////
-  //
-  //
-  ///////////////////////////////////////////////////////////////////
-  showPayload (uri, target = '_blank') {
-
-    var link = document.createElement('a')
-    link.target = target
-    link.href = uri
-    link.click()
   }
 
   ///////////////////////////////////////////////////////////////////
@@ -373,6 +366,23 @@ export default class DataManagementPanel extends EventsEmitter {
     }
   }
 
+  ///////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////
+  onNodeIconClick (node) {
+
+    if (node.type === 'items') {
+
+      node.showLoader(true)
+
+      this.emit('loadDerivatives', node).then(() => {
+
+        node.showLoader(false)
+      })
+    }
+  }
+
   /////////////////////////////////////////////////////////////
   //
   //
@@ -437,6 +447,9 @@ export default class DataManagementPanel extends EventsEmitter {
 
     delegate.on('node.dblClick',
       this.onNodeDblClickHandler)
+
+    delegate.on('node.iconClick',
+      this.onNodeIconClickHandler)
   }
 }
 
@@ -496,7 +509,7 @@ class DMTreeDelegate extends BaseTreeDelegate {
       $(parent).append(html)
 
       $(parent).find('label[data-toggle="tooltip"]').tooltip({
-        container: $(parent),
+        container: 'body',
         animated: 'fade',
         html: true
       })

@@ -120,7 +120,7 @@ export default class DerivativeSvc extends BaseSvc {
   //
   //
   /////////////////////////////////////////////////////////////////
-  getMetadata (token, urn) {
+  getMetadata (token, urn, opts = {}) {
 
     this._APIAuth.accessToken = token
 
@@ -143,11 +143,11 @@ export default class DerivativeSvc extends BaseSvc {
   //
   //
   /////////////////////////////////////////////////////////////////
-  getProperties (token, urn, guid) {
+  getProperties (token, urn, guid, opts = {}) {
 
     this._APIAuth.accessToken = token
 
-    return this._derivativesAPI.getModelviewPropertie(
+    return this._derivativesAPI.getModelviewProperties(
       urn, guid, opts)
   }
 

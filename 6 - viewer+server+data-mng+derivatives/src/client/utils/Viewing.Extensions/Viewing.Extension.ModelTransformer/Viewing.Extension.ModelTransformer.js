@@ -161,6 +161,8 @@ class ModelTransformerExtension extends ExtensionBase {
         model.name = model.name ||
         'Model ' + (Object.keys(this.modelCollection).length + 1)
 
+        console.log(model)
+
         this.addModel(model)
       }
     }

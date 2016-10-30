@@ -17,6 +17,7 @@
 /////////////////////////////////////////////////////////////////////
 import ModelTransformerExtension from 'Viewing.Extension.ModelTransformer'
 import DMPanel from 'Components/DataManagement/DataManagement.Panel'
+import {ManagerPanel as DerivativesManagerPanel} from 'Derivatives'
 import ViewerPanel from 'Components/Viewer/Viewer.Panel'
 import ServiceManager from 'Services/SvcManager'
 import {clientConfig as config} from 'c0nfig'
@@ -31,6 +32,8 @@ import 'app.css'
 export default class App {
 
   constructor() {
+
+    this.derivativesPanel = new DerivativesManagerPanel()
 
     this.viewerPanel = new ViewerPanel(
       config.forge.token3LeggedUrl)
@@ -204,45 +207,23 @@ export default class App {
               dm: document.getElementById('dm-panel')
             }
 
+            this.derivativesPanel.initialize(
+              this.panelContainers.derivatives)
+
             this.dmPanel.initialize(
               this.panelContainers.dm,
               this.panelContainers.app,
               this.panelContainers.viewer)
 
-            //this.dmPanel.on('loadItem', (item) => {
-            //
-            //  return new Promise(async(resolve, reject) => {
-            //
-            //    var version = item.versions[ item.versions.length - 1 ]
-            //
-            //    let urn = window.btoa(
-            //      version.relationships.storage.data.id)
-            //
-            //    urn = 'urn:' + urn.replace(new RegExp('=', 'g'), '')
-            //
-            //    this.viewerPanel.setTokenUrl(
-            //      config.forge.token3LeggedUrl)
-            //
-            //    let doc = await this.viewerPanel.loadDocument(urn)
-            //
-            //    let viewer = this.viewerPanel.viewer
-            //
-            //    let path = this.viewerPanel.getDefaultViewablePath(doc)
-            //
-            //    let options = {}
-            //
-            //    viewer.loadExtension(ModelTransformerExtension, {
-            //      autoload: true
-            //    })
-            //
-            //    viewer.loadModel(path, options, (model) => {
-            //
-            //      model.name = item.name
-            //
-            //      resolve(model)
-            //    })
-            //  })
-            //})
+            this.dmPanel.on('loadItem', (item) => {
+
+              return this.onLoadItem (item)
+            })
+
+            this.dmPanel.on('loadDerivatives', (node) => {
+
+              return this.onLoadDerivatives (node)
+            })
 
             let socketSvc = new SocketSvc({
               host: config.host,
@@ -290,6 +271,71 @@ export default class App {
   }
 
   ///////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////
+  onLoadItem (item) {
+
+    return new Promise(async(resolve, reject) => {
+
+      var version = item.versions[ item.versions.length - 1 ]
+
+      let urn = window.btoa(
+        version.relationships.storage.data.id)
+
+      urn = 'urn:' + urn.replace(new RegExp('=', 'g'), '')
+
+      this.viewerPanel.setTokenUrl(
+        config.forge.token3LeggedUrl)
+
+      let doc = await this.viewerPanel.loadDocument(urn)
+
+      let viewer = this.viewerPanel.viewer
+
+      let path = this.viewerPanel.getDefaultViewablePath(doc)
+
+      let options = {}
+
+      viewer.loadExtension(ModelTransformerExtension, {
+        autoLoad: true
+      })
+
+      viewer.loadModel(path, options, (model) => {
+
+        model.name = item.name
+
+        resolve(model)
+      })
+    })
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////
+  onLoadDerivatives (node) {
+
+    return new Promise((resolve, reject) => {
+
+      const urn = this.dmPanel.getLastVersionURN(node)
+
+      $('#model-name').text(node.name)
+
+      this.derivativesPanel.off()
+
+      this.derivativesPanel.on('manifest.delete', () => {
+
+        node.parent.classList.remove('derivated')
+      })
+
+      this.derivativesPanel.load(urn).then(() => {
+
+        resolve()
+      })
+    })
+  }
+
+  ///////////////////////////////////////////////////////////////////
   // User logged in handler
   //
   ///////////////////////////////////////////////////////////////////
@@ -304,8 +350,8 @@ export default class App {
     $('#dm-user').text(' ' + username)
     $('#dm-toggle').addClass('active')
 
-    $('.left-panel').css({
-      display: 'block'
+    $('.data-panel').css({
+      display: 'flex'
     })
 
     this.viewerPanel.initialize(
@@ -322,12 +368,12 @@ export default class App {
   ///////////////////////////////////////////////////////////////////
   onToggleDM () {
 
-    if(this.user) {
+    if (this.user) {
 
       $('#dm-user').text('User Data')
       $('#dm-toggle').removeClass('active')
 
-      $('.dm-panel').css({
+      $('.data-panel').css({
         display: 'none'
       })
 

@@ -33,4 +33,16 @@ export default class UIComponent extends EventsEmitter {
 
     return guid
   }
+
+  ///////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////
+  showPayload (uri, target = '_blank') {
+
+    var link = document.createElement('a')
+    link.target = target
+    link.href = uri
+    link.click()
+  }
 }

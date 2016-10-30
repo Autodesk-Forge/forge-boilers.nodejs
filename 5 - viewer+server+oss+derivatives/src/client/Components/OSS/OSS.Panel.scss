@@ -95,7 +95,7 @@
     position: relative;
     margin-right: 4px;
     margin-left: 4px;
-    top: -1px;
+    top: 1px;
 }
 
 .storage .treeview group.expanded>header.oss.object.derivated>icon,
@@ -104,7 +104,7 @@
     position: relative;
     margin-right: 4px;
     margin-left: 4px;
-    top: -1px;
+    top: 1px;
 }
 
 .storage.details {
@@ -156,7 +156,7 @@
     color: #0ecc1f
 }
 
-.storage .tooltip-inner {
+div.tooltip-inner {
     border: 1px solid #b4b4b4;
     background-color: #f8f8f8;
     color: #000000;

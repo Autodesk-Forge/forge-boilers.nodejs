@@ -469,7 +469,7 @@ class RotateControl extends EventsEmitter {
         center,
         new THREE.Euler(0, Math.PI / 2, 0),
         size * 0.0045,
-        size * 0.8, 0xFF0000,
+        size * 0.4, 0xFF0000,
         Math.PI,
         new THREE.Vector3(1, 0, 0)))
 
@@ -477,7 +477,7 @@ class RotateControl extends EventsEmitter {
         center,
         new THREE.Euler(Math.PI / 2, 0, 0),
         size * 0.0045,
-        size * 0.8, 0x00FF00,
+        size * 0.4, 0x00FF00,
         2 * Math.PI,
         new THREE.Vector3(0, 1, 0)))
 
@@ -485,7 +485,7 @@ class RotateControl extends EventsEmitter {
         center,
         new THREE.Euler(0, 0, 0),
         size * 0.0045,
-        size * 0.8, 0x0000FF,
+        size * 0.4, 0x0000FF,
         Math.PI,
         new THREE.Vector3(0, 0, 1)))
 
@@ -497,7 +497,7 @@ class RotateControl extends EventsEmitter {
         center,
         new THREE.Euler(Math.PI / 2, Math.PI / 2, 0),
         size * 0.0045,
-        size * 0.8, 0xFF0000,
+        size * 0.4, 0xFF0000,
         Math.PI,
         new THREE.Vector3(1, 0, 0)))
 
@@ -505,7 +505,7 @@ class RotateControl extends EventsEmitter {
         center,
         new THREE.Euler(Math.PI / 2, 0, 0),
         size * 0.0045,
-        size * 0.8, 0x00FF00,
+        size * 0.4, 0x00FF00,
         Math.PI,
         new THREE.Vector3(0, 1, 0)))
 
@@ -513,7 +513,7 @@ class RotateControl extends EventsEmitter {
         center,
         new THREE.Euler(0, 0, 0),
         size * 0.0045,
-        size * 0.8, 0x0000FF,
+        size * 0.4, 0x0000FF,
         2 * Math.PI,
         new THREE.Vector3(0, 0, 1)))
     }
@@ -622,7 +622,7 @@ class RotateControl extends EventsEmitter {
 
     var material = new THREE.LineBasicMaterial({
       color: color,
-      linewidth: 3,
+      linewidth: 2,
       depthTest: false,
       depthWrite: false,
       transparent: true

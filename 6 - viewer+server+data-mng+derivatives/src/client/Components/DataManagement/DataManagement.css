@@ -1,11 +1,4 @@
 
-.storage {
-    margin-top: 6px;
-    margin-left: 6px;
-    width: calc(100% - 14px);
-    height: calc(100% - 78px);
-}
-
 .storage .container {
     transition: opacity 3.0s ease-in-out;
     opacity: 0.2;
@@ -61,7 +54,7 @@
     margin-left: 6px;
     height: 19px;
     width: 19px;
-    top: -1px;
+    top: 0px;
 }
 
 .storage .treeview .label-loader-2 {
@@ -188,7 +181,7 @@
     color: #0ecc1f
 }
 
-.storage .tooltip-inner {
+div.tooltip-inner {
     border: 1px solid #b4b4b4;
     background-color: #f8f8f8;
     color: #000000;

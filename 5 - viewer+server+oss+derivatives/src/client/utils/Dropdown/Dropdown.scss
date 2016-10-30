@@ -18,10 +18,20 @@
 }
 
 .lmv-dropdown .label-container {
-    width: 100%;
+    width: calc(100% - 18px);
+    white-space: nowrap;
     overflow: hidden;
 }
 
 .lmv-dropdown .caret {
-    border-top:4px solid white;
+  border-top: 4px solid #fff;
+  position: absolute;
+  top: 45%;
+  right: 10px;
+}
+
+.lmv-dropdown .dropdown-menu > li > a {
+  height: 26px;
+  line-height: 18px;
+  padding: 3px 20px;
 }

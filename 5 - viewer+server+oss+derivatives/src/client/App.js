@@ -15,8 +15,8 @@
 // DOES NOT WARRANT THAT THE OPERATION OF THE PROGRAM WILL BE
 // UNINTERRUPTED OR ERROR FREE.
 /////////////////////////////////////////////////////////////////////
+import {ManagerPanel as DerivativesManagerPanel} from 'Derivatives'
 import ViewerPanel from 'Components/Viewer/ViewerPanel'
-import {DerivativesManagerPanel} from 'Derivatives'
 import OSSPanel from 'Components/OSS/OSS.Panel'
 import 'jquery-ui/themes/base/resizable.css'
 import 'jquery-ui/ui/widgets/resizable'
@@ -86,13 +86,9 @@ export default class App {
               return this.onLoadItem(urn)
             })
 
-            this.ossPanel.on('loadDerivatives', (item) => {
+            this.ossPanel.on('loadDerivatives', (node) => {
 
-              const urn = window.btoa(item.objectId).replace(
-                new RegExp('=', 'g'), '')
-
-              return this.onLoadDerivatives(
-                item.objectkey, urn)
+              return this.onLoadDerivatives(node)
             })
           }
         })
@@ -135,13 +131,28 @@ export default class App {
   //
   //
   ///////////////////////////////////////////////////////////////////
-  onLoadDerivatives (objectKey, urn) {
+  onLoadDerivatives (node) {
 
     return new Promise((resolve, reject) => {
 
-      this.derivativesPanel.load(urn)
+      const urn = window.btoa(node.details.objectId).replace(
+        new RegExp('=', 'g'), '')
 
-      resolve()
+      const modelName = node.details.objectKey
+
+      $('#model-name').text(modelName)
+
+      this.derivativesPanel.off()
+
+      this.derivativesPanel.on('manifest.delete', () => {
+
+        node.parent.classList.remove('derivated')
+      })
+
+      this.derivativesPanel.load(urn).then(() => {
+
+        resolve()
+      })
     })
   }
 

@@ -33,18 +33,19 @@ body{
     /* only manually resize */
     width: 30%;
     min-height: 200px;
-    min-width: 150px;
+    min-width: 0px;
+    max-width: 100%;
     white-space: nowrap;
-    background: #e7e7e7;
+    background: #f8f8f8;
 }
 
 .top-panel {
     flex: 0 0 auto;
     /* only manually resize */
+    max-height: calc(100% - 65px);
     min-height: 100px;
-    min-width: 100px;
     white-space: nowrap;
-    background: #f8f8f8;
+    background: #e7e7e7;
     color: white;
     height: 40%;
 }
@@ -89,7 +90,13 @@ body{
     flex: 1 1 auto;
     min-height: 200px;
     min-width: 200px;
-    margin-top: 25px;
+    margin-left: 4px;
+    width: calc(100% - 12px);
+}
+
+.bottom-panel {
+    flex: 1 1 auto;
+    min-height: 200px;
     margin-left: 4px;
     width: calc(100% - 12px);
 }
@@ -100,6 +107,13 @@ body{
     margin-left: 4px;
     margin-top: 4px;
     width: calc(100% - 10px);
+}
+
+.derivatives.model-name {
+    width: calc(100% - 20px);
+    overflow-x: hidden;
+    min-height: 20px;
+    margin: 8px;
 }
 
 .viewer-panel {

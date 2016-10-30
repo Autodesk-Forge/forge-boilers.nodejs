@@ -1,6 +1,5 @@
-
+import JobPanel from './JobPanel/JobPanel.js'
 import ClientAPI from 'ClientAPI'
-import JobPanel from './JobPanel'
 
 export default class DerivativesAPI extends ClientAPI {
 
