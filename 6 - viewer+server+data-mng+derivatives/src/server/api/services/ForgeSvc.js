@@ -201,6 +201,19 @@ export default class ForgeSvc extends BaseSvc {
         if (!session.forge) {
 
           throw { status:404, msg: 'Not Found' }
+
+        } else if(!session.forge.clientToken) {
+
+          // request a downgraded token to provide to client App
+
+          const masterToken = await this.get3LeggedTokenMaster(
+            session)
+
+          const clientToken = await this.refresh3LeggedToken(
+            masterToken, 'data:read')
+
+          this.set3LeggedTokenClient(
+            session, clientToken)
         }
 
         var token = session.forge.clientToken
@@ -285,8 +298,8 @@ export default class ForgeSvc extends BaseSvc {
           }
 
           return resolve(body.data || body)
-        }
-        catch(ex){
+
+        } catch(ex){
 
           return reject(response)
         }

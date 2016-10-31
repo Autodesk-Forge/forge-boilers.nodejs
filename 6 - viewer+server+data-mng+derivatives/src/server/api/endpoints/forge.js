@@ -39,8 +39,8 @@ module.exports = function() {
         'data:read')
 
       res.json(token)
-    }
-    catch (error) {
+
+    } catch (error) {
 
       res.status(error.statusCode || 404)
       res.json(error)
@@ -148,25 +148,15 @@ module.exports = function() {
           forgeSvc.set3LeggedTokenMaster(
             req.session, token)
 
-          // request a downgraded token to provide to client App
-          // read-only for viewing
+          if(req.session.socketId) {
 
-          forgeSvc.refresh3LeggedToken(token, 'data:read').then(
-            (clientToken) => {
+            socketSvc.broadcast(
+              'callback',
+              'success',
+              req.session.socketId)
+          }
 
-              forgeSvc.set3LeggedTokenClient(
-                req.session, clientToken)
-
-              if(req.session.socketId) {
-
-                socketSvc.broadcast(
-                  'callback',
-                  'success',
-                  req.session.socketId)
-              }
-
-              res.end('success')
-            })
+          res.end('success')
 
         } catch (ex) {
 
@@ -209,8 +199,8 @@ module.exports = function() {
         access_token: token.access_token,
         expires_in: forgeSvc.getExpiry(token)
       })
-    }
-    catch (error) {
+
+    } catch (error) {
 
       res.status(error.statusCode || 404)
       res.json(error)

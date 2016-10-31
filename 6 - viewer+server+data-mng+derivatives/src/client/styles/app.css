@@ -20,7 +20,7 @@ body{
 }
 
 .data-panel {
-    display: flex;
+    display: none;
     flex-direction: column;
     border: 1px solid silver;
     overflow: hidden;
@@ -45,7 +45,7 @@ body{
     max-height: calc(100% - 65px);
     min-height: 100px;
     white-space: nowrap;
-    background: #e7e7e7;
+    background: #f8f8f8;
     color: white;
     height: 40%;
 }

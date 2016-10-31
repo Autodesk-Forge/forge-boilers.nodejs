@@ -288,9 +288,7 @@ export default class DerivativesManagerPanel extends UIComponent {
 //
 //
 ///////////////////////////////////////////////////////////////////////////////
-class HierarchyTreeDelegate
-  extends EventsEmitter.Composer (BaseTreeDelegate)
-{
+class HierarchyTreeDelegate extends EventsEmitter.Composer (BaseTreeDelegate) {
 
   /////////////////////////////////////////////////////////////
   //
@@ -360,9 +358,7 @@ class HierarchyTreeDelegate
 //
 //
 ///////////////////////////////////////////////////////////////////////////////
-class ExportsTreeDelegate
-  extends EventsEmitter.Composer (BaseTreeDelegate)
-{
+class ExportsTreeDelegate extends EventsEmitter.Composer (BaseTreeDelegate) {
 
   /////////////////////////////////////////////////////////////
   //
@@ -378,7 +374,7 @@ class ExportsTreeDelegate
   //
   //
   /////////////////////////////////////////////////////////////
-  async forEachChild(node, addChildCallback) {
+  forEachChild(node, addChildCallback) {
 
     switch (node.type) {
 
