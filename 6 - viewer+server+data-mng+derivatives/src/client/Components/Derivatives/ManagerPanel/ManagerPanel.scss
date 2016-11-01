@@ -1,0 +1,43 @@
+
+.derivatives-tab-container {
+  overflow: auto;
+  height: 100%;
+}
+
+.manifest .json-view {
+  overflow: auto;
+  height: 100%;
+}
+
+.manifest .json-view .string,
+.manifest .json-view .num {
+  user-select: text;
+}
+
+.hierarchy .controls,
+.manifest .controls {
+  position: absolute;
+  display: none;
+  width: 160px;
+  right: -22px;
+  top: 4px;
+}
+
+.hierarchy .controls .btn,
+.manifest .controls .btn {
+  margin-top: 4px;
+  font-size: 10px;
+  padding: 4px;
+  width: 122px;
+}
+
+.hierarchy .controls .btn span,
+.manifest .controls .btn span {
+ top: 2px;
+}
+
+.derivatives .treeview group label:hover {
+  text-decoration: none;
+}
+
+
