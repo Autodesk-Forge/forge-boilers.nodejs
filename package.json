@@ -1,7 +1,7 @@
 {
   "name": "roomedit3dv3",
   "description": "Forge Viewer extension to move building elements and update the Revit BIM in real-time",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "engines": {
     "node": ">= 0.10.0"
   },
