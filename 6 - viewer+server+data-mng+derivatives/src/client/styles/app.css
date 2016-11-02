@@ -46,6 +46,7 @@ body{
     min-height: 0px;
     white-space: nowrap;
     background: #f8f8f8;
+    margin-bottom: 2px;
     color: white;
     height: 40%;
 }
@@ -91,6 +92,7 @@ body{
     min-height: 0px;
     min-width: 0px;
     margin-left: 4px;
+    margin-bottom: 2px;
     width: calc(100% - 12px);
 }
 

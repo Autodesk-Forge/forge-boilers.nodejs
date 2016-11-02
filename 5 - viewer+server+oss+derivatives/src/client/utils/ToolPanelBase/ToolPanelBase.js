@@ -243,15 +243,17 @@ export default class ToolPanelBase extends
       this._height = $(this.container).css('height')
 
       $(this.container).css({
-        'height':'32px',
-        'min-height':'32px'
+        'min-height':'32px',
+        overflow: 'hidden',
+        height:'32px'
       })
-    }
-    else {
+
+    } else {
 
       $(this.container).css({
-        'height':this._height,
-        'min-height':'100px'
+        height:this._height,
+        'min-height':'100px',
+        overflow: 'visible'
       })
     }
   }

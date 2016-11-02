@@ -298,6 +298,7 @@ export default class App {
       let options = {}
 
       viewer.loadExtension(ModelTransformerExtension, {
+        parentControl: 'modelTools',
         autoLoad: true
       })
 

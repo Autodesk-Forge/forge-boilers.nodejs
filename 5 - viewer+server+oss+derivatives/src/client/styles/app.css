@@ -44,6 +44,7 @@ body{
     /* only manually resize */
     max-height: calc(100% - 65px);
     min-height: 0px;
+    margin-bottom: 2px;
     white-space: nowrap;
     background: #e7e7e7;
     color: white;
@@ -91,6 +92,7 @@ body{
     min-height: 0px;
     min-width: 200px;
     margin-left: 4px;
+    margin-bottom: 2px;
     width: calc(100% - 12px);
 }
 

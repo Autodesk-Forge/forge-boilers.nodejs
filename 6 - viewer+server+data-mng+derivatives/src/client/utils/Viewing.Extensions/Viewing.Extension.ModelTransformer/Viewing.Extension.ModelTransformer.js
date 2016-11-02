@@ -128,7 +128,15 @@ class ModelTransformerExtension extends ExtensionBase {
 
     if (this._options.parentControl) {
 
-      this.parentControl = this._options.parentControl
+      if(typeof this._options.parentControl === 'string') {
+
+        this.parentControl = this._viewer.getToolbar().getControl(
+          this._options.parentControl)
+
+      } else if (typeof this._options.parentControl === 'object') {
+
+        this.parentControl = this._options.parentControl
+      }
 
     } else {
 
@@ -140,8 +148,11 @@ class ModelTransformerExtension extends ExtensionBase {
       viewerToolbar.addControl(this.parentControl)
     }
 
-    this.parentControl.addControl(
-      this.control)
+    if (this.parentControl) {
+
+      this.parentControl.addControl(
+        this.control)
+    }
   }
 
   /////////////////////////////////////////////////////////////////
@@ -160,8 +171,6 @@ class ModelTransformerExtension extends ExtensionBase {
 
         model.name = model.name ||
         'Model ' + (Object.keys(this.modelCollection).length + 1)
-
-        console.log(model)
 
         this.addModel(model)
       }
