@@ -126,7 +126,7 @@ To deploy this project to Heroku, click on the button below at the Heroku Create
 
 The result will look like this, displaying a treeview of your Autodesk Cloud storage that lets you upload designs, perform actions from the context menu, start the roomedit3d viewer extension, select and translate model elements:
 
-![roomedit3dv3_running](7 - viewer+extension+server+data-mng+derivatives/resources/img/roomedit3dv3_running.png)
+![roomedit3dv3_running_2](7 - viewer+extension+server+data-mng+derivatives/resources/img/roomedit3dv3_running_2.png)
 
 You can also test run my own web server instance directly at [roomedit3dv3.herokuapp.com](https://roomedit3dv3.herokuapp.com).
 
