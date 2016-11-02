@@ -31,7 +31,7 @@ body{
 .left-panel {
     flex: 1 0 auto;
     /* only manually resize */
-    width: 30%;
+    width: 40%;
     min-height: 200px;
     min-width: 0px;
     max-width: 100%;
@@ -43,7 +43,7 @@ body{
     flex: 0 0 auto;
     /* only manually resize */
     max-height: calc(100% - 65px);
-    min-height: 100px;
+    min-height: 0px;
     white-space: nowrap;
     background: #f8f8f8;
     color: white;
@@ -51,8 +51,8 @@ body{
 }
 
 .vertical-splitter {
-    z-index: 10;
-    margin-left: -4px;
+    z-index: 1;
+    margin-left: -5px;
     flex: 0 0 auto;
     width: 5px;
     height: 100%;
@@ -70,7 +70,7 @@ body{
 }
 
 .horizontal-splitter {
-    z-index: 10;
+    z-index: 1;
     margin-top: -4px;
     flex: 0 0 auto;
     height: 5px;
@@ -88,15 +88,8 @@ body{
 
 .bottom-panel {
     flex: 1 1 auto;
-    min-height: 200px;
-    min-width: 200px;
-    margin-left: 4px;
-    width: calc(100% - 12px);
-}
-
-.bottom-panel {
-    flex: 1 1 auto;
-    min-height: 200px;
+    min-height: 0px;
+    min-width: 0px;
     margin-left: 4px;
     width: calc(100% - 12px);
 }

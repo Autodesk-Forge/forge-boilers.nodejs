@@ -1,4 +1,7 @@
-
+.toolPanelBase {
+    transform: rotateY(0deg);
+    overflow: visible;
+}
 
 .dockingPanel .dockingPanelTitle img,
 .dockingPanel .dockingPanelTitle img:before {

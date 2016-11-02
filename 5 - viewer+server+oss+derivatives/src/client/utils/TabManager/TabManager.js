@@ -14,7 +14,7 @@ export default class TabManager extends UIComponent {
   //
   //
   ///////////////////////////////////////////////////////////////////
-  constructor(container) {
+  constructor (container, opts = {}) {
 
     super()
 
@@ -32,21 +32,24 @@ export default class TabManager extends UIComponent {
 
     $(container).append(html)
 
-    this.drake = dragula(
-      [$(`#${this.tabsHeaderId}`)[0]],
-      {removeOnSpill: false})
+    if (opts.allowDrag) {
 
-    var drakeEvents = [
-      'drag', 'dragend', 'drop', 'cancel', 'remove'
-    ]
+      this.drake = dragula(
+        [$(`#${this.tabsHeaderId}`)[0]],
+        {removeOnSpill: false})
 
-    drakeEvents.forEach((event) => {
+      var drakeEvents = [
+        'drag', 'dragend', 'drop', 'cancel', 'remove'
+      ]
 
-      this.drake.on(event, () => {
+      drakeEvents.forEach((event) => {
 
-        this.emit('drake.' + event, arguments)
+        this.drake.on(event, () => {
+
+          this.emit('drake.' + event, arguments)
+        })
       })
-    })
+    }
   }
 
   ///////////////////////////////////////////////////////////////////

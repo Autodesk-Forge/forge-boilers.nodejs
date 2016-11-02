@@ -69,7 +69,8 @@ export default class App {
             }
 
             this.derivativesPanel.initialize(
-              this.panelContainers.derivatives)
+              this.panelContainers.derivatives,
+              this.panelContainers.app)
 
             this.viewerPanel.initialize(
               this.panelContainers.viewer)

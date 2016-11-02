@@ -26,7 +26,7 @@ export default class Dropdown extends UIComponent {
   // }
   //
   /////////////////////////////////////////////////////////////
-  constructor(opts) {
+  constructor (opts) {
 
     super()
 
@@ -37,6 +37,8 @@ export default class Dropdown extends UIComponent {
     this.labelId = guid()
 
     this.listId = guid()
+
+    this.opts = opts
 
     this.currentItem = null
 
@@ -78,7 +80,7 @@ export default class Dropdown extends UIComponent {
   //
   //
   /////////////////////////////////////////////////////////////
-  addItem(item, setActive = false) {
+  addItem (item, setActive = false) {
 
     $('#' + this.buttonId).prop('disabled', false)
 
@@ -126,7 +128,7 @@ export default class Dropdown extends UIComponent {
   //
   //
   /////////////////////////////////////////////////////////////
-  setCurrentItem(item) {
+  setCurrentItem (item) {
 
     this.currentItem = item
 
@@ -138,16 +140,23 @@ export default class Dropdown extends UIComponent {
   //
   //
   /////////////////////////////////////////////////////////////
-  setItems(items, selectedItemIdx = 0) {
+  setItems (items, selectedItemIdx = 0) {
 
     $(`#${this.listId} li`).remove()
 
-    var text = this.title + ': ' +
-      items[selectedItemIdx].name
+    if (selectedItemIdx < 0) {
 
-    $('#' + this.labelId).text(text)
+      $('#' + this.labelId).text(this.opts.prompt)
 
-    items.forEach((item)=>{
+    }  else {
+
+      var text = this.title + ': ' +
+        items[selectedItemIdx].name
+
+      $('#' + this.labelId).text(text)
+    }
+
+    items.forEach((item) => {
 
       this.addItem(item)
     })
@@ -157,7 +166,7 @@ export default class Dropdown extends UIComponent {
   //
   //
   /////////////////////////////////////////////////////////////
-  removeCurrentItem() {
+  removeCurrentItem () {
 
     if(this.currentItem){
 
@@ -180,7 +189,7 @@ export default class Dropdown extends UIComponent {
   //
   //
   /////////////////////////////////////////////////////////////
-  removeItem(item) {
+  removeItem (item) {
 
     if(this.currentItem && this.currentItem.id === item.id) {
 
@@ -201,7 +210,7 @@ export default class Dropdown extends UIComponent {
   //
   //
   /////////////////////////////////////////////////////////////
-  setVisible(show) {
+  setVisible (show) {
 
     $('#' + this.dropdownId).css({
       display: show ? 'block' : 'none'
@@ -212,7 +221,7 @@ export default class Dropdown extends UIComponent {
   //
   //
   /////////////////////////////////////////////////////////////
-  setPosition(pos) {
+  setPosition (pos) {
 
     $('#' + this.dropdownId).css(opts.pos)
   }

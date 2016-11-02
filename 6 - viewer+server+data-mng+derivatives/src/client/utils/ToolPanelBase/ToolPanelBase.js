@@ -2,6 +2,7 @@
 //
 //
 /////////////////////////////////////////////////////////////////
+import velocity from 'velocity-animate'
 import './ToolPanelBase.css'
 
 function getDefaultOptions () {
@@ -89,7 +90,14 @@ export default class ToolPanelBase extends
   // setVisible override
   //
   /////////////////////////////////////////////////////////////
-  setVisible(show = false) {
+  setVisible (show = false) {
+
+    if (show) {
+
+      $(this.container).velocity({
+        rotateY: [0, -90]
+      })
+    }
 
     if (show !== this._isVisible) {
 

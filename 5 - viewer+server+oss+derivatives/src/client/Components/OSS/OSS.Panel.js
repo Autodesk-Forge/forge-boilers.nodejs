@@ -89,17 +89,17 @@ export default class OSSPanel extends UIComponent {
 
     this.contextMenu.on('context.oss.bucket.create', (data) => {
 
-      let modal = new CreateBucketPanel(appContainer)
+      const dlg = new CreateBucketPanel(appContainer)
 
-      modal.setVisible(true)
+      dlg.setVisible(true)
 
-      modal.on('close', async(event) => {
+      dlg.on('close', async(event) => {
 
         if (event.result === 'OK') {
 
           let bucketCreationData = {
-            policyKey: modal.PolicyKey,
-            bucketKey: modal.BucketKey
+            policyKey: dlg.PolicyKey,
+            bucketKey: dlg.BucketKey
             //allow:[{
             //  authId: 'AYVir4YpIiobKbt7peqr0Y85uGuFdUj7',
             //  access: 'full'
@@ -125,18 +125,40 @@ export default class OSSPanel extends UIComponent {
       })
     })
 
-    this.contextMenu.on('context.oss.bucket.delete', async(data) =>{
+    this.contextMenu.on('context.oss.bucket.delete', (data) =>{
 
-      console.log('Deleting bucket: ' + data.node.bucketKey)
+      const dlg = new ToolPanelModal(appContainer, {
+        title: 'Delete bucket ...'
+      })
 
-      data.node.showLoader(true)
+      dlg.bodyContent(
+        `<div class="confirm-delete">
+          Are you sure you want to delete
+          <b>
+            ${data.node.bucketKey}
+          </b>
+          bucket?
+        </div>
+        `)
 
-      let response = await this.ossAPI.deleteBucket(
-        data.node.bucketKey)
+      dlg.setVisible(true)
 
-      console.log(response)
+      dlg.on('close', async(event) => {
 
-      data.node.remove()
+        if (event.result === 'OK') {
+
+          console.log('Deleting bucket: ' + data.node.bucketKey)
+
+          data.node.showLoader(true)
+
+          let response = await this.ossAPI.deleteBucket(
+            data.node.bucketKey)
+
+          console.log(response)
+
+          data.node.remove()
+        }
+      })
     })
 
     this.contextMenu.on('context.oss.object.delete', async(data) =>{
@@ -180,17 +202,23 @@ export default class OSSPanel extends UIComponent {
         const urn = window.btoa(data.node.details.objectId).replace(
             new RegExp('=', 'g'), '')
 
-        let input = {
+        const input = {
           urn: urn
+        }
+
+        const output = {
+          type: 'svf'
         }
 
         console.log('Posting SVF Job: ')
         console.log(input)
 
-        let response = await this.derivativesAPI.postSVFJob(
-          input,
-          data.node.details.objectKey,
-          viewerContainer)
+       await this.derivativesAPI.postJobWithProgress({
+          designName: data.node.details.objectKey,
+          panelContainer: viewerContainer,
+          output,
+          input
+        })
 
         setTimeout(() => {
           this.onObjectNodeAddedHandler (data.node)
@@ -250,7 +278,7 @@ export default class OSSPanel extends UIComponent {
             manifest.progress === 'complete') {
 
           if (this.derivativesAPI.hasDerivative(
-              manifest, { outputType: 'svf' })) {
+              manifest, { output: {type: 'svf' }})) {
 
             node.parent.classList.add('derivated')
 
@@ -304,7 +332,7 @@ export default class OSSPanel extends UIComponent {
     if (node.type === 'oss.object' && node.manifest) {
 
       if (this.derivativesAPI.hasDerivative(
-          node.manifest, { outputType: 'svf' })) {
+          node.manifest, { output: {type: 'svf' }})) {
 
         node.showLoader(true)
 
@@ -362,6 +390,7 @@ class OSSTreeDelegate extends BaseTreeDelegate {
     node.parent = parent
 
     node.type.split('.').forEach((cls) => {
+
       parent.classList.add(cls)
     })
 
@@ -372,7 +401,7 @@ class OSSTreeDelegate extends BaseTreeDelegate {
       text = Autodesk.Viewing.i18n.translate(text)
     }
 
-    let labelId = guid()
+    const labelId = guid()
 
     if (node.tooltip) {
 
@@ -557,7 +586,7 @@ class OSSTreeDelegate extends BaseTreeDelegate {
       $(`group[lmv-nodeid='${node.id}']`).remove()
     }
 
-    let loadDivId = guid()
+    const loadDivId = guid()
 
     node.showLoader = (show) => {
 

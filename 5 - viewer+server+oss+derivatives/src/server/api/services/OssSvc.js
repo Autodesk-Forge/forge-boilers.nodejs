@@ -41,7 +41,7 @@ export default class OssSvc extends BaseSvc {
     this._APIAuth.accessToken = token
 
     opts = Object.assign({
-      limit: 10,
+      limit: 100,
       startAt: null,
       region: 'US'}, opts)
 

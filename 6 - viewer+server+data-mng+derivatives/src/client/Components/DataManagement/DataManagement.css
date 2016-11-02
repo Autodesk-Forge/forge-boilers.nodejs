@@ -23,7 +23,7 @@
 
 .storage .treeview .label-container {
     pointer-events: none;
-    overflow-x: hidden;
+    overflow: hidden;
 }
 
 .storage .treeview .items .label-container {
@@ -54,7 +54,7 @@
     margin-left: 6px;
     height: 19px;
     width: 19px;
-    top: 0px;
+    top: -1px;
 }
 
 .storage .treeview .label-loader-2 {

@@ -16,6 +16,11 @@ export default class ToolPanelModal extends ToolPanelBase {
       shadow: true
     })
 
+    this.options = Object.assign({
+      showCancel: true,
+      showOK: true
+    }, options)
+
     $(this.container).addClass('tool-panel-modal')
 
     if(options.height) {
@@ -70,6 +75,16 @@ export default class ToolPanelModal extends ToolPanelBase {
     `
 
     $(this.container).append(footer)
+
+    $('#' + this.btnCancelId).css({
+
+      display: this.options.showCancel ? 'block' : 'none'
+    })
+
+    $('#' + this.btnOkId).css({
+
+      display: this.options.showOK ? 'block' : 'none'
+    })
 
     $('#' + this.btnCancelId).click(() => {
 

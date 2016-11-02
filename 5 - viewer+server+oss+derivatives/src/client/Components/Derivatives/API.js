@@ -31,48 +31,50 @@ export default class DerivativesAPI extends ClientAPI {
   //
   //
   /////////////////////////////////////////////////////////////////
-  postSVFJob(input, designName, panelContainer) {
+  postJobWithProgress (args) {
 
     return new Promise(async(resolve, reject) => {
 
       var jobPanel = new JobPanel(
-        panelContainer,
-        designName)
+        args.panelContainer,
+        args.designName)
 
       jobPanel.setVisible(true)
 
       try {
 
-        const output = {
-          type: 'svf'
-        }
-
         var job = await this.postJob({
-          input,
-          output
+          input: args.input,
+          output:args.output
         })
 
         if (job.result === 'success' || job.result === 'created') {
 
-          var manifest = await this.waitJob(input.urn,
-            (progress) => {
+          const onProgress = (progress) => {
 
-              return jobPanel.updateProgress(progress)
-            })
+            jobPanel.updateProgress(progress)
+          }
+
+          const derivativeResult = await this.getDerivativeURN ({
+              input: args.input,
+              output:args.output
+            }, onProgress, true)
 
           jobPanel.done()
 
-          return resolve(manifest)
-        }
-        else {
+          resolve(derivativeResult)
+
+        } else {
 
           jobPanel.jobFailed(job)
+
           return reject(job)
         }
-      }
-      catch(ex) {
+
+      } catch(ex) {
 
         jobPanel.jobFailed(ex)
+
         return reject(ex)
       }
     })
@@ -150,50 +152,6 @@ export default class DerivativesAPI extends ClientAPI {
   //
   //
   ///////////////////////////////////////////////////////////////////
-  waitJob (urn, onProgress) {
-
-    return new Promise(async(resolve, reject) => {
-
-      try {
-
-        while(true) {
-
-          var manifest = await this.getManifest(urn)
-
-          if(manifest.status === 'failed') {
-
-            return reject(manifest)
-          }
-
-          if(manifest.status   === 'success' &&
-             manifest.progress === 'complete') {
-
-            return resolve(manifest)
-          }
-
-          var progress = manifest.progress.split(' ')[0]
-
-          var loop = onProgress ? onProgress(progress) : true
-
-          if(!loop) {
-
-            return reject('cancelled')
-          }
-
-          await sleep(1000)
-        }
-      }
-      catch(ex) {
-
-        return reject(ex)
-      }
-    })
-  }
-
-  ///////////////////////////////////////////////////////////////////
-  //
-  //
-  ///////////////////////////////////////////////////////////////////
   deleteManifest (urn) {
 
     const url = `${this.apiUrl}/manifest/${urn}`
@@ -216,7 +174,7 @@ export default class DerivativesAPI extends ClientAPI {
 
       var derivative = manifest.derivatives[i]
 
-      if (derivative.outputType === params.outputType) {
+      if (derivative.outputType === params.output.type) {
 
         parentDerivative = derivative
 
@@ -237,7 +195,7 @@ export default class DerivativesAPI extends ClientAPI {
             // match objectId
             else if(_.isEqual(
                 childDerivative.objectIds,
-                params.objectIds)) {
+                params.output.objectIds)) {
 
               return {
                 parent: parentDerivative,
@@ -276,10 +234,10 @@ export default class DerivativesAPI extends ClientAPI {
 
       try {
 
-        while(true) {
+        while (true) {
 
           var manifest = await this.getManifest(
-            params.urn)
+            params.input.urn)
 
           //if(manifest.status === 'failed') {
           //  return reject(manifest)

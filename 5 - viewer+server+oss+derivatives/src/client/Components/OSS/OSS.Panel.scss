@@ -1,12 +1,11 @@
 
 .storage .treeview .label-container {
     pointer-events: none;
-    overflow-x: hidden;
+    overflow: hidden;
 }
 
 .storage .treeview .oss.object .label-container {
   pointer-events: auto;
-  overflow-y: visible;
   position: relative;
   top: 2px;
 }
@@ -18,6 +17,7 @@
 }
 
 .storage .treeview group > header > icon {
+    position: initial;
     height: 19px;
     float: left;
 }
@@ -68,10 +68,6 @@
 
 .storage .tabs-container {
     height: 100%;
-}
-
-.storage .treeview group > header > icon {
-    position: initial;
 }
 
 .storage .treeview header {
@@ -160,4 +156,9 @@ div.tooltip-inner {
     border: 1px solid #b4b4b4;
     background-color: #f8f8f8;
     color: #000000;
+}
+
+.tool-panel-modal .confirm-delete {
+  margin-top: 12px;
+  overflow: hidden;
 }

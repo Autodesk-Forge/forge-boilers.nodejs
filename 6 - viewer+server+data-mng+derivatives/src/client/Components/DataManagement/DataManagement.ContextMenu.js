@@ -21,7 +21,7 @@ export default class DataManagementContextMenu extends
 
     var menu = []
 
-    switch(node.type) {
+    switch (node.type) {
 
       case 'hubs':
 

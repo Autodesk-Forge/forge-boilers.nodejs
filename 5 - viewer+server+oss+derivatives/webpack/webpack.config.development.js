@@ -30,6 +30,7 @@ module.exports = {
       dry: false
     }),
 
+    new webpack.IgnorePlugin(/regenerator|nodent|js\-beautify/, /ajv/),
     new webpack.optimize.UglifyJsPlugin({minimize: false}),
     new webpack.optimize.OccurenceOrderPlugin(),
     new webpack.HotModuleReplacementPlugin(),
@@ -72,6 +73,10 @@ module.exports = {
   module: {
 
     loaders: [
+      {
+        test: /\.json$/,
+        loader: 'json-loader'
+      },
       {
         test: /\.jsx?$/,
         exclude: /node_modules/,

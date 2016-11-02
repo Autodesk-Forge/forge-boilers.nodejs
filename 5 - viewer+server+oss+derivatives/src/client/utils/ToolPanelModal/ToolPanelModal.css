@@ -54,28 +54,3 @@
 .tool-panel-modal .tool-panel-modal-footer .btn:hover {
     color:#E2580B
 }
-
-.tool-panel-modal .lmv-dropdown .btn {
-    background-color: #e7e7e7;
-    vertical-align: top;
-    line-height: 0;
-    height: 28px;
-    border: 1px solid #a5a5a5;
-}
-
-.tool-panel-modal .lmv-dropdown .caret {
-    border-top: 4px solid #a5a5a5;
-}
-
-.tool-panel-modal .lmv-dropdown .label {
-    font: normal 14px Times New Roman;
-    color: #323535;
-}
-
-.tool-panel-modal .open>.dropdown-menu {
-    background-color: #f8f8f8;
-}
-
-.tool-panel-modal .dropdown-menu>li>a {
-    color: #040707;
-}
