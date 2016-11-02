@@ -105,8 +105,6 @@ export default class TransformTool extends EventsEmitter {
         fragProxy.updateAnimTransform()
       }
 
-      //console.log( 'transform.translate' ); // jeremy
-      
       this.emit('transform.translate', {
         model: this._selection.model,
         translation: translation
@@ -366,38 +364,6 @@ export default class TransformTool extends EventsEmitter {
   ///////////////////////////////////////////////////////////////////////////
   handleButtonUp(event, button) {
 
-    console.log( 'transform.translate complete' ); // jeremy
-    
-    if (this._selection) {
-      if (this._selection.dbIdArray) {
-        var dbId = this._selection.dbIdArray[0]
-        
-        if(dbId) {
-         
-          var translation = new THREE.Vector3(
-            this._transformMesh.position.x - this._selection.model.offset.x,
-            this._transformMesh.position.y - this._selection.model.offset.y,
-            this._transformMesh.position.z - this._selection.model.offset.z)
-          
-          this._viewer.getProperties(dbId, (result) => {
-            
-            var externalId = result.externalId;
-            
-            console.log( 'transform.translate complete for '
-              + externalId
-              + ': ' + translation.x.toFixed( 2 )
-              + ','+ translation.y.toFixed( 2 )
-              + ','+ translation.z.toFixed( 2 ) );
-            
-            this.emit('transform.translate.complete', {
-              externalId: externalId,
-              translation: translation
-            })
-          });
-        }    
-      }
-    }
-    
     this._isDragging = false
 
     if (this._transformControlTx.onPointerUp(event))

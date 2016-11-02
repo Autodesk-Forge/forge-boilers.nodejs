@@ -6,8 +6,8 @@
 import ServiceManager from 'Services/SvcManager'
 import TranslateTool from './Viewing.Tool.Translate'
 import RotateTool from './Viewing.Tool.Rotate'
-import ExtensionBase from 'ExtensionBase'
-import ViewerToolkit from 'ViewerToolkit'
+import ExtensionBase from 'Viewer.ExtensionBase'
+import ViewerToolkit from 'Viewer.Toolkit'
 
 class TransformExtension extends ExtensionBase {
 
