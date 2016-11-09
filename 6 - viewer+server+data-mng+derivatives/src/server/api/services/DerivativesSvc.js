@@ -66,7 +66,7 @@ export default class DerivativeSvc extends BaseSvc {
           formats: [ {
             type: 'obj',
             advanced: {
-              modelGuid: opts.guid,
+              modelGuid: opts.modelGuid,
               objectIds: opts.objectIds
             }
           } ]
@@ -91,16 +91,11 @@ export default class DerivativeSvc extends BaseSvc {
   //
   //
   /////////////////////////////////////////////////////////////////
-  postJob (token, input, output) {
+  postJob (token, payload) {
 
     this._APIAuth.accessToken = token
 
-    let job = {
-      input,
-      output
-    }
-
-    return this._derivativesAPI.translate (job, {
+    return this._derivativesAPI.translate (payload, {
       'xAdsForce': true
     })
   }

@@ -49,10 +49,11 @@ export default class SocketSvc extends BaseSvc {
     _thisSvc._connections[socket.id] = socket;
 
     socket.on('request.connection.data', ()=> {
+
       socket.emit('connection.data', {
         socketId: socket.id
-      });
-    });
+      })
+    })
 
     socket.on('disconnect', ()=> {
 
@@ -112,19 +113,19 @@ export default class SocketSvc extends BaseSvc {
 
       filter.forEach((socketId) => {
 
-        if(_thisSvc._connections[socketId]){
+        if (_thisSvc._connections[socketId]) {
 
-          var socket = _thisSvc._connections[socketId];
+          var socket = _thisSvc._connections[socketId]
 
           socket.emit(msgId, msg);
         }
       })
-    }
-    else {
 
-      for(var socketId in _thisSvc._connections){
+    } else {
 
-        var socket = _thisSvc._connections[socketId];
+      for (var socketId in _thisSvc._connections) {
+
+        var socket = _thisSvc._connections[socketId]
 
         socket.emit(msgId, msg);
       }

@@ -1,7 +1,9 @@
+6 - viewer+server+data-mng+derivatives/push-to-prod.sh
 6 - viewer+server+data-mng+derivatives/node_modules
 6 - viewer+server+data-mng+derivatives/dist
 6 - viewer+server+data-mng+derivatives/TMP
 
+5 - viewer+server+oss+derivatives/push-to-prod.sh
 5 - viewer+server+oss+derivatives/node_modules
 5 - viewer+server+oss+derivatives/dist
 5 - viewer+server+oss+derivatives/TMP

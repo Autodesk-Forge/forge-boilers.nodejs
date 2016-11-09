@@ -207,13 +207,16 @@ export default class OSSPanel extends UIComponent {
         }
 
         const output = {
-          type: 'svf'
+          formats:[{
+            type: 'svf',
+            views: ['2d', '3d']
+          }]
         }
 
         console.log('Posting SVF Job: ')
         console.log(input)
 
-       await this.derivativesAPI.postJobWithProgress({
+        await this.derivativesAPI.postJobWithProgress({
           designName: data.node.details.objectKey,
           panelContainer: viewerContainer,
           output,
@@ -266,7 +269,13 @@ export default class OSSPanel extends UIComponent {
   ///////////////////////////////////////////////////////////////////
   onObjectNodeAdded (node) {
 
-    const urn = window.btoa(node.details.objectId).replace(
+    const bucketKey = encodeURIComponent(node.bucketKey)
+    const objectKey = encodeURIComponent(node.objectKey)
+
+    const objectId = `urn:adsk.objects:os.object:` +
+      `${bucketKey}/${objectKey}`
+
+    const urn = window.btoa(objectId).replace(
       new RegExp('=', 'g'), '')
 
     this.derivativesAPI.getManifest(
@@ -405,9 +414,10 @@ class OSSTreeDelegate extends BaseTreeDelegate {
 
     if (node.tooltip) {
 
-      let html = `
+      const html = `
         <div class="label-container">
-            <label class="${node.type}" id="${labelId}"
+            <label id="${labelId}"
+              class="tooltip-container ${node.type}"
               ${options && options.localize?"data-i18n=" + text : ''}
                 data-placement="right"
                 data-toggle="tooltip"
@@ -420,7 +430,10 @@ class OSSTreeDelegate extends BaseTreeDelegate {
 
       $(parent).append(html)
 
-      $(parent).find('label[data-toggle="tooltip"]').tooltip({
+      const $tooltipTarget = $(parent).find(
+        '[data-toggle="tooltip"]')
+
+      $tooltipTarget.tooltip({
         container: 'body',
         animated: 'fade',
         html: true
@@ -428,7 +441,7 @@ class OSSTreeDelegate extends BaseTreeDelegate {
 
       node.setTooltip = (title) => {
 
-        $(parent).find('label')
+        $(parent).find('.tooltip-container')
           .attr('title', title)
           .tooltip('fixTitle')
           .tooltip('setContent')
@@ -620,30 +633,36 @@ class OSSTreeDelegate extends BaseTreeDelegate {
 
         this.ossAPI.getBuckets().then((response) => {
 
-          response.items.forEach((bucketDetails) => {
+          const buckets = _.sortBy(response.items,
+            (bucketDetails) => {
+              return bucketDetails.bucketKey.toLowerCase()
+            })
+
+          buckets.forEach((bucket) => {
+
+            let bucketNode = new TreeNode({
+              bucketKey: bucket.bucketKey,
+              name: bucket.bucketKey,
+              id: bucket.bucketKey,
+              type: 'oss.bucket',
+              group: true
+            })
+
+            bucketNode.on('childrenLoaded', (children) => {
+
+              bucketNode.showLoader(false)
+            })
+
+            addChildCallback(bucketNode)
+
+            bucketNode.showLoader(true)
+
+            bucketNode.collapse()
 
             this.ossAPI.getBucketDetails(
-              bucketDetails.bucketKey).then((bucketDetails) => {
+              bucket.bucketKey).then((bucketDetails) => {
 
-                let bucketNode = new TreeNode({
-                  bucketKey: bucketDetails.bucketKey,
-                  name: bucketDetails.bucketKey,
-                  id: bucketDetails.bucketKey,
-                  details: bucketDetails,
-                  type: 'oss.bucket',
-                  group: true
-                })
-
-                bucketNode.on('childrenLoaded', (children) => {
-
-                  bucketNode.showLoader(false)
-                })
-
-                addChildCallback(bucketNode)
-
-                bucketNode.showLoader(true)
-
-                bucketNode.collapse()
+                bucketNode.details = bucketDetails
               })
           })
         })
@@ -654,31 +673,37 @@ class OSSTreeDelegate extends BaseTreeDelegate {
 
         this.ossAPI.getObjects(node.bucketKey).then((response) => {
 
-          let itemTasks = response.items.map((item) => {
+          const items = _.sortBy(response.items,
+            (objectDetails) => {
+              return objectDetails.objectKey.toLowerCase()
+            })
+
+          let itemTasks = items.map((item) => {
 
             return new Promise((resolve, reject) => {
+
+              let objectNode = new TreeNode({
+                id: node.bucketKey + '-' + item.objectKey,
+                objectKey: item.objectKey,
+                name: item.objectKey,
+                bucketKey: node.bucketKey,
+                type: 'oss.object',
+                tooltip: true,
+                group: true
+              })
+
+              addChildCallback(objectNode)
+
+              this.emit('objectNodeAdded', objectNode)
+
+              objectNode.showLoader(true)
 
               this.ossAPI.getObjectDetails(
                 node.bucketKey, item.objectKey).then((objectDetails) => {
 
-                  let objectNode = new TreeNode({
-                    id: node.bucketKey + '-' + objectDetails.objectKey,
-                    objectKey: objectDetails.objectKey,
-                    name: objectDetails.objectKey,
-                    bucketKey: node.bucketKey,
-                    details: objectDetails,
-                    type: 'oss.object',
-                    tooltip: true,
-                    group: true
-                  })
-
-                  addChildCallback(objectNode)
-
-                  objectNode.showLoader(true)
+                  objectNode.details = objectDetails
 
                   resolve()
-
-                  this.emit('objectNodeAdded', objectNode)
                 })
             })
           })

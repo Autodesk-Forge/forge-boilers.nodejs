@@ -8,19 +8,19 @@ import './JobPanel.scss'
 
 export default class JobPanel extends ToolPanelBase {
 
-  constructor (container, designName) {
+  constructor (container, designName, format) {
 
-    super(container, 'Processing Derivatives ...', {
+    super(container, `Processing derivatives ...`, {
       closable: false,
       movable: true,
       shadow: true
     })
 
-    $(this.container).addClass('derivative')
+    $(this.container).addClass('derivatives')
     $(this.container).addClass('job')
 
-    $(`#${this.container.id}-name`).text(
-      'Design: ' + designName)
+    $(`#${this.container.id}-name`).text(designName)
+    $(`#${this.container.id}-format`).text(format)
 
     var angle = 0
 
@@ -45,10 +45,23 @@ export default class JobPanel extends ToolPanelBase {
 
       <div class="container">
 
-        <div id=${id}-name>
+        <div class="design-name">
+          Design:&nbsp;
+          <label id="${id}-name">
+          </label>
         </div>
 
-        <div id=${id}-job-progress>
+        <div class="design-name">
+          Format:&nbsp;
+          <label id="${id}-format">
+          </label>
+        </div>
+
+        <div class="job-progress">
+          Progress:&nbsp;
+          <label id="${id}-job-progress">
+          0%
+          </label>
         </div>
 
       </div>
@@ -61,8 +74,7 @@ export default class JobPanel extends ToolPanelBase {
   /////////////////////////////////////////////////////////////
   updateProgress (progress) {
 
-    $(`#${this.container.id}-job-progress`).text(
-      'Job Progress: ' + progress)
+    $(`#${this.container.id}-job-progress`).text(progress)
 
     return this._isVisible
   }
@@ -83,7 +95,7 @@ export default class JobPanel extends ToolPanelBase {
 
     setTimeout(() => {
       this.setVisible(false)
-    }, 5000)
+    }, 4000)
   }
 
   /////////////////////////////////////////////////////////////
@@ -98,7 +110,7 @@ export default class JobPanel extends ToolPanelBase {
 
     setTimeout(() => {
       this.setVisible(false)
-    }, 5000)
+    }, 4000)
   }
 
   /////////////////////////////////////////////////////////////

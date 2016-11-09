@@ -40,7 +40,7 @@ export default class ToolPanelModal extends ToolPanelBase {
 
       $(this.container).css({
         left: `calc(50% - ${w/2}px)`,
-        top: `calc(50% - ${h/2}px)`
+        top: `calc(40% - ${h/2}px)`
       })
     })
 

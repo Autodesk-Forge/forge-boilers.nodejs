@@ -42,9 +42,11 @@ export default class DerivativesManagerPanel extends UIComponent {
   //
   //
   ///////////////////////////////////////////////////////////////////
-  initialize (container, appContainer) {
+  initialize (container, appContainer, viewerContainer) {
 
     $(container).append(this.domElement)
+
+    this.viewerContainer = viewerContainer
 
     this.appContainer = appContainer
 
@@ -71,15 +73,79 @@ export default class DerivativesManagerPanel extends UIComponent {
   //
   //
   ///////////////////////////////////////////////////////////////////
-  load (urn) {
+  async load (urn, designName) {
+
+    this.designName = designName
 
     this.urn = urn
 
-    return Promise.all([
-      this.loadHierarchy(urn),
-      this.loadManifest(urn),
-      this.loadExports(urn)
-    ])
+    this.properties = null
+
+    this.hierarchy = null
+
+    this.modelGuid = null
+
+    this.manifest = null
+
+    try {
+
+      this.manifest =
+        await this.derivativesAPI.getManifest(
+          this.urn)
+
+      this.loadManifest(
+        this.manifest)
+
+      const metadataResponse =
+        await this.derivativesAPI.getMetadata(
+          this.urn)
+
+      const metadata = metadataResponse.data.metadata
+
+      if (metadata && metadata.length) {
+
+        this.modelGuid = metadata[0].guid
+
+        this.loadExports(
+          this.urn,
+          this.designName,
+          this.manifest,
+          this.modelGuid)
+
+        const hierarchy =
+          await this.derivativesAPI.getHierarchy(
+            this.urn,
+            this.modelGuid)
+
+        const properties =
+          await this.derivativesAPI.getProperties(
+            this.urn,
+            this.modelGuid)
+
+        this.properties = properties.data.collection
+
+        this.hierarchy = hierarchy.data
+
+        this.loadHierarchy(
+          this.hierarchy,
+          this.properties)
+      }
+
+    } catch (ex) {
+
+      this.loadManifest(
+        this.manifest)
+
+      this.loadHierarchy(
+        this.hierarchy,
+        this.properties)
+
+      this.loadExports(
+        this.urn,
+        this.designName,
+        this.manifest,
+        this.modelGuid)
+    }
   }
 
   ///////////////////////////////////////////////////////////////////
@@ -142,36 +208,28 @@ export default class DerivativesManagerPanel extends UIComponent {
   //
   //
   ///////////////////////////////////////////////////////////////////
-  loadManifest (urn) {
+  loadManifest (manifest) {
 
-    return new Promise((resolve) => {
+    if (manifest) {
 
-      this.derivativesAPI.getManifest(
-        urn).then((manifest) => {
+      $(`.json-view`).JSONView(manifest, {
+        collapsed: false
+      })
 
-          $(`.json-view`).JSONView(manifest, {
-            collapsed: false
-          })
+      $('.manifest .controls').css({
+        display: 'block'
+      })
 
-          $('.manifest .controls').css({
-            display: 'block'
-          })
+    } else {
 
-          resolve()
+      $(`.json-view`).JSONView({
+        message: 'No manifest on this item'
+      })
 
-        }, (error) => {
-
-          $(`.json-view`).JSONView({
-            message: 'No manifest on this item'
-          })
-
-          $('.manifest .controls').css({
-            display: 'none'
-          })
-
-          resolve()
-        })
-    })
+      $('.manifest .controls').css({
+        display: 'none'
+      })
+    }
   }
 
   ///////////////////////////////////////////////////////////////////
@@ -211,80 +269,50 @@ export default class DerivativesManagerPanel extends UIComponent {
   //
   //
   ///////////////////////////////////////////////////////////////////
-  loadHierarchy (urn) {
+  loadHierarchy (hierarchy, properties) {
 
-    return new Promise(async(resolve) => {
+    $('.hierarchy-tree').empty()
 
-      try {
+    $('.hierarchy .controls').css({
+      display: 'none'
+    })
 
-        $('.hierarchy-tree').empty()
+    if (hierarchy && properties) {
 
-        $('.hierarchy .controls').css({
-          display: 'none'
+      const delegate =
+        new HierarchyTreeDelegate(
+          hierarchy,
+          properties)
+
+      delegate.on('node.dblClick', (node) => {
+
+        const propertyPanel =
+          new DerivativesPropertyPanel(
+            this.appContainer,
+            node.name + ' Properties',
+            node.properties)
+
+        propertyPanel.setVisible(true)
+      })
+
+      const rootNode = {
+        name: 'Model Hierarchy',
+        type: 'hierarchy.root',
+        id: this.guid(),
+        group: true
+      }
+
+      const domContainer = $('.hierarchy-tree')[0]
+
+      new Autodesk.Viewing.UI.Tree(
+        delegate, rootNode, domContainer, {
+          excludeRoot: false
         })
 
-        const metadataResponse = await this.derivativesAPI.getMetadata(
-          this.urn)
-
-        const metadata = metadataResponse.data.metadata
-
-        if (metadata && metadata.length) {
-
-          this.modelGuid = metadata[0].guid
-
-          const hierarchy = await this.derivativesAPI.getHierarchy(
-            this.urn, this.modelGuid)
-
-          const properties = await this.derivativesAPI.getProperties(
-            this.urn, this.modelGuid)
-
-          if(hierarchy.data && properties.data) {
-
-            const delegate = new HierarchyTreeDelegate(
-              hierarchy.data,
-              properties.data.collection)
-
-            delegate.on('node.dblClick', (node) => {
-
-              const propertyPanel = new DerivativesPropertyPanel(
-                this.appContainer,
-                node.name + ' Properties',
-                node.properties)
-
-              propertyPanel.setVisible(true)
-            })
-
-            const rootNode = {
-              name: 'Model Hierarchy',
-              type: 'hierarchy.root',
-              id: this.guid(),
-              group: true
-            }
-
-            // ensure no double requests populate UI
-            $('.hierarchy-tree').empty()
-
-            const domContainer = $('.hierarchy-tree')[0]
-
-            new Autodesk.Viewing.UI.Tree(
-              delegate, rootNode, domContainer, {
-                excludeRoot: false
-              })
-
-            $('.hierarchy .controls').css({
-              display: 'block'
-            })
-          }
-        }
-
-        resolve()
-
-      } catch (ex) {
-
-        console.log(ex)
-        resolve()
-      }
-    })
+      $('.hierarchy .controls').css({
+        display: 'block'
+      })
+    }
   }
 
   ///////////////////////////////////////////////////////////////////
@@ -328,24 +356,50 @@ export default class DerivativesManagerPanel extends UIComponent {
 
     this.formatsDropdown.on('item.selected', (item) => {
 
-      this.editor.set(Payloads[item.name])
+      let payload = Object.assign({},
+        Payloads[item.name], {
+          input: {
+            urn: this.urn
+          }
+        })
+
+      if(item.name === 'obj' && this.modelGuid) {
+
+        payload.output.formats[0].advanced.modelGuid =
+          this.modelGuid
+      }
+
+      this.editor.set(payload)
+
+      this.editor.expandAll()
     })
 
     this.editor = new JSONEditor($('.exports-payload')[0], {
       search: false
     })
 
-    const defaultPayload = {
-      input: {},
-      output: {}
-    }
+    $('#' + btnPostJobId).click(async() => {
 
-    this.editor.set(defaultPayload)
+      const payload = this.editor.get()
 
-    this.editor.expandAll()
+      await this.derivativesAPI.postJobWithProgress(
+        Object.assign({}, payload, {
+          panelContainer: this.viewerContainer,
+          designName: this.designName
+        }))
 
-    $('#' + btnPostJobId).click(() => {
+      this.manifest =
+        await this.derivativesAPI.getManifest(
+          this.urn)
 
+      this.loadManifest (this.manifest)
+
+      this.loadExports(
+        this.urn,
+        this.designName,
+        this.manifest,
+        this.modelGuid,
+        false)
     })
   }
 
@@ -353,58 +407,90 @@ export default class DerivativesManagerPanel extends UIComponent {
   //
   //
   ///////////////////////////////////////////////////////////////////
-  loadExports (urn) {
+  loadExports (urn, designName, manifest, modelGuid, clearAll = true) {
 
-    return new Promise(async(resolve) => {
+    $('.exports-tree').empty()
 
-      $('.exports-tree').empty()
+    $('.exports').css({
+      display: 'block'
+    })
 
-      $('.exports').css({
-        display: 'block'
+    const fileType = window.atob(urn).split(".").pop(-1)
+
+    let supportedFormats = []
+
+    for(var format in this.formats) {
+
+      if (this.formats[format].indexOf(fileType) > -1) {
+
+        supportedFormats.push(format)
+      }
+    }
+
+    const delegate = new ExportsTreeDelegate(
+      urn,
+      designName,
+      manifest,
+      modelGuid,
+      supportedFormats,
+      this.derivativesAPI)
+
+    delegate.on('postJob', async(node) => {
+
+      await this.derivativesAPI.postJobWithProgress(
+        Object.assign({}, node, {
+          panelContainer: this.viewerContainer,
+          designName: this.designName
+        }))
+
+      this.manifest =
+        await this.derivativesAPI.getManifest(
+          this.urn)
+
+      this.loadManifest (this.manifest)
+
+      this.loadExports(
+        this.urn,
+        this.designName,
+        this.manifest,
+        this.modelGuid,
+        false)
+    })
+
+    const domContainer = $('.exports-tree')[0]
+
+    const rootNode = {
+      name: 'Available Export Formats',
+      type: 'formats.root',
+      id: this.guid(),
+      group: true
+    }
+
+    new Autodesk.Viewing.UI.Tree(
+      delegate, rootNode, domContainer, {
+        excludeRoot: false
       })
 
-      const fileType = window.atob(urn).split(".").pop(-1)
-
-      let supportedFormats = []
-
-      for(var format in this.formats) {
-
-        if (this.formats[format].indexOf(fileType) > -1) {
-
-          supportedFormats.push(format)
-        }
-      }
-
-      const delegate = new ExportsTreeDelegate(
-        urn,
-        supportedFormats,
-        this.derivativesAPI)
-
-      const domContainer = $('.exports-tree')[0]
-
-      const rootNode = {
-        name: 'Available Export Formats',
-        type: 'formats.root',
-        id: this.guid(),
-        group: true
-      }
-
-      new Autodesk.Viewing.UI.Tree(
-        delegate, rootNode, domContainer, {
-          excludeRoot: false
-        })
+    if (clearAll) {
 
       this.formatsDropdown.setItems(
 
         supportedFormats.map((format) => {
           return {
-           name: format
+            name: format
           }
         }), -1
       )
 
-      resolve()
-    })
+      const payload = {
+        input: {
+          urn: this.urn
+        },
+        output: {}
+      }
+
+      this.editor.set(payload)
+    }
   }
 }
 

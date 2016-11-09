@@ -37,15 +37,23 @@ export default class DerivativesAPI extends ClientAPI {
 
       var jobPanel = new JobPanel(
         args.panelContainer,
-        args.designName)
+        args.designName,
+        args.output.formats[0].type)
 
       jobPanel.setVisible(true)
 
       try {
 
+        console.log('Posting Job:')
+
+        console.log(Object.assign({}, {
+          input: args.input,
+          output: args.output
+        }))
+
         var job = await this.postJob({
           input: args.input,
-          output:args.output
+          output: args.output
         })
 
         if (job.result === 'success' || job.result === 'created') {
@@ -174,7 +182,11 @@ export default class DerivativesAPI extends ClientAPI {
 
       var derivative = manifest.derivatives[i]
 
-      if (derivative.outputType === params.output.type) {
+      const outputType =
+        params.output.type ||
+        params.output.formats[0].type
+
+      if (derivative.outputType === outputType) {
 
         parentDerivative = derivative
 
@@ -190,12 +202,11 @@ export default class DerivativesAPI extends ClientAPI {
                 parent: parentDerivative,
                 target: childDerivative
               }
-            }
 
-            // match objectId
-            else if(_.isEqual(
+            } else if(
+              _.isEqual( // match objectIds
                 childDerivative.objectIds,
-                params.output.objectIds)) {
+                params.output.formats[0].advanced.objectIds)) {
 
               return {
                 parent: parentDerivative,
@@ -216,7 +227,7 @@ export default class DerivativesAPI extends ClientAPI {
   //
   //
   /////////////////////////////////////////////////////////////////
-  hasDerivative(manifest, params) {
+  hasDerivative (manifest, params) {
 
     var derivativeResult = this.findDerivative(
       manifest, params)
@@ -251,9 +262,9 @@ export default class DerivativesAPI extends ClientAPI {
           var derivativeResult = this.findDerivative(
             manifest, params)
 
-          if(derivativeResult.target) {
+          if (derivativeResult.target) {
 
-            var progress = manifest.progress.split(' ')[0]
+            let progress = manifest.progress.split(' ')[0]
 
             progress = (progress === 'complete' ? '100%' : progress)
 
@@ -284,7 +295,12 @@ export default class DerivativesAPI extends ClientAPI {
 
           if(!derivativeResult.parent) {
 
-            onProgress ? onProgress('0%') : ''
+            if (manifest.status === 'inprogress') {
+
+              const progress = manifest.progress.split(' ')[0]
+
+              onProgress ? onProgress(progress) : ''
+            }
 
             if(!skipNotFound) {
 

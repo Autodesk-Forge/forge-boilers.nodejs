@@ -186,3 +186,7 @@ div.tooltip-inner {
     background-color: #f8f8f8;
     color: #000000;
 }
+
+.menu {
+    z-index:5000;
+}

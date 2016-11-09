@@ -101,7 +101,7 @@ body{
     height: calc(100% - 9px);
     margin-left: 4px;
     margin-top: 4px;
-    width: calc(100% - 10px);
+    width: calc(100% - 12px);
 }
 
 .derivatives.model-name {

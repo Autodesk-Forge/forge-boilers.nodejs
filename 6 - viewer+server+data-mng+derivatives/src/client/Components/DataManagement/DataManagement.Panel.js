@@ -118,7 +118,10 @@ export default class DataManagementPanel extends UIComponent {
         }
 
         const output = {
-          type: 'svf'
+          formats:[{
+            type: 'svf',
+            views: ['2d', '3d']
+          }]
         }
 
         const fileExtType = (version.attributes && version.attributes.extension) ?
@@ -175,30 +178,6 @@ export default class DataManagementPanel extends UIComponent {
         data.node.showLoader(false)
       })
     })
-
-    this.contextMenu.on('context.derivatives.manage', (data) => {
-
-      try {
-
-        const dlg = new ToolPanelModal(appContainer, {
-          title: 'Model Derivatives: ' + data.node.objectKey,
-          height: 'calc(100% - 100px)',
-          width: 'calc(100% - 100px)'
-        })
-
-        const pane = new DerivativesManagerPane()
-
-        dlg.bodyContent(pane.domElement)
-
-        pane.load()
-
-        dlg.setVisible(true)
-
-      } catch (ex) {
-
-        console.log(ex)
-      }
-    })
   }
 
   ///////////////////////////////////////////////////////////////////
@@ -218,10 +197,17 @@ export default class DataManagementPanel extends UIComponent {
 
     var version = node.versions[ node.versions.length - 1 ]
 
-    var urn = window.btoa(
-      version.relationships.storage.data.id)
+    if(version.relationships.storage) {
 
-    return urn.replace(new RegExp('=', 'g'), '')
+      var urn = window.btoa(
+        version.relationships.storage.data.id)
+
+      return urn.replace(new RegExp('=', 'g'), '')
+
+    } else {
+
+      return null
+    }
   }
 
   ///////////////////////////////////////////////////////////////////
@@ -253,6 +239,13 @@ export default class DataManagementPanel extends UIComponent {
           node.projectId, node.id).then((versions) => {
 
             node.versions = versions.data
+
+            if(!node.name) {
+
+              // fix for BIM Docs - displayName doesn't appear in item
+              node.name = node.versions[
+                node.versions.length-1].attributes.displayName
+            }
 
             parent.addChild(node)
 
@@ -517,9 +510,10 @@ class DMTreeDelegate extends BaseTreeDelegate {
 
     if (node.tooltip) {
 
-      let html = `
+      const html = `
         <div class="label-container">
-            <label class="${node.type}" id="${labelId}"
+            <label id="${labelId}"
+              class="tooltip-container ${node.type}"
               ${options && options.localize?"data-i18n=" + text : ''}
                 data-placement="right"
                 data-toggle="tooltip"
@@ -532,7 +526,10 @@ class DMTreeDelegate extends BaseTreeDelegate {
 
       $(parent).append(html)
 
-      $(parent).find('label[data-toggle="tooltip"]').tooltip({
+      const $tooltipTarget = $(parent).find(
+        '[data-toggle="tooltip"]')
+
+      $tooltipTarget.tooltip({
         container: 'body',
         animated: 'fade',
         html: true
@@ -540,7 +537,7 @@ class DMTreeDelegate extends BaseTreeDelegate {
 
       node.setTooltip = (title) => {
 
-        $(parent).find('label')
+        $(parent).find('.tooltip-container')
           .attr('title', title)
           .tooltip('fixTitle')
           .tooltip('setContent')
@@ -761,9 +758,14 @@ class DMTreeDelegate extends BaseTreeDelegate {
             node.children = []
 
             this.dmAPI.getProjects(
-              node.id).then((projects) => {
+              node.id).then((projectsRes) => {
 
-                let projectTasks = projects.data.map((project) => {
+                const projects = _.sortBy(projectsRes.data,
+                  (project) => {
+                    return project.attributes.name.toLowerCase()
+                  })
+
+                let projectTasks = projects.map((project) => {
 
                   return new Promise((resolve, reject) => {
 
@@ -854,9 +856,14 @@ class DMTreeDelegate extends BaseTreeDelegate {
                 const rootId = project.data.relationships.rootFolder.data.id
 
                 this.dmAPI.getFolderContent(
-                  node.id, rootId).then((folderItems) => {
+                  node.id, rootId).then((folderItemsRes) => {
 
-                    let folderItemTasks = folderItems.data.map((folderItem) => {
+                    const folderItems = _.sortBy(folderItemsRes.data,
+                      (folderItem) => {
+                        return folderItem.attributes.displayName.toLowerCase()
+                      })
+
+                    let folderItemTasks = folderItems.map((folderItem) => {
 
                       return new Promise((resolve, reject) => {
 

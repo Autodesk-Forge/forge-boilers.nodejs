@@ -15,6 +15,7 @@
 // DOES NOT WARRANT THAT THE OPERATION OF THE PROGRAM WILL BE
 // UNINTERRUPTED OR ERROR FREE.
 /////////////////////////////////////////////////////////////////////
+import ModelTransformerExtension from 'Viewing.Extension.ModelTransformer'
 import {ManagerPanel as DerivativesManagerPanel} from 'Derivatives'
 import ViewerPanel from 'Components/Viewer/ViewerPanel'
 import OSSPanel from 'Components/OSS/OSS.Panel'
@@ -70,7 +71,8 @@ export default class App {
 
             this.derivativesPanel.initialize(
               this.panelContainers.derivatives,
-              this.panelContainers.app)
+              this.panelContainers.app,
+              this.panelContainers.viewer)
 
             this.viewerPanel.initialize(
               this.panelContainers.viewer)
@@ -82,9 +84,7 @@ export default class App {
 
             this.ossPanel.on('loadObject', (item) => {
 
-              const urn = 'urn:' + window.btoa(item.objectId)
-
-              return this.onLoadItem(urn)
+              return this.onLoadItem(item)
             })
 
             this.ossPanel.on('loadDerivatives', (node) => {
@@ -101,27 +101,37 @@ export default class App {
   //
   //
   ///////////////////////////////////////////////////////////////////
-  onLoadItem (urn) {
+  onLoadItem (item) {
 
     return new Promise(async(resolve, reject) => {
 
-      let doc = await this.viewerPanel.loadDocument(urn)
+      const urn = 'urn:' + window.btoa(item.objectId)
 
-      let viewer = this.viewerPanel.viewer
+      const doc = await this.viewerPanel.loadDocument(urn)
 
-      if (viewer.model) {
+      const viewer = this.viewerPanel.viewer
 
-        viewer.impl.unloadModel(
-          viewer.model)
+      viewer.loadExtension(ModelTransformerExtension, {
+        parentControl: 'modelTools',
+        autoLoad: true
+      })
 
-        viewer.impl.sceneUpdated(true)
+      const path = this.viewerPanel.getDefaultViewablePath(doc)
+
+      //  builds placementTransform based on model extension
+      const extInstance = viewer.getExtension(
+        ModelTransformerExtension)
+
+      const placementTransform = extInstance.buildPlacementTransform(
+        item.objectKey)
+
+      const loadOptions = {
+        placementTransform
       }
 
-      let path = this.viewerPanel.getDefaultViewablePath(doc)
-
-      let loadOptions = {}
-
       viewer.loadModel(path, loadOptions, (model) => {
+
+        model.name = item.objectKey
 
         resolve(model)
       })
@@ -150,7 +160,7 @@ export default class App {
         node.parent.classList.remove('derivated')
       })
 
-      this.derivativesPanel.load(urn).then(() => {
+      this.derivativesPanel.load(urn, modelName).then(() => {
 
         resolve()
       })

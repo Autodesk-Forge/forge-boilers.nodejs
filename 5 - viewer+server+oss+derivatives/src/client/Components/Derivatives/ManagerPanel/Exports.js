@@ -12,11 +12,17 @@ export class ExportsTreeDelegate
   //
   //
   /////////////////////////////////////////////////////////////
-  constructor (urn, formats, api) {
+  constructor (urn, designName, manifest, modelGuid, formats, api) {
 
     super()
 
+    this.designName = designName.split('.')[0]
+
+    this.modelGuid = modelGuid
+
     this.derivativesAPI = api
+
+    this.manifest = manifest
 
     this.formats = formats
 
@@ -77,14 +83,26 @@ export class ExportsTreeDelegate
 
       $(`#${downloadId}`).click(() => {
 
-        node.showLoader(true)
+        if (node.derivative) {
 
+          node.showLoader(true)
 
+          const uri = this.derivativesAPI.getDownloadURI(
+            node.input.urn,
+            node.derivative.derivativeUrn,
+            node.exportFilename)
 
+          this.derivativesAPI.downloadURI(
+            uri, node.exportFilename)
 
-        setTimeout(() => {
-          node.showLoader(false)
-        }, 2000)
+          setTimeout(() => {
+            node.showLoader(false)
+          }, 2000)
+
+        } else {
+
+          this.emit('postJob', node)
+        }
       })
     }
 
@@ -117,43 +135,61 @@ export class ExportsTreeDelegate
   //
   //
   /////////////////////////////////////////////////////////////
-  forEachChild(node, addChildCallback) {
+  forEachChild (node, addChildCallback) {
 
     switch (node.type) {
 
       case 'formats.root':
 
-        this.formats.forEach(async(format) => {
+        this.formats.forEach((format) => {
 
           let exportNode = {
+            exportFilename: this.designName + '.' + format,
             type: 'formats.' + format + '-export',
-            filename: 'export' + '.' + format,
-            outputType: format,
+            output: { formats:[{type: format}] },
+            input: { urn: this.urn },
             id: this.guid(),
-            urn: this.urn,
             group: true,
             name: format
           }
 
           if (format === 'obj') {
 
-            const metadataResponse =
-              await this.derivativesAPI.getMetadata(
-                this.urn)
+            if (this.modelGuid) {
 
-            const metadata = metadataResponse.data.metadata
+              let objFormat =
+                exportNode.output.formats[0]
 
-            if (metadata && metadata.length) {
+              objFormat.advanced = {
+                modelGuid: this.modelGuid,
+                objectIds: [-1]
+              }
 
-              exportNode.guid = metadata.guid
-              exportNode.objectIds = [-1]
+              addChildCallback(exportNode)
             }
+
+          } else {
+
+            addChildCallback(exportNode)
           }
 
-          addChildCallback(exportNode)
+          if (this.manifest) {
+
+            if(this.derivativesAPI.hasDerivative (
+                this.manifest, exportNode)) {
+
+              exportNode.parent.classList.add('derivated')
+
+              this.derivativesAPI.getDerivativeURN(
+                exportNode).then((derivative) => {
+
+                  exportNode.derivative = derivative
+                })
+            }
+          }
         })
 
-        break
+      break
     }
   }
 

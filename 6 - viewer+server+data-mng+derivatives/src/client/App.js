@@ -209,7 +209,8 @@ export default class App {
 
             this.derivativesPanel.initialize(
               this.panelContainers.derivatives,
-              this.panelContainers.app)
+              this.panelContainers.app,
+              this.panelContainers.viewer)
 
             this.dmPanel.initialize(
               this.panelContainers.dm,
@@ -240,8 +241,6 @@ export default class App {
                 this.register(data.socketId)
               })
 
-              socketSvc.emit('request.connection.data')
-
               socketSvc.on('callback', (msg)=> {
 
                 if (this.popup) {
@@ -259,6 +258,8 @@ export default class App {
                   })
                 }
               })
+
+              socketSvc.emit('request.connection.data')
             })
 
             $.get('/api/dm/user', (user) => {
@@ -289,20 +290,29 @@ export default class App {
       this.viewerPanel.setTokenUrl(
         config.forge.token3LeggedUrl)
 
-      let doc = await this.viewerPanel.loadDocument(urn)
+      const doc = await this.viewerPanel.loadDocument(urn)
 
-      let viewer = this.viewerPanel.viewer
+      const viewer = this.viewerPanel.viewer
 
-      let path = this.viewerPanel.getDefaultViewablePath(doc)
-
-      let options = {}
+      const path = this.viewerPanel.getDefaultViewablePath(doc)
 
       viewer.loadExtension(ModelTransformerExtension, {
         parentControl: 'modelTools',
         autoLoad: true
       })
 
-      viewer.loadModel(path, options, (model) => {
+      //  builds placementTransform based on model extension
+      const extInstance = viewer.getExtension(
+        ModelTransformerExtension)
+
+      const placementTransform = extInstance.buildPlacementTransform(
+        item.name)
+
+      const loadOptions = {
+        placementTransform
+      }
+
+      viewer.loadModel(path, loadOptions, (model) => {
 
         model.name = item.name
 
@@ -330,7 +340,7 @@ export default class App {
         node.parent.classList.remove('derivated')
       })
 
-      this.derivativesPanel.load(urn).then(() => {
+      this.derivativesPanel.load(urn, node.name).then(() => {
 
         resolve()
       })

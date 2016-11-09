@@ -134,6 +134,8 @@ export default class ViewerPanel {
     this.viewer.setBackgroundColor(
       255, 226, 110,
       219, 219, 219)
+
+    this.viewer.prefs.tag('ignore-producer')
   }
 
   ///////////////////////////////////////////////////////////////////
