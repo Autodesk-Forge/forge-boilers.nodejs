@@ -22,6 +22,7 @@ import ViewerPanel from 'Components/Viewer/Viewer.Panel'
 import ServiceManager from 'Services/SvcManager'
 import {clientConfig as config} from 'c0nfig'
 import 'jquery-ui/themes/base/resizable.css'
+import ToolPanelModal from 'ToolPanelModal'
 import SocketSvc from 'Services/SocketSvc'
 import 'jquery-ui/ui/widgets/resizable'
 import 'font-awesome-webpack'
@@ -45,6 +46,11 @@ export default class App {
     this.$toggleDM.click((e) => {
 
       this.onToggleDM(e)
+    })
+
+    $('#about').click((e) => {
+
+      this.onAbout(e)
     })
   }
 
@@ -402,5 +408,20 @@ export default class App {
 
       this.login()
     }
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////
+  onAbout () {
+
+    const aboutDlg = new ToolPanelModal(
+      this.panelContainers.app, {
+        title: 'About this sample ...',
+        showCancel: false
+      })
+
+    aboutDlg.setVisible(true)
   }
 }

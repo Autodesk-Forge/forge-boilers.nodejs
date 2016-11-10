@@ -6,7 +6,6 @@ import async from 'async'
 import path from 'path'
 import util from 'util'
 import zlib from 'zlib'
-import util from 'util'
 import _ from 'lodash'
 import fs from 'fs'
 
@@ -47,7 +46,7 @@ export default class SVFDownloaderSvc extends BaseSvc {
   // GET /viewingservice/v1/items/:encodedURN
   //
   ///////////////////////////////////////////////////////////////////
-  getItem = function (urn) {
+  getItem (urn) {
 
     var promise = new Promise(function(resolve, reject) {
 
@@ -92,7 +91,7 @@ export default class SVFDownloaderSvc extends BaseSvc {
   // Download specified model from URN to target directory
   //
   ////////////////////////////////////////////////////////////////////////
-  download = function(urn, directory) {
+  download (urn, directory) {
 
     var promise = new Promise(function(resolve, reject) {
 
@@ -146,7 +145,7 @@ export default class SVFDownloaderSvc extends BaseSvc {
   // Extract items from viewable
   //
   ////////////////////////////////////////////////////////////////////////
-  parseViewable(directory, urn, saveViewable, callback) {
+  parseViewable (directory, urn, saveViewable, callback) {
 
     var filename = path.join(
       directory,
@@ -210,7 +209,7 @@ export default class SVFDownloaderSvc extends BaseSvc {
   // Download all items to target directory
   //
   ////////////////////////////////////////////////////////////////////////
-  downloadItems(items, directory, maxWorkers, callback) {
+  downloadItems (items, directory, maxWorkers, callback) {
 
     //Download each item asynchronously
     async.mapLimit (items, maxWorkers,
@@ -245,7 +244,7 @@ export default class SVFDownloaderSvc extends BaseSvc {
   // Grab all urn's from viewable recursively
   //
   ////////////////////////////////////////////////////////////////////////
-  function getUrnRec(item) {
+  getUrnRec(item) {
 
     var urn =[];
 
@@ -266,7 +265,7 @@ export default class SVFDownloaderSvc extends BaseSvc {
   // Grab all views recursively
   //
   ////////////////////////////////////////////////////////////////////////
-  getViewsRec(item, parentNode, directory) {
+  getViewsRec (item, parentNode, directory) {
 
     var views = [];
 
@@ -302,7 +301,7 @@ export default class SVFDownloaderSvc extends BaseSvc {
   // Download item to target directory
   //
   ////////////////////////////////////////////////////////////////////////
-  downloadItem(item, directory, callback) {
+  downloadItem (item, directory, callback) {
 
     this.getItem(item).then(
 
@@ -358,7 +357,7 @@ export default class SVFDownloaderSvc extends BaseSvc {
   // Collect additional elements from manifest
   //
   ////////////////////////////////////////////////////////////////////////
-  parseManifest(items, callback) {
+  parseManifest (items, callback) {
 
     async.parallel([
 
@@ -460,7 +459,7 @@ export default class SVFDownloaderSvc extends BaseSvc {
   //
   //
   ////////////////////////////////////////////////////////////////////////
-  filterItems(items, filter) {
+  filterItems (items, filter) {
 
     return items.filter (function (item) {
 
@@ -472,7 +471,7 @@ export default class SVFDownloaderSvc extends BaseSvc {
   // Extract URI's from manifest recursively
   //
   ////////////////////////////////////////////////////////////////////////
-  getUriRec(manifest, urnParent) {
+  getUriRec (manifest, urnParent) {
 
     var uris = [];
 
@@ -495,7 +494,7 @@ export default class SVFDownloaderSvc extends BaseSvc {
   //
   //
   ////////////////////////////////////////////////////////////////////////
-  readSvfItem(item, callback) {
+  readSvfItem (item, callback) {
 
     console.log(item)
 
@@ -534,7 +533,7 @@ export default class SVFDownloaderSvc extends BaseSvc {
   //
   //
   ////////////////////////////////////////////////////////////////////////
-  readF2dfItem(item, callback) {
+  readF2dfItem (item, callback) {
 
     callback(null, []);
   }
@@ -543,7 +542,7 @@ export default class SVFDownloaderSvc extends BaseSvc {
   //
   //
   ////////////////////////////////////////////////////////////////////////
-  readManifest(item, callback) {
+  readManifest (item, callback) {
 
     fs.readFile(item.path, function (err, content) {
 
