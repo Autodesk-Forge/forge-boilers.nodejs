@@ -71,8 +71,9 @@
   ],
   "license": "MIT",
   "scripts": {
+    "postinstall": "npm run build-prod",
+    "start": "node bin/static/server.js",
     "build-server": "babel --presets es2015,stage-0 ./src/server -d ./bin/static",
-    "start": "npm run build-prod && node bin/static/server.js",
     "build-dev": "webpack --watch --progress --colors --config ./webpack/webpack.config.development.js",
     "build-prod": "webpack --progress --config ./webpack/webpack.config.production.js",
     "nodemon": "nodemon bin/run.js --config nodemon.js",
