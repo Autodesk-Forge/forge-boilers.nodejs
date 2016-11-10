@@ -75,7 +75,8 @@
   ],
   "license": "MIT",
   "scripts": {
-    "start": "npm run build-prod && node bin/static/server.js",
+    "start": "node bin/run.js",
+    "postinstall": "npm run build-prod",
     "build-server": "babel --presets es2015,stage-0 ./src/server -d ./bin/static",
     "build-dev": "webpack --watch --progress --colors --config ./webpack/webpack.config.development.js",
     "build-prod": "webpack --progress --config ./webpack/webpack.config.production.js",
