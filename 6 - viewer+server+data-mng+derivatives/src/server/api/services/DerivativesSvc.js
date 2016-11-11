@@ -40,63 +40,12 @@ export default class DerivativeSvc extends BaseSvc {
   //
   //
   /////////////////////////////////////////////////////////////////
-  get jobOutputBuilder () {
-
-    return {
-
-      svf: (opts = {}) => {
-
-        return {
-          destination: {
-            region: opts.region || 'us'
-          },
-          formats: [ {
-            type: 'svf',
-            views: opts.views || ['2d', '3d']
-          } ]
-        }
-      },
-
-      obj: (opts = {}) => {
-
-        return {
-          destination: {
-            region: opts.region || 'us'
-          },
-          formats: [ {
-            type: 'obj',
-            advanced: {
-              modelGuid: opts.modelGuid,
-              objectIds: opts.objectIds
-            }
-          } ]
-        }
-      },
-
-      defaultOutput: (opts = {}) => {
-
-        return {
-          destination: {
-            region: opts.region || 'us'
-          },
-          formats: [ {
-            type: opts.outputType
-          }]
-        }
-      }
-    }
-  }
-
-  /////////////////////////////////////////////////////////////////
-  //
-  //
-  /////////////////////////////////////////////////////////////////
   postJob (token, payload) {
 
     this._APIAuth.accessToken = token
 
     return this._derivativesAPI.translate (payload, {
-      'xAdsForce': true
+      'xAdsForce': payload.output.force
     })
   }
 

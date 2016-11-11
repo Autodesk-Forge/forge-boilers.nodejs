@@ -422,6 +422,22 @@ export default class App {
         showCancel: false
       })
 
+    aboutDlg.bodyContent (`
+      <div>
+        <br>
+        Written by <a href="https://twitter.com/F3lipek"
+          target="_blank">
+          Philippe Leefsma
+        </a>, November 2016
+        <hr class="about"/>
+        Source on
+        <a href="https://github.com/Autodesk-Forge/forge-boilers.nodejs"
+          target="_blank">
+          Github
+        </a>
+      </div>
+    `)
+
     aboutDlg.setVisible(true)
   }
 }

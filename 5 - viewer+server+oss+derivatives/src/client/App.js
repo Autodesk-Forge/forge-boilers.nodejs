@@ -20,6 +20,7 @@ import {ManagerPanel as DerivativesManagerPanel} from 'Derivatives'
 import ViewerPanel from 'Components/Viewer/ViewerPanel'
 import OSSPanel from 'Components/OSS/OSS.Panel'
 import 'jquery-ui/themes/base/resizable.css'
+import ToolPanelModal from 'ToolPanelModal'
 import 'jquery-ui/ui/widgets/resizable'
 import 'font-awesome-webpack'
 import 'bootstrap-webpack'
@@ -41,6 +42,11 @@ export default class App {
     this.$toggleOSS.click((e) => {
 
       this.onToggleOSS(e)
+    })
+
+    $('#about').click((e) => {
+
+      this.onAbout(e)
     })
   }
 
@@ -181,5 +187,36 @@ export default class App {
     this.$toggleOSS.toggleClass('active')
 
     this.viewerPanel.onResize()
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////
+  onAbout () {
+
+    const aboutDlg = new ToolPanelModal(
+      this.panelContainers.app, {
+        title: 'About this sample ...',
+        showCancel: false
+      })
+
+    aboutDlg.bodyContent (`
+      <div>
+        <br>
+        Written by <a href="https://twitter.com/F3lipek"
+          target="_blank">
+          Philippe Leefsma
+        </a>, November 2016
+        <hr class="about"/>
+        Source on
+        <a href="https://github.com/Autodesk-Forge/forge-boilers.nodejs"
+          target="_blank">
+          Github
+        </a>
+      </div>
+    `)
+
+    aboutDlg.setVisible(true)
   }
 }

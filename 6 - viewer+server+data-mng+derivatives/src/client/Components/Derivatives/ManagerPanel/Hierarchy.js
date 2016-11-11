@@ -155,6 +155,15 @@ export class HierarchyTreeDelegate
       }
     })
 
+    nodeProperties.push({
+      displayCategory: 'Derivatives',
+      displayName: 'Node Id',
+      displayValue: nodeId,
+      units: null,
+      hidden: 0,
+      type: 20
+    })
+
     return nodeProperties
   }
 }

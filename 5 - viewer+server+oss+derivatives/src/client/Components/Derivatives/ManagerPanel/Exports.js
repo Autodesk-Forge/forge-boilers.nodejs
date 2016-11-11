@@ -81,27 +81,35 @@ export class ExportsTreeDelegate
           </div>
         `)
 
+      const download = (derivativeUrn) => {
+
+        node.showLoader(true)
+
+        const uri = this.derivativesAPI.getDownloadURI(
+          node.input.urn,
+          derivativeUrn,
+          node.exportFilename)
+
+        this.derivativesAPI.downloadURI(
+          uri, node.exportFilename)
+
+        setTimeout(() => {
+          node.showLoader(false)
+        }, 2000)
+      }
+
       $(`#${downloadId}`).click(() => {
 
         if (node.derivative) {
 
-          node.showLoader(true)
-
-          const uri = this.derivativesAPI.getDownloadURI(
-            node.input.urn,
-            node.derivative.derivativeUrn,
-            node.exportFilename)
-
-          this.derivativesAPI.downloadURI(
-            uri, node.exportFilename)
-
-          setTimeout(() => {
-            node.showLoader(false)
-          }, 2000)
+          download(node.derivative.urn)
 
         } else {
 
-          this.emit('postJob', node)
+          this.emit('postJob', node).then((derivative) => {
+
+            download(derivative.urn)
+          })
         }
       })
     }
@@ -166,6 +174,63 @@ export class ExportsTreeDelegate
               }
 
               addChildCallback(exportNode)
+
+              if (this.manifest) {
+
+                // add specific OBJ nodes, if any ...
+
+                const genericObj = {
+                  output: {
+                    formats:[{
+                      type: 'obj',
+                      advanced: {
+                        modelGuid: this.modelGuid
+                      }
+                    }]
+                  },
+                  input: { urn: this.urn }
+                }
+
+                const results =
+                  this.derivativesAPI.findDerivatives(
+                    this.manifest, genericObj)
+
+                if(Array.isArray(results)) {
+
+                  results.forEach((result) => {
+
+                    if (result.target) {
+
+                      const ids = result.target.objectIds.join('-')
+
+                      // excludes full model
+                      if (ids !== '-1') {
+
+                        let extraExportNode = {
+                          exportFilename: this.designName + '-' + ids + '.' + format,
+                          type: 'formats.' + format + '-export',
+                          output: { formats:[{
+                            type: format,
+                            advanced: {
+                              modelGuid: this.modelGuid,
+                              objectIds: result.target.objectIds
+                            }}] },
+                          input: { urn: this.urn },
+                          id: this.guid(),
+                          group: true,
+                          name: format + ` [${result.target.objectIds.join(', ')}]`
+                        }
+
+                        addChildCallback(extraExportNode)
+
+                        extraExportNode.parent.classList.add('derivated')
+
+                        extraExportNode.derivative = result.target
+                      }
+                    }
+                  })
+                }
+              }
             }
 
           } else {
@@ -189,7 +254,7 @@ export class ExportsTreeDelegate
           }
         })
 
-      break
+        break
     }
   }
 

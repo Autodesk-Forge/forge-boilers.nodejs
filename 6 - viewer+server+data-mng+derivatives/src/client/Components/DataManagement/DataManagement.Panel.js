@@ -118,6 +118,7 @@ export default class DataManagementPanel extends UIComponent {
         }
 
         const output = {
+          force: true,
           formats:[{
             type: 'svf',
             views: ['2d', '3d']

@@ -435,32 +435,39 @@ export default class DerivativesManagerPanel extends UIComponent {
       supportedFormats,
       this.derivativesAPI)
 
-    delegate.on('postJob', async(node) => {
+    delegate.on('postJob', (node) => {
 
-      await this.derivativesAPI.postJobWithProgress(
-        Object.assign({}, node, {
-          panelContainer: this.viewerContainer,
-          designName: this.designName
-        }))
+      return new Promise(async(resolve) => {
 
-      this.manifest =
-        await this.derivativesAPI.getManifest(
-          this.urn)
+        const derivative =
+          await this.derivativesAPI.postJobWithProgress(
+            Object.assign({}, node, {
+              panelContainer: this.viewerContainer,
+              designName: this.designName
+            }))
 
-      this.loadManifest (this.manifest)
+        resolve(derivative)
 
-      this.loadExports(
-        this.urn,
-        this.designName,
-        this.manifest,
-        this.modelGuid,
-        false)
+        this.manifest =
+          await this.derivativesAPI.getManifest(
+            this.urn)
+
+        this.loadManifest (this.manifest)
+
+        this.loadExports(
+          this.urn,
+          this.designName,
+          this.manifest,
+          this.modelGuid,
+          false)
+      })
+
     })
 
     const domContainer = $('.exports-tree')[0]
 
     const rootNode = {
-      name: 'Available Export Formats',
+      name: 'Available Exports',
       type: 'formats.root',
       id: this.guid(),
       group: true

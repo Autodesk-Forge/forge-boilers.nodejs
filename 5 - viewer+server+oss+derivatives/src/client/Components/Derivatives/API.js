@@ -174,11 +174,11 @@ export default class DerivativesAPI extends ClientAPI {
   //
   //
   ///////////////////////////////////////////////////////////////////
-  findDerivative (manifest, params) {
+  findDerivatives (manifest, params) {
 
     var parentDerivative = null
 
-    for(var i = 0; i < manifest.derivatives.length; ++i) {
+    for (var i = 0; i < manifest.derivatives.length; ++i) {
 
       var derivative = manifest.derivatives[i]
 
@@ -192,27 +192,45 @@ export default class DerivativesAPI extends ClientAPI {
 
         if (derivative.children) {
 
-          for(var j = 0; j < derivative.children.length; ++j) {
+          switch (derivative.outputType) {
 
-            var childDerivative = derivative.children[j]
+            case 'obj':
 
-            if(derivative.outputType !== 'obj'){
+              if (params.output.formats[0].advanced.objectIds) {
+
+                for(var j = 0; j < derivative.children.length; ++j) {
+
+                  var childDerivative = derivative.children[j]
+
+                  if(_.isEqual( // match objectIds
+                    childDerivative.objectIds,
+                    params.output.formats[0].advanced.objectIds)) {
+
+                    return {
+                      parent: parentDerivative,
+                      target: childDerivative
+                    }
+                  }
+                }
+
+              } else {
+
+                return derivative.children.map((childDerivative) => {
+                  return {
+                    parent: parentDerivative,
+                    target: childDerivative
+                  }
+                })
+              }
+
+              break
+
+            default:
 
               return {
                 parent: parentDerivative,
-                target: childDerivative
+                target: derivative.children[0]
               }
-
-            } else if(
-              _.isEqual( // match objectIds
-                childDerivative.objectIds,
-                params.output.formats[0].advanced.objectIds)) {
-
-              return {
-                parent: parentDerivative,
-                target: childDerivative
-              }
-            }
           }
         }
       }
@@ -229,7 +247,7 @@ export default class DerivativesAPI extends ClientAPI {
   /////////////////////////////////////////////////////////////////
   hasDerivative (manifest, params) {
 
-    var derivativeResult = this.findDerivative(
+    var derivativeResult = this.findDerivatives(
       manifest, params)
 
     return derivativeResult.target ? true : false
@@ -259,7 +277,7 @@ export default class DerivativesAPI extends ClientAPI {
             return reject(manifest)
           }
 
-          var derivativeResult = this.findDerivative(
+          var derivativeResult = this.findDerivatives(
             manifest, params)
 
           if (derivativeResult.target) {
@@ -275,8 +293,8 @@ export default class DerivativesAPI extends ClientAPI {
               onProgress ? onProgress('100%') : ''
 
               return resolve({
-                status: 'success',
-                derivativeUrn: derivativeResult.target.urn
+                urn: derivativeResult.target.urn,
+                status: 'success'
               })
 
             } else if (derivativeResult.target.status === 'failed') {

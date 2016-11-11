@@ -156,6 +156,7 @@ const Payloads = {
   stl: {
     input:{},
     output:{
+      force: true,
       formats: [{
         type: 'stl'
       }],
@@ -167,6 +168,7 @@ const Payloads = {
   step: {
     input:{},
     output:{
+      force: true,
       formats: [{
         type: 'step'
       }],
@@ -178,6 +180,7 @@ const Payloads = {
   dwg: {
     input:{},
     output:{
+      force: true,
       formats: [{
         type: 'dwg'
       }],
@@ -189,6 +192,7 @@ const Payloads = {
   iges: {
     input:{},
     output:{
+      force: true,
       formats: [{
         type: 'iges'
       }],
@@ -200,6 +204,7 @@ const Payloads = {
   obj: {
     input:{},
     output:{
+      force: false,
       formats: [{
         type: 'obj',
         advanced: {
@@ -214,6 +219,7 @@ const Payloads = {
   svf: {
     input:{},
     output:{
+      force: true,
       formats: [{
         type: 'svf',
         views: ['2d', '3d']
@@ -228,6 +234,7 @@ const Payloads = {
 
     },
     output:{
+      force: true,
       type: 'thumbnail',
       formats:{
         advanced: {
@@ -245,6 +252,7 @@ const Payloads = {
 
     },
     output:{
+      force: true,
       formats: [{
         type: 'fbx'
       }],
@@ -258,6 +266,7 @@ const Payloads = {
 
     },
     output:{
+      force: true,
       formats: [{
         type: 'ifc'
       }],

@@ -111,7 +111,10 @@ export class BaseTreeDelegate extends
 
     if (this.nodeClickSelector(event)) {
 
-      this.contextMenu.show(event, node)
+      if(this.contextMenu) {
+
+        this.contextMenu.show(event, node)
+      }
     }
   }
 

@@ -207,6 +207,7 @@ export default class OSSPanel extends UIComponent {
         }
 
         const output = {
+          force: true,
           formats:[{
             type: 'svf',
             views: ['2d', '3d']
