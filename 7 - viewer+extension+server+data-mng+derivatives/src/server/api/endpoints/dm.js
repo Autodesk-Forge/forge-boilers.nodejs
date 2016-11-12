@@ -29,8 +29,8 @@ module.exports = function() {
         token.access_token)
 
       res.json(response)
-    }
-    catch (ex) {
+
+    } catch (ex) {
 
       res.status(ex.status || 500)
       res.json(ex)
@@ -58,8 +58,8 @@ module.exports = function() {
         token.access_token)
 
       res.json(response)
-    }
-    catch (ex) {
+
+    } catch (ex) {
 
       console.log(ex)
 
@@ -91,8 +91,8 @@ module.exports = function() {
         token.access_token, hubId)
 
       res.json(response)
-    }
-    catch (ex) {
+
+    } catch (ex) {
 
       res.status(ex.status || 500)
       res.json(ex)
@@ -124,8 +124,8 @@ module.exports = function() {
         token.access_token, hubId, projectId)
 
       res.json(response)
-    }
-    catch (ex) {
+
+    } catch (ex) {
 
       res.status(ex.status || 500)
       res.json(ex)
@@ -157,8 +157,8 @@ module.exports = function() {
         token.access_token, projectId, folderId)
 
       res.json(response)
-    }
-    catch (ex) {
+
+    } catch (ex) {
 
       res.status(ex.status || 500)
       res.json(ex)
@@ -178,6 +178,8 @@ module.exports = function() {
 
       var folderId = req.params.folderId
 
+      var itemId = req.params.itemId
+
       var forgeSvc = ServiceManager.getService(
         'ForgeSvc');
 
@@ -189,9 +191,12 @@ module.exports = function() {
       var response = await dmSvc.getFolderContent(
         token.access_token, projectId, folderId)
 
-      res.json(response)
-    }
-    catch (ex) {
+      res.json(response.data.filter((folderItem) => {
+
+        return folderItem.id === itemId
+      }))
+
+    } catch (ex) {
 
       res.status(ex.status || 500)
       res.json(ex)
@@ -223,8 +228,8 @@ module.exports = function() {
         token.access_token, projectId, itemId)
 
       res.json(response)
-    }
-    catch (ex) {
+
+    } catch (ex) {
 
       res.status(ex.status || 500)
       res.json(ex)

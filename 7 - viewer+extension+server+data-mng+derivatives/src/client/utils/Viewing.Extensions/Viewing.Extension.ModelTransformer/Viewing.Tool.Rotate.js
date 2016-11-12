@@ -18,6 +18,8 @@ export default class RotateTool extends EventsEmitter {
 
     this.fullTransform = false
 
+    this._hitPoint = new THREE.Vector3()
+
     this.viewer.toolController.registerTool(this)
 
     this.onAggregateSelectionChangedHandler = (e) => {
@@ -110,51 +112,59 @@ export default class RotateTool extends EventsEmitter {
 
       this.rotateControl.engaged = false
 
-      this.viewer.select(this.selection.dbIdArray)
+      //this.viewer.select(this.selection.dbIdArray)
 
       return
     }
 
     if (event.selections && event.selections.length) {
 
-      var selection = event.selections[ 0 ]
+      var selection = event.selections[0]
 
-      this.selection = selection
-
-      this.emit('transform.modelSelected',
-        this.selection)
-
-      if (this.fullTransform) {
-
-        this.selection.fragIdsArray = []
-
-        var fragCount = selection.model.getFragmentList().
-          fragments.fragId2dbId.length
-
-        for (var fragId = 0; fragId < fragCount; ++fragId) {
-
-          this.selection.fragIdsArray.push(fragId)
-        }
-
-        this.selection.dbIdArray = []
-
-        var instanceTree = selection.model.getData().instanceTree
-
-        var rootId = instanceTree.getRootId()
-
-        this.selection.dbIdArray.push(rootId)
-      }
-
-      this.drawAxis()
-
-      this.viewer.model = this.selection.model
-
-      this.viewer.fitToView(
-        this.selection.dbIdArray)
+      this.setSelection(selection)
 
     } else {
 
       this.clearSelection()
+    }
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////////////
+  setSelection(selection) {
+
+    this.selection = selection
+
+    this.emit('transform.modelSelected',
+      this.selection)
+
+    if (this.fullTransform) {
+
+      this.selection.fragIdsArray = []
+
+      var fragCount = selection.model.getFragmentList().
+        fragments.fragId2dbId.length
+
+      for (var fragId = 0; fragId < fragCount; ++fragId) {
+
+        this.selection.fragIdsArray.push(fragId)
+      }
+
+      this.selection.dbIdArray = []
+
+      var instanceTree = selection.model.getData().instanceTree
+
+      var rootId = instanceTree.getRootId()
+
+      this.selection.dbIdArray.push(rootId)
+
+      this.drawAxis()
+
+    } else {
+
+      this.drawAxis()
     }
   }
 
@@ -218,6 +228,58 @@ export default class RotateTool extends EventsEmitter {
   }
 
   ///////////////////////////////////////////////////////////////////////////
+  // get 3d hit point on mesh
+  //
+  ///////////////////////////////////////////////////////////////////////////
+  getHitPoint (event) {
+
+    var screenPoint = {
+      x: event.clientX,
+      y: event.clientY
+    }
+
+    var n = this.normalize(screenPoint)
+
+    var hitPoint = this.viewer.utilities.getHitPoint(n.x, n.y)
+
+    return hitPoint
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////////////
+  hitPoint () {
+
+    return this._hitPoint
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // normalize screen coordinates
+  //
+  ///////////////////////////////////////////////////////////////////////////
+  normalize (screenPoint) {
+
+    var viewport = this.viewer.navigation.getScreenViewport()
+
+    var n = {
+      x: (screenPoint.x - viewport.left) / viewport.width,
+      y: (screenPoint.y - viewport.top) / viewport.height
+    }
+
+    return n
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////////////
+  setHitPoint (hitPoint) {
+
+    this._hitPoint.copy(hitPoint)
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
   //
   //
   ///////////////////////////////////////////////////////////////////////////
@@ -241,6 +303,13 @@ export default class RotateTool extends EventsEmitter {
       }
 
       return true
+    }
+
+    var hitPoint = this.getHitPoint(event)
+
+    if (hitPoint) {
+
+      this._hitPoint = hitPoint
     }
 
     return false
@@ -344,6 +413,11 @@ export default class RotateTool extends EventsEmitter {
 
     this.keys[event.key] = true
 
+    if (keyCode === 27) { //ESC
+
+      this.viewer.clearSelection()
+    }
+
     return false
   }
 
@@ -390,6 +464,15 @@ export default class RotateTool extends EventsEmitter {
         quaternion, fragProxy.quaternion)
 
       if (idx === 0) {
+
+        if(this._hitPoint) {
+
+          this._hitPoint.sub(center)
+
+          this._hitPoint.applyQuaternion(quaternion)
+
+          this._hitPoint.add(center)
+        }
 
         var euler = new THREE.Euler()
 

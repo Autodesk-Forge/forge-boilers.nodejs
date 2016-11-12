@@ -137,6 +137,8 @@ export default class ViewerPanel {
       255, 226, 110,
       219, 219, 219)
 
+    this.viewer.prefs.tag('ignore-producer')
+
     // Load and unload extension events
 
     var loadBtn = document.getElementById('loadBtn');

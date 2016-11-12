@@ -22,6 +22,7 @@ import ViewerPanel from 'Components/Viewer/Viewer.Panel'
 import ServiceManager from 'Services/SvcManager'
 import {clientConfig as config} from 'c0nfig'
 import 'jquery-ui/themes/base/resizable.css'
+import ToolPanelModal from 'ToolPanelModal'
 import SocketSvc from 'Services/SocketSvc'
 import 'jquery-ui/ui/widgets/resizable'
 import 'font-awesome-webpack'
@@ -45,6 +46,11 @@ export default class App {
     this.$toggleDM.click((e) => {
 
       this.onToggleDM(e)
+    })
+
+    $('#about').click((e) => {
+
+      this.onAbout(e)
     })
   }
 
@@ -208,7 +214,9 @@ export default class App {
             }
 
             this.derivativesPanel.initialize(
-              this.panelContainers.derivatives)
+              this.panelContainers.derivatives,
+              this.panelContainers.app,
+              this.panelContainers.viewer)
 
             this.dmPanel.initialize(
               this.panelContainers.dm,
@@ -239,8 +247,6 @@ export default class App {
                 this.register(data.socketId)
               })
 
-              socketSvc.emit('request.connection.data')
-
               socketSvc.on('callback', (msg)=> {
 
                 if (this.popup) {
@@ -258,6 +264,8 @@ export default class App {
                   })
                 }
               })
+
+              socketSvc.emit('request.connection.data')
             })
 
             $.get('/api/dm/user', (user) => {
@@ -288,19 +296,29 @@ export default class App {
       this.viewerPanel.setTokenUrl(
         config.forge.token3LeggedUrl)
 
-      let doc = await this.viewerPanel.loadDocument(urn)
+      const doc = await this.viewerPanel.loadDocument(urn)
 
-      let viewer = this.viewerPanel.viewer
+      const viewer = this.viewerPanel.viewer
 
-      let path = this.viewerPanel.getDefaultViewablePath(doc)
-
-      let options = {}
+      const path = this.viewerPanel.getDefaultViewablePath(doc)
 
       viewer.loadExtension(ModelTransformerExtension, {
+        parentControl: 'modelTools',
         autoLoad: true
       })
 
-      viewer.loadModel(path, options, (model) => {
+      //  builds placementTransform based on model extension
+      const extInstance = viewer.getExtension(
+        ModelTransformerExtension)
+
+      const placementTransform = extInstance.buildPlacementTransform(
+        item.name)
+
+      const loadOptions = {
+        placementTransform
+      }
+
+      viewer.loadModel(path, loadOptions, (model) => {
 
         model.name = item.name
 
@@ -328,7 +346,7 @@ export default class App {
         node.parent.classList.remove('derivated')
       })
 
-      this.derivativesPanel.load(urn).then(() => {
+      this.derivativesPanel.load(urn, node.name).then(() => {
 
         resolve()
       })
@@ -390,5 +408,36 @@ export default class App {
 
       this.login()
     }
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////
+  onAbout () {
+
+    const aboutDlg = new ToolPanelModal(
+      this.panelContainers.app, {
+        title: 'About this sample ...',
+        showCancel: false
+      })
+
+    aboutDlg.bodyContent (`
+      <div>
+        <br>
+        Written by <a href="https://twitter.com/F3lipek"
+          target="_blank">
+          Philippe Leefsma
+        </a>, November 2016
+        <hr class="about"/>
+        Source on
+        <a href="https://github.com/Autodesk-Forge/forge-boilers.nodejs"
+          target="_blank">
+          Github
+        </a>
+      </div>
+    `)
+
+    aboutDlg.setVisible(true)
   }
 }

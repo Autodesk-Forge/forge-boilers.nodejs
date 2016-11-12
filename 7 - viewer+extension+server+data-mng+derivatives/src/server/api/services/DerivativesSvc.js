@@ -40,68 +40,12 @@ export default class DerivativeSvc extends BaseSvc {
   //
   //
   /////////////////////////////////////////////////////////////////
-  get jobOutputBuilder () {
-
-    return {
-
-      svf: (opts = {}) => {
-
-        return {
-          destination: {
-            region: opts.region || 'us'
-          },
-          formats: [ {
-            type: 'svf',
-            views: opts.views || ['2d', '3d']
-          } ]
-        }
-      },
-
-      obj: (opts = {}) => {
-
-        return {
-          destination: {
-            region: opts.region || 'us'
-          },
-          formats: [ {
-            type: 'obj',
-            advanced: {
-              modelGuid: opts.guid,
-              objectIds: opts.objectIds
-            }
-          } ]
-        }
-      },
-
-      defaultOutput: (opts = {}) => {
-
-        return {
-          destination: {
-            region: opts.region || 'us'
-          },
-          formats: [ {
-            type: opts.outputType
-          }]
-        }
-      }
-    }
-  }
-
-  /////////////////////////////////////////////////////////////////
-  //
-  //
-  /////////////////////////////////////////////////////////////////
-  postJob (token, input, output) {
+  postJob (token, payload) {
 
     this._APIAuth.accessToken = token
 
-    let job = {
-      input,
-      output
-    }
-
-    return this._derivativesAPI.translate (job, {
-      'xAdsForce': true
+    return this._derivativesAPI.translate (payload, {
+      'xAdsForce': payload.output.force
     })
   }
 

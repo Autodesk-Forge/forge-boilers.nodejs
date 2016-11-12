@@ -15,6 +15,10 @@
 // DOES NOT WARRANT THAT THE OPERATION OF THE PROGRAM WILL BE
 // UNINTERRUPTED OR ERROR FREE.
 ///////////////////////////////////////////////////////////////////////
+
+// async support
+import 'babel-polyfill'
+
 import {serverConfig as config} from 'c0nfig'
 
 //Server stuff

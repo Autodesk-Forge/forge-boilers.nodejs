@@ -65,7 +65,7 @@ export class BaseTreeDelegate extends
 
     const selector = ['HEADER', 'LABEL']
 
-    return (selector.indexOf(event.path[0].nodeName) > -1)
+    return (selector.indexOf(event.target.nodeName) > -1)
   }
 
   ///////////////////////////////////////////////////////////////////
@@ -111,7 +111,10 @@ export class BaseTreeDelegate extends
 
     if (this.nodeClickSelector(event)) {
 
-      this.contextMenu.show(event, node)
+      if(this.contextMenu) {
+
+        this.contextMenu.show(event, node)
+      }
     }
   }
 

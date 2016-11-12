@@ -4,13 +4,17 @@
 //
 /////////////////////////////////////////////////////////////////////
 import JSONView from 'jquery-jsonview/dist/jquery.jsonview'
-import { BaseTreeDelegate, TreeNode } from 'TreeView'
 import 'jquery-jsonview/dist/jquery.jsonview.css'
-import ToolPanelModal from 'ToolPanelModal'
+import {HierarchyTreeDelegate} from './Hierarchy'
+import {ExportsTreeDelegate} from './Exports'
+import 'jsoneditor/dist/jsoneditor.min.css'
 import EventsEmitter from 'EventsEmitter'
+import {Formats, Payloads} from './data'
 import UIComponent from 'UIComponent'
 import TabManager from 'TabManager'
 import DerivativesAPI from '../API'
+import JSONEditor from 'jsoneditor'
+import Dropdown from 'Dropdown'
 import './ManagerPanel.scss'
 
 export default class DerivativesManagerPanel extends UIComponent {
@@ -31,9 +35,6 @@ export default class DerivativesManagerPanel extends UIComponent {
       apiUrl
     })
 
-    this.TabManager = new TabManager(
-      this.domElement)
-
     this.apiUrl = apiUrl
   }
 
@@ -41,9 +42,25 @@ export default class DerivativesManagerPanel extends UIComponent {
   //
   //
   ///////////////////////////////////////////////////////////////////
-  initialize (container) {
+  initialize (container, appContainer, viewerContainer) {
 
     $(container).append(this.domElement)
+
+    this.viewerContainer = viewerContainer
+
+    this.appContainer = appContainer
+
+    this.TabManager = new TabManager(
+      this.domElement)
+
+    // API missing formats for dwf
+    // using hardcoded version for now
+    //this.derivativesAPI.getFormats().then((res) => {
+    //
+    //  this.formats = formats
+    //})
+
+    this.formats = Formats
 
     this.createManifestTab()
 
@@ -56,15 +73,79 @@ export default class DerivativesManagerPanel extends UIComponent {
   //
   //
   ///////////////////////////////////////////////////////////////////
-  load (urn) {
+  async load (urn, designName) {
+
+    this.designName = designName
 
     this.urn = urn
 
-    return Promise.all([
-      this.loadHierarchy(urn),
-      this.loadManifest(urn),
-      this.loadExports(urn)
-    ])
+    this.properties = null
+
+    this.hierarchy = null
+
+    this.modelGuid = null
+
+    this.manifest = null
+
+    try {
+
+      this.manifest =
+        await this.derivativesAPI.getManifest(
+          this.urn)
+
+      this.loadManifest(
+        this.manifest)
+
+      const metadataResponse =
+        await this.derivativesAPI.getMetadata(
+          this.urn)
+
+      const metadata = metadataResponse.data.metadata
+
+      if (metadata && metadata.length) {
+
+        this.modelGuid = metadata[0].guid
+
+        this.loadExports(
+          this.urn,
+          this.designName,
+          this.manifest,
+          this.modelGuid)
+
+        const hierarchy =
+          await this.derivativesAPI.getHierarchy(
+            this.urn,
+            this.modelGuid)
+
+        const properties =
+          await this.derivativesAPI.getProperties(
+            this.urn,
+            this.modelGuid)
+
+        this.properties = properties.data.collection
+
+        this.hierarchy = hierarchy.data
+
+        this.loadHierarchy(
+          this.hierarchy,
+          this.properties)
+      }
+
+    } catch (ex) {
+
+      this.loadManifest(
+        this.manifest)
+
+      this.loadHierarchy(
+        this.hierarchy,
+        this.properties)
+
+      this.loadExports(
+        this.urn,
+        this.designName,
+        this.manifest,
+        this.modelGuid)
+    }
   }
 
   ///////////////////////////////////////////////////////////////////
@@ -127,71 +208,28 @@ export default class DerivativesManagerPanel extends UIComponent {
   //
   //
   ///////////////////////////////////////////////////////////////////
-  loadManifest (urn) {
+  loadManifest (manifest) {
 
-    return new Promise((resolve) => {
+    if (manifest) {
 
-      this.derivativesAPI.getManifest(
-        urn).then((manifest) => {
+      $(`.json-view`).JSONView(manifest, {
+        collapsed: false
+      })
 
-          $(`.json-view`).JSONView(manifest, {
-            collapsed: false
-          })
+      $('.manifest .controls').css({
+        display: 'block'
+      })
 
-          $('.manifest .controls').css({
-            display: 'block'
-          })
+    } else {
 
-          resolve()
+      $(`.json-view`).JSONView({
+        message: 'No manifest on this item'
+      })
 
-        }, (error) => {
-
-          $(`.json-view`).JSONView({
-            message: 'No manifest on this item'
-          })
-
-          $('.manifest .controls').css({
-            display: 'none'
-          })
-
-          resolve()
-        })
-    })
-  }
-
-  ///////////////////////////////////////////////////////////////////
-  //
-  //
-  ///////////////////////////////////////////////////////////////////
-  createExportsTab () {
-
-    this.TabManager.addTab({
-      name: 'Exports',
-      html: `
-        <div class="derivatives-tab-container exports">
-           <div>
-
-           </div>
-           <div>
-
-           </div>
-           <div>
-
-           </div>
-       </div>`
-    })
-  }
-
-  ///////////////////////////////////////////////////////////////////
-  //
-  //
-  ///////////////////////////////////////////////////////////////////
-  loadExports (urn) {
-
-    return new Promise((resolve) => {
-
-      resolve()
-    })
+      $('.manifest .controls').css({
+        display: 'none'
+      })
+    }
   }
 
   ///////////////////////////////////////////////////////////////////
@@ -231,134 +269,339 @@ export default class DerivativesManagerPanel extends UIComponent {
   //
   //
   ///////////////////////////////////////////////////////////////////
-  loadHierarchy (urn) {
+  loadHierarchy (hierarchy, properties) {
 
-    return new Promise(async(resolve) => {
+    $('.hierarchy-tree').empty()
 
-      try {
-
-        $('.hierarchy-tree').empty()
-
-        const metadataResponse = await this.derivativesAPI.getMetadata(
-          this.urn)
-
-        const metadata = metadataResponse.data.metadata
-
-        if (metadata && metadata.length) {
-
-          this.modelGuid = metadata[0].guid
-
-          const hierarchy = await this.derivativesAPI.getHierarchy(
-            this.urn, this.modelGuid)
-
-          const delegate = new HierarchyTreeDelegate(
-            hierarchy.data)
-
-          const rootNode = {
-            id: this.guid(),
-            name: 'Model Hierarchy',
-            type: 'hierarchy.root',
-            group: true
-          }
-
-          const domContainer = $('.hierarchy-tree')[0]
-
-          new Autodesk.Viewing.UI.Tree(
-            delegate, rootNode, domContainer, {
-              excludeRoot: false
-            })
-
-          $('.hierarchy .controls').css({
-            display: 'block'
-          })
-        }
-
-        resolve()
-
-      } catch (ex) {
-
-        console.log(ex)
-        resolve()
-      }
+    $('.hierarchy .controls').css({
+      display: 'none'
     })
-  }
-}
 
-///////////////////////////////////////////////////////////////////////////////
-//
-//
-///////////////////////////////////////////////////////////////////////////////
-class HierarchyTreeDelegate
-  extends EventsEmitter.Composer (BaseTreeDelegate)
-{
+    if (hierarchy && properties) {
 
-  /////////////////////////////////////////////////////////////
-  //
-  //
-  /////////////////////////////////////////////////////////////
-  constructor (hierarchy) {
+      const delegate =
+        new HierarchyTreeDelegate(
+          hierarchy,
+          properties)
 
-    super()
+      delegate.on('node.dblClick', (node) => {
 
-    this.hierarchy = hierarchy
-  }
+        const propertyPanel =
+          new DerivativesPropertyPanel(
+            this.appContainer,
+            node.name + ' Properties',
+            node.properties)
 
-  /////////////////////////////////////////////////////////////
-  //
-  //
-  /////////////////////////////////////////////////////////////
-  async forEachChild(node, addChildCallback) {
+        propertyPanel.setVisible(true)
+      })
 
-    switch (node.type) {
+      const rootNode = {
+        name: 'Model Hierarchy',
+        type: 'hierarchy.root',
+        id: this.guid(),
+        group: true
+      }
 
-      case 'hierarchy.root':
+      const domContainer = $('.hierarchy-tree')[0]
 
-        this.hierarchy.objects.forEach((obj) => {
-
-          var objectNode = {
-            objects: obj.objects,
-            id: obj.objectid,
-            type: 'objects',
-            name: obj.name,
-            group: true
-          }
-
-          addChildCallback(objectNode)
+      new Autodesk.Viewing.UI.Tree(
+        delegate, rootNode, domContainer, {
+          excludeRoot: false
         })
 
-        break
+      $('.hierarchy .controls').css({
+        display: 'block'
+      })
+    }
+  }
 
-      case 'objects':
+  ///////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////
+  createExportsTab () {
 
-        if (node.objects) {
+    const btnPostJobId = this.guid()
 
-          node.objects.forEach((obj) => {
+    this.TabManager.addTab({
+      name: 'Exports',
+      html: `
+        <div class="derivatives-tab-container exports">
+           <div class="exports-tree">
 
-            var objectNode = {
-              objects: obj.objects,
-              id: obj.objectid,
-              type: 'objects',
-              name: obj.name,
-              group: true
-            }
+           </div>
+           <div class="exports-formats">
 
-            if (!obj.objects) {
+           </div>
+           <div class="exports-payload">
 
-              objectNode.type += '.leaf'
-            }
+           </div>
+           <button id="${btnPostJobId}" class="btn btn-post-job">
+              <span class="glyphicon glyphicon-cloud-upload">
+              </span>
+              Post job ...
+            </button>
+       </div>`
+    })
 
-            addChildCallback(objectNode)
-          })
-        }
+    this.formatsDropdown = new Dropdown({
+      container: '.exports-formats',
+      title: 'Export format',
+      prompt: 'Select an export format ...',
+      pos: {
+        top: 0, left: 0
+      },
+      menuItems: []
+    })
 
-        break
+    this.formatsDropdown.on('item.selected', (item) => {
+
+      let payload = Object.assign({},
+        Payloads[item.name], {
+          input: {
+            urn: this.urn
+          }
+        })
+
+      if(item.name === 'obj' && this.modelGuid) {
+
+        payload.output.formats[0].advanced.modelGuid =
+          this.modelGuid
+      }
+
+      this.editor.set(payload)
+
+      this.editor.expandAll()
+    })
+
+    this.editor = new JSONEditor($('.exports-payload')[0], {
+      search: false
+    })
+
+    $('#' + btnPostJobId).click(async() => {
+
+      const payload = this.editor.get()
+
+      await this.derivativesAPI.postJobWithProgress(
+        Object.assign({}, payload, {
+          panelContainer: this.viewerContainer,
+          designName: this.designName
+        }))
+
+      this.manifest =
+        await this.derivativesAPI.getManifest(
+          this.urn)
+
+      this.loadManifest (this.manifest)
+
+      this.loadExports(
+        this.urn,
+        this.designName,
+        this.manifest,
+        this.modelGuid,
+        false)
+    })
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////
+  loadExports (urn, designName, manifest, modelGuid, clearAll = true) {
+
+    $('.exports-tree').empty()
+
+    $('.exports').css({
+      display: 'block'
+    })
+
+    const fileType = window.atob(urn).split(".").pop(-1)
+
+    let supportedFormats = []
+
+    for(var format in this.formats) {
+
+      if (this.formats[format].indexOf(fileType) > -1) {
+
+        supportedFormats.push(format)
+      }
+    }
+
+    const delegate = new ExportsTreeDelegate(
+      urn,
+      designName,
+      manifest,
+      modelGuid,
+      supportedFormats,
+      this.derivativesAPI)
+
+    delegate.on('postJob', (node) => {
+
+      return new Promise(async(resolve) => {
+
+        const derivative =
+          await this.derivativesAPI.postJobWithProgress(
+            Object.assign({}, node, {
+              panelContainer: this.viewerContainer,
+              designName: this.designName
+            }))
+
+        resolve(derivative)
+
+        this.manifest =
+          await this.derivativesAPI.getManifest(
+            this.urn)
+
+        this.loadManifest (this.manifest)
+
+        this.loadExports(
+          this.urn,
+          this.designName,
+          this.manifest,
+          this.modelGuid,
+          false)
+      })
+
+    })
+
+    const domContainer = $('.exports-tree')[0]
+
+    const rootNode = {
+      name: 'Available Exports',
+      type: 'formats.root',
+      id: this.guid(),
+      group: true
+    }
+
+    new Autodesk.Viewing.UI.Tree(
+      delegate, rootNode, domContainer, {
+        excludeRoot: false
+      })
+
+    if (clearAll) {
+
+      this.formatsDropdown.setItems(
+
+        supportedFormats.map((format) => {
+          return {
+            name: format
+          }
+        }), -1
+      )
+
+      const payload = {
+        input: {
+          urn: this.urn
+        },
+        output: {}
+      }
+
+      this.editor.set(payload)
     }
   }
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//
+//
+///////////////////////////////////////////////////////////////////////////////
+class DerivativesPropertyPanel extends Autodesk.Viewing.UI.PropertyPanel {
 
+  constructor (container, title, properties) {
 
+    super (container, UIComponent.guid(), title)
 
+    this.setProperties(properties)
+  }
 
+  /////////////////////////////////////////////////////////////
+  // initialize override
+  //
+  /////////////////////////////////////////////////////////////
+  initialize() {
 
+    super.initialize()
 
+    this.container.classList.add('derivatives')
+  }
+
+  /////////////////////////////////////////////////////////////
+  // createTitleBar override
+  //
+  /////////////////////////////////////////////////////////////
+  createTitleBar (title) {
+
+    var titleBar = document.createElement("div")
+
+    titleBar.className = "dockingPanelTitle"
+
+    this.titleTextId = this.guid()
+
+    this.titleImgId = this.guid()
+
+    var html = `
+      <img id="${this.titleImgId}"></img>
+      <div id="${this.titleTextId}" class="dockingPanelTitleText">
+        ${title}
+      </div>
+    `
+
+    $(titleBar).append(html)
+
+    this.addEventListener(titleBar, 'click', (event)=> {
+
+      if (!this.movedSinceLastClick) {
+
+        this.onTitleClick(event)
+      }
+
+      this.movedSinceLastClick = false
+    })
+
+    this.addEventListener(titleBar, 'dblclick', (event) => {
+
+      this.onTitleDoubleClick(event)
+    })
+
+    return titleBar
+  }
+
+  /////////////////////////////////////////////////////////////
+  // setTitle override
+  //
+  /////////////////////////////////////////////////////////////
+  setTitle (text, options) {
+
+    if (options && options.localizeTitle) {
+
+      $(`#${this.titleTextId}`).attr('data-i18n', text)
+
+      text = Autodesk.Viewing.i18n.translate(text)
+
+    } else {
+
+      $(`#${this.titleTextId}`).removeAttr('data-i18n')
+    }
+
+    $(`#${this.titleTextId}`).text(text)
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////
+  guid(format = 'xxxxxxxxxx') {
+
+    var d = new Date().getTime()
+
+    var guid = format.replace(
+      /[xy]/g,
+      function (c) {
+        var r = (d + Math.random() * 16) % 16 | 0
+        d = Math.floor(d / 16)
+        return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16)
+      })
+
+    return guid
+  }
+}

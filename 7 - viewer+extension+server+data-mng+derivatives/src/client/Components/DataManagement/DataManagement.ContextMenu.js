@@ -21,7 +21,7 @@ export default class DataManagementContextMenu extends
 
     var menu = []
 
-    switch(node.type) {
+    switch (node.type) {
 
       case 'hubs':
 
@@ -105,14 +105,17 @@ export default class DataManagementContextMenu extends
 
         } else {
 
-          menu.push({
-            title: 'Generate viewable',
-            target: () => {
-              this.emit('context.viewable.create', {
-                event, node
-              })
-            }
-          })
+          if(node.versions[node.versions.length-1].relationships.storage) {
+
+            menu.push({
+              title: 'Generate viewable',
+              target: () => {
+                this.emit('context.viewable.create', {
+                  event, node
+                })
+              }
+            })
+          }
         }
 
         break

@@ -5,7 +5,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     height: calc(100% - 42px);
-    width: calc(100% - 10px);
+    width: calc(100% - 12px);
     margin-left: 5px;
     margin-top: 3px;
     padding: 0;
@@ -23,7 +23,7 @@
 
 .storage .treeview .label-container {
     pointer-events: none;
-    overflow-x: hidden;
+    overflow: hidden;
 }
 
 .storage .treeview .items .label-container {
@@ -54,7 +54,7 @@
     margin-left: 6px;
     height: 19px;
     width: 19px;
-    top: 0px;
+    top: -1px;
 }
 
 .storage .treeview .label-loader-2 {
@@ -185,4 +185,8 @@ div.tooltip-inner {
     border: 1px solid #b4b4b4;
     background-color: #f8f8f8;
     color: #000000;
+}
+
+.menu {
+    z-index:5000;
 }

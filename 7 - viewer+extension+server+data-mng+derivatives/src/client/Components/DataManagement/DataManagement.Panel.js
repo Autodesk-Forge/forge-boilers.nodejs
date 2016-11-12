@@ -117,6 +117,14 @@ export default class DataManagementPanel extends UIComponent {
           urn: this.getLastVersionURN(data.node)
         }
 
+        const output = {
+          force: true,
+          formats:[{
+            type: 'svf',
+            views: ['2d', '3d']
+          }]
+        }
+
         const fileExtType = (version.attributes && version.attributes.extension) ?
           version.attributes.extension.type : null
 
@@ -132,10 +140,12 @@ export default class DataManagementPanel extends UIComponent {
         console.log('Posting SVF Job: ')
         console.log(input)
 
-        let response = await this.derivativesAPI.postSVFJob(
-          input,
-          data.node.name,
-          viewerContainer)
+        await this.derivativesAPI.postJobWithProgress({
+          panelContainer: viewerContainer,
+          designName: data.node.name,
+          output,
+          input
+        })
 
         setTimeout(() => {
           this.onItemNodeAddedHandler (data.node)
@@ -169,30 +179,6 @@ export default class DataManagementPanel extends UIComponent {
         data.node.showLoader(false)
       })
     })
-
-    this.contextMenu.on('context.derivatives.manage', (data) => {
-
-      try {
-
-        const dlg = new ToolPanelModal(appContainer, {
-          title: 'Model Derivatives: ' + data.node.objectKey,
-          height: 'calc(100% - 100px)',
-          width: 'calc(100% - 100px)'
-        })
-
-        const pane = new DerivativesManagerPane()
-
-        dlg.bodyContent(pane.domElement)
-
-        pane.load()
-
-        dlg.setVisible(true)
-
-      } catch (ex) {
-
-        console.log(ex)
-      }
-    })
   }
 
   ///////////////////////////////////////////////////////////////////
@@ -212,10 +198,17 @@ export default class DataManagementPanel extends UIComponent {
 
     var version = node.versions[ node.versions.length - 1 ]
 
-    var urn = window.btoa(
-      version.relationships.storage.data.id)
+    if(version.relationships.storage) {
 
-    return urn.replace(new RegExp('=', 'g'), '')
+      var urn = window.btoa(
+        version.relationships.storage.data.id)
+
+      return urn.replace(new RegExp('=', 'g'), '')
+
+    } else {
+
+      return null
+    }
   }
 
   ///////////////////////////////////////////////////////////////////
@@ -247,6 +240,13 @@ export default class DataManagementPanel extends UIComponent {
           node.projectId, node.id).then((versions) => {
 
             node.versions = versions.data
+
+            if(!node.name) {
+
+              // fix for BIM Docs - displayName doesn't appear in item
+              node.name = node.versions[
+                node.versions.length-1].attributes.displayName
+            }
 
             parent.addChild(node)
 
@@ -296,7 +296,7 @@ export default class DataManagementPanel extends UIComponent {
           manifest.progress === 'complete') {
 
           if (this.derivativesAPI.hasDerivative(
-              manifest, { outputType: 'svf' })) {
+              manifest, { output:{ type: 'svf' }})) {
 
             node.parent.classList.add('derivated')
 
@@ -350,7 +350,7 @@ export default class DataManagementPanel extends UIComponent {
     if (node.type === 'items' && node.manifest) {
 
       if (this.derivativesAPI.hasDerivative(
-          node.manifest, { outputType: 'svf' })) {
+          node.manifest, { output: {type: 'svf' }})) {
 
         node.showLoader(true)
 
@@ -468,6 +468,24 @@ class DMTreeDelegate extends BaseTreeDelegate {
     super(container, contextMenu)
 
     this.dmAPI = dmAPI
+
+    this.on('node.click node.iconClick', (node) => {
+
+      if (node.loadChildren) {
+
+        node.loadChildren('firstLevel')
+      }
+    })
+
+    this.on('node.dblClick', (node) => {
+
+      if (node.loadChildren) {
+
+        node.loadChildren('allLevels')
+
+        node.expand()
+      }
+    })
   }
 
   /////////////////////////////////////////////////////////////
@@ -493,9 +511,10 @@ class DMTreeDelegate extends BaseTreeDelegate {
 
     if (node.tooltip) {
 
-      let html = `
+      const html = `
         <div class="label-container">
-            <label class="${node.type}" id="${labelId}"
+            <label id="${labelId}"
+              class="tooltip-container ${node.type}"
               ${options && options.localize?"data-i18n=" + text : ''}
                 data-placement="right"
                 data-toggle="tooltip"
@@ -508,7 +527,10 @@ class DMTreeDelegate extends BaseTreeDelegate {
 
       $(parent).append(html)
 
-      $(parent).find('label[data-toggle="tooltip"]').tooltip({
+      const $tooltipTarget = $(parent).find(
+        '[data-toggle="tooltip"]')
+
+      $tooltipTarget.tooltip({
         container: 'body',
         animated: 'fade',
         html: true
@@ -516,7 +538,7 @@ class DMTreeDelegate extends BaseTreeDelegate {
 
       node.setTooltip = (title) => {
 
-        $(parent).find('label')
+        $(parent).find('.tooltip-container')
           .attr('title', title)
           .tooltip('fixTitle')
           .tooltip('setContent')
@@ -683,6 +705,9 @@ class DMTreeDelegate extends BaseTreeDelegate {
         }, timeout)
       }
     }
+
+    // collapse node by default
+    node.collapse()
   }
 
   /////////////////////////////////////////////////////////////
@@ -693,78 +718,255 @@ class DMTreeDelegate extends BaseTreeDelegate {
 
     node.addChild = addChildCallback
 
-    if(node.onIteratingChildren) {
-
-      node.onIteratingChildren()
-    }
-
     switch(node.type) {
 
       case 'hubs':
 
-        node.showLoader(true)
-
         node.on('childrenLoaded', (children) => {
+
+          node.loadStatus = 'loaded'
 
           node.showLoader(false)
         })
 
-        this.dmAPI.getProjects(
-          node.id).then((projects) => {
+        node.loadChildren = (loadingMode) => {
 
-            let projectTasks = projects.data.map((project) => {
+          if (['pending', 'loaded'].indexOf(node.loadStatus) > -1) {
 
-              return new Promise((resolve, reject) => {
+            return
+          }
 
-                let rootId = project.relationships.rootFolder.data.id
+          node.loadStatus = 'pending'
 
-                let child = new TreeNode({
-                  name: project.attributes.name,
-                  projectId: project.id,
-                  type: project.type,
-                  details: project,
-                  folderId: rootId,
-                  hubId: node.id,
-                  id: project.id,
-                  group: true
-                })
-                
-                child.on('childrenLoaded', (children) => {
+          node.showLoader(true)
 
-                  child.showLoader(false)
+          // if node has children -> run loadChildren
+          // on each child if loadMode is not 'firstLevel'
+          // otherwise request children from API
 
-                  resolve(child)
-                })
+          if (node.children) {
 
-                addChildCallback(child)
+            if (loadingMode !== 'firstLevel') {
 
-                child.showLoader(true)
+              node.children.forEach((child) => {
 
-                child.collapse()
+                child.loadChildren(loadingMode)
               })
-            })
+            }
 
-            Promise.all(projectTasks).then((children) => {
+          } else {
 
-              node.emit('childrenLoaded', children)
-            })
+            node.children = []
 
-        }, (error) => {
+            this.dmAPI.getProjects(
+              node.id).then((projectsRes) => {
 
-            node.emit('childrenLoaded', null)
-        })
+                const projects = _.sortBy(projectsRes.data,
+                  (project) => {
+                    return project.attributes.name.toLowerCase()
+                  })
+
+                let projectTasks = projects.map((project) => {
+
+                  return new Promise((resolve, reject) => {
+
+                    let rootId = project.relationships.rootFolder.data.id
+
+                    let child = new TreeNode({
+                      name: project.attributes.name,
+                      projectId: project.id,
+                      type: project.type,
+                      details: project,
+                      folderId: rootId,
+                      hubId: node.id,
+                      id: project.id,
+                      group: true
+                    })
+
+                    child.on('childrenLoaded', (children) => {
+
+                      child.loadStatus = 'loaded'
+
+                      child.showLoader(false)
+
+                      resolve(child)
+                    })
+
+                    addChildCallback(child)
+
+                    node.children.push(child)
+
+                    if (loadingMode !== 'firstLevel') {
+
+                      child.loadChildren(loadingMode)
+                    }
+                  })
+                })
+
+                if (loadingMode === 'firstLevel') {
+
+                  node.loadStatus = 'idle'
+
+                  node.showLoader(false)
+                }
+
+                Promise.all(projectTasks).then((children) => {
+
+                  node.emit('childrenLoaded', children)
+                })
+
+              }, (error) => {
+
+                node.emit('childrenLoaded', null)
+              })
+          }
+        }
 
         break
 
       case 'projects':
 
-        this.dmAPI.getProject(
-          node.hubId, node.id).then((project) => {
+        node.loadChildren = (loadingMode) => {
 
-            let rootId = project.data.relationships.rootFolder.data.id
+          if (['pending', 'loaded'].indexOf(node.loadStatus) > -1) {
+
+            return
+          }
+
+          node.loadStatus = 'pending'
+
+          node.showLoader(true)
+
+          if (node.children) {
+
+            if (loadingMode !== 'firstLevel') {
+
+              node.children.forEach((child) => {
+
+                child.loadChildren(loadingMode)
+              })
+            }
+
+          } else {
+
+            node.children = []
+
+            this.dmAPI.getProject(
+              node.hubId, node.id).then((project) => {
+
+                const rootId = project.data.relationships.rootFolder.data.id
+
+                this.dmAPI.getFolderContent(
+                  node.id, rootId).then((folderItemsRes) => {
+
+                    const folderItems = _.sortBy(folderItemsRes.data,
+                      (folderItem) => {
+                        return folderItem.attributes.displayName.toLowerCase()
+                      })
+
+                    let folderItemTasks = folderItems.map((folderItem) => {
+
+                      return new Promise((resolve, reject) => {
+
+                        if (folderItem.type === 'items') {
+
+                          var itemNode = this.createItemNode(
+                            node,
+                            folderItem)
+
+                          resolve(itemNode)
+
+                        } else {
+
+                          let child = new TreeNode({
+                            name: folderItem.attributes.displayName,
+                            folderId: folderItem.id,
+                            type: folderItem.type,
+                            details: folderItem,
+                            projectId: node.id,
+                            hubId: node.hubId,
+                            id: folderItem.id,
+                            group: true
+                          })
+
+                          child.on('childrenLoaded', (children) => {
+
+                            child.loadStatus = 'loaded'
+
+                            child.showLoader(false)
+
+                            resolve(child)
+                          })
+
+                          addChildCallback(child)
+
+                          node.children.push(child)
+
+                          if (loadingMode !== 'firstLevel') {
+
+                            child.loadChildren(loadingMode)
+                          }
+                        }
+                      })
+                    })
+
+                    if (loadingMode === 'firstLevel') {
+
+                      node.loadStatus = 'idle'
+
+                      node.showLoader(false)
+                    }
+
+                    Promise.all(folderItemTasks).then((children) => {
+
+                      node.emit('childrenLoaded', children)
+                    })
+
+                  }, (error) => {
+
+                    node.emit('childrenLoaded', null)
+
+                  })
+
+              }, (error) => {
+
+                node.emit('childrenLoaded', null)
+
+              })
+          }
+        }
+
+        break
+
+      case 'folders':
+
+        node.loadChildren = (loadingMode) => {
+
+          if (['pending', 'loaded'].indexOf(node.loadStatus) > -1) {
+
+            return
+          }
+
+          node.loadStatus = 'pending'
+
+          node.showLoader(true)
+
+          if (node.children) {
+
+            if (loadingMode !== 'firstLevel') {
+
+              node.children.forEach((child) => {
+
+                child.loadChildren(loadingMode)
+              })
+            }
+
+          } else {
+
+            node.children = []
 
             this.dmAPI.getFolderContent(
-              node.id, rootId).then((folderItems) => {
+              node.projectId, node.id).then((folderItems) => {
 
                 let folderItemTasks = folderItems.data.map((folderItem) => {
 
@@ -777,21 +979,23 @@ class DMTreeDelegate extends BaseTreeDelegate {
                         folderItem)
 
                       resolve(itemNode)
-                    }
-                    else {
+
+                    } else {
 
                       let child = new TreeNode({
                         name: folderItem.attributes.displayName,
+                        projectId: node.projectId,
                         folderId: folderItem.id,
                         type: folderItem.type,
                         details: folderItem,
-                        projectId: node.id,
                         hubId: node.hubId,
                         id: folderItem.id,
                         group: true
                       })
 
                       child.on('childrenLoaded', (children) => {
+
+                        child.loadStatus = 'loaded'
 
                         child.showLoader(false)
 
@@ -800,88 +1004,35 @@ class DMTreeDelegate extends BaseTreeDelegate {
 
                       addChildCallback(child)
 
-                      child.showLoader(true)
+                      node.children.push(child)
 
-                      child.collapse()
+                      if (loadingMode !== 'firstLevel') {
+
+                        child.loadChildren(loadingMode)
+                      }
                     }
                   })
                 })
+
+                if (loadingMode === 'firstLevel') {
+
+                  node.loadStatus = 'idle'
+
+                  node.showLoader(false)
+                }
 
                 Promise.all(folderItemTasks).then((children) => {
 
                   node.emit('childrenLoaded', children)
                 })
 
-            }, (error) => {
+              }, (error) => {
 
                 node.emit('childrenLoaded', null)
 
-            })
-
-          }, (error) => {
-
-            node.emit('childrenLoaded', null)
-
-          })
-
-        break
-
-      case 'folders':
-
-        this.dmAPI.getFolderContent(
-          node.projectId, node.id).then((folderItems) => {
-
-            let folderItemTasks = folderItems.data.map((folderItem) => {
-
-              return new Promise((resolve, reject) => {
-
-                if (folderItem.type === 'items') {
-
-                  var itemNode = this.createItemNode(
-                    node,
-                    folderItem)
-
-                  resolve(itemNode)
-
-                } else {
-
-                  let child = new TreeNode({
-                    name: folderItem.attributes.displayName,
-                    projectId: node.projectId,
-                    folderId: folderItem.id,
-                    type: folderItem.type,
-                    details: folderItem,
-                    hubId: node.hubId,
-                    id: folderItem.id,
-                    group: true
-                  })
-
-                  child.on('childrenLoaded', (children) => {
-
-                    child.showLoader(false)
-
-                    resolve(child)
-                  })
-
-                  addChildCallback(child)
-
-                  child.showLoader(true)
-
-                  child.collapse()
-                }
               })
-            })
-
-            Promise.all(folderItemTasks).then((children) => {
-
-              node.emit('childrenLoaded', children)
-            })
-
-          }, (error) => {
-
-            node.emit('childrenLoaded', null)
-
-          })
+          }
+        }
 
         break
     }

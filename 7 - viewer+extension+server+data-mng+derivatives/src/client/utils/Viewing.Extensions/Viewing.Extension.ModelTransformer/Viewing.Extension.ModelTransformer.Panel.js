@@ -6,6 +6,7 @@
 import TranslateTool from './Viewing.Tool.Translate'
 import './Viewing.Extension.ModelTransformer.scss'
 import RotateTool from './Viewing.Tool.Rotate'
+import ViewerTooltip from 'Viewer.Tooltip'
 import ToolPanelBase from 'ToolPanelBase'
 import SwitchButton from 'SwitchButton'
 import Dropdown from 'Dropdown'
@@ -70,10 +71,13 @@ export default class ModelTransformerPanel extends ToolPanelBase {
     this.fullTransformSwitch = new SwitchButton(
       `#${this.container.id}-full-transform-switch`)
 
+    this.fullTransform = true
+
     this.fullTransformSwitch.on('checked', (checked) => {
 
       this.txTool.fullTransform = checked
       this.rxTool.fullTransform = checked
+      this.fullTransform = checked
 
       this.txTool.clearSelection()
       this.rxTool.clearSelection()
@@ -126,6 +130,9 @@ export default class ModelTransformerPanel extends ToolPanelBase {
 
     var onModelSelected = (selection) => {
 
+      $('#' + this.transPickBtnId).prop(
+        'disabled', !this.txTool.active)
+
       this.dropdown.setCurrentItem(selection.model)
 
       this.setTransform(selection.model.transform)
@@ -136,10 +143,20 @@ export default class ModelTransformerPanel extends ToolPanelBase {
         model: selection.model,
         fitToView: false
       })
+
+      this.tooltip.deactivate()
     }
 
     this.txTool.on('transform.modelSelected',
       onModelSelected)
+
+    this.txTool.on('transform.clearSelection', () => {
+
+      $('#' + this.transPickBtnId).prop(
+        'disabled', true)
+
+      this.tooltip.deactivate()
+    })
 
     this.rxTool.on('transform.modelSelected',
       onModelSelected)
@@ -157,6 +174,9 @@ export default class ModelTransformerPanel extends ToolPanelBase {
 
       this.viewer.toolController.deactivateTool(
         this.rxTool.getName())
+
+      $('#' + this.transPickBtnId).prop(
+        'disabled', true)
     })
 
     $('.model-transformer .trans, ' +
@@ -195,6 +215,20 @@ export default class ModelTransformerPanel extends ToolPanelBase {
 
       applyTransform(this.currentModel)
     })
+
+    $('#' + this.transPickBtnId).click(() => {
+
+      this.txTool.onPick()
+
+      this.tooltip.activate()
+    })
+
+    this.tooltip = new ViewerTooltip(viewer)
+
+    this.tooltip.setContent(`
+      <div id="pickTooltipId" class="pick-tooltip">
+        <b>Pick position ...</b>
+      </div>`, '#pickTooltipId')
   }
 
   /////////////////////////////////////////////////////////////
@@ -204,6 +238,8 @@ export default class ModelTransformerPanel extends ToolPanelBase {
   htmlContent(id) {
 
     this.dropdownContainerId = ToolPanelBase.guid()
+
+    this.transPickBtnId = ToolPanelBase.guid()
 
     return `
 
@@ -215,31 +251,18 @@ export default class ModelTransformerPanel extends ToolPanelBase {
         <hr class="v-spacer">
 
         <div>
-          <span class="text-span">
-            Scale:
-          </span>
-
-          <hr class="v-spacer">
-
-          <input id="${id}-Sx" type="text"
-            class="input numeric scale"
-            placeholder="  x (1.0)">
-
-          <input id="${id}-Sy" type="text"
-            class="input numeric scale"
-            placeholder="  y (1.0)">
-
-          <input id="${id}-Sz" type="text"
-            class="input numeric scale"
-            placeholder="  z (1.0)">
-
-          <hr class="v-spacer">
 
           <span class="text-span">
             Translation:
           </span>
 
           <hr class="v-spacer">
+
+          <button id="${this.transPickBtnId}"
+            class="btn btn-trans-pick" disabled>
+            <span class="glyphicon glyphicon-screenshot btn-span">
+            </span>
+          </button>
 
           <input id="${id}-Tx" type="text"
             class="input numeric trans"
@@ -273,6 +296,24 @@ export default class ModelTransformerPanel extends ToolPanelBase {
             class="input numeric rot"
             placeholder="  z (0.0)">
 
+          <span class="text-span">
+            Scale:
+          </span>
+
+          <hr class="v-spacer">
+
+          <input id="${id}-Sx" type="text"
+            class="input numeric scale"
+            placeholder="  x (1.0)">
+
+          <input id="${id}-Sy" type="text"
+            class="input numeric scale"
+            placeholder="  y (1.0)">
+
+          <input id="${id}-Sz" type="text"
+            class="input numeric scale"
+            placeholder="  z (1.0)">
+
           <hr class="v-spacer-large">
 
         </div>
@@ -288,10 +329,8 @@ export default class ModelTransformerPanel extends ToolPanelBase {
 
           <hr class="v-spacer-large">
 
-          <button class="btn btn-danger"
-                  id="${id}-unload-btn">
-            <span class="glyphicon glyphicon-save-file btn-span"
-                  aria-hidden="true">
+          <button class="btn btn-danger" id="${id}-unload-btn">
+            <span class="glyphicon glyphicon-save-file btn-span">
             </span>
              Unload Model
           </button>
@@ -310,9 +349,9 @@ export default class ModelTransformerPanel extends ToolPanelBase {
     $(`#${this.container.id}-Ty`).val(transform.translation.y.toFixed(2))
     $(`#${this.container.id}-Tz`).val(transform.translation.z.toFixed(2))
 
-    $(`#${this.container.id}-Rx`).val(transform.rotation.x)
-    $(`#${this.container.id}-Ry`).val(transform.rotation.y)
-    $(`#${this.container.id}-Rz`).val(transform.rotation.z)
+    $(`#${this.container.id}-Rx`).val(transform.rotation.x.toFixed(2))
+    $(`#${this.container.id}-Ry`).val(transform.rotation.y.toFixed(2))
+    $(`#${this.container.id}-Rz`).val(transform.rotation.z.toFixed(2))
 
     $(`#${this.container.id}-Sx`).val(transform.scale.x)
     $(`#${this.container.id}-Sy`).val(transform.scale.y)

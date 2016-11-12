@@ -27,32 +27,9 @@ module.exports = function() {
       var derivativesSvc = ServiceManager.getService(
         'DerivativesSvc')
 
-      var output = null
-
-      switch(payload.output.type) {
-
-        case 'obj':
-          output = derivativesSvc.jobOutputBuilder.obj({
-            objectIds: payload.output.objectIds || [-1],
-            guid: payload.output.guid
-          })
-          break
-
-        case 'svf':
-          output = derivativesSvc.jobOutputBuilder.svf()
-          break
-
-        default:
-          output = derivativesSvc.jobOutputBuilder.defaultOutput({
-            outputType: payload.output.type
-          })
-          break
-      }
-
       var response = await derivativesSvc.postJob(
         token.access_token,
-        payload.input,
-        output)
+        payload)
 
       res.json(response)
 
@@ -185,6 +162,8 @@ module.exports = function() {
       res.json(response)
 
     } catch (ex) {
+
+      console.log(ex)
 
       res.status(ex.statusCode || 500)
       res.json(ex)

@@ -17,6 +17,7 @@
 ///////////////////////////////////////////////////////////////////////
 import ForgeOAuth from 'forge-oauth2'
 import BaseSvc from './BaseSvc'
+import memoize from 'memoizee'
 import request from 'request'
 import moment from 'moment'
 
@@ -31,6 +32,29 @@ export default class ForgeSvc extends BaseSvc {
     super (config)
 
     this._2leggedAPI = new ForgeOAuth.TwoLeggedApi()
+
+    // will return same result if query arguments are
+    // identical { sessionId, refreshToken }
+    this.__refresh3LeggedTokenMemo = memoize(
+
+      (session, scope) => {
+
+        return this.__refresh3LeggedToken(
+          session, scope)
+
+      }, {
+
+        normalizer: (args) => {
+
+          const memoId = {
+            refreshToken: args[0].forge.refreshToken,
+            socketId: args[0].socketId
+          }
+
+          return JSON.stringify(JSON.stringify(memoId))
+        },
+        promise: true
+      })
   }
 
   /////////////////////////////////////////////////////////////////
@@ -126,13 +150,11 @@ export default class ForgeSvc extends BaseSvc {
     //store current time
     token.time_stamp = moment().format()
 
-    session.forge = session.forge || {}
+    session.forge = session.forge || {
+      refreshToken: token.refresh_token
+    }
 
-    session.forge.masterToken =
-      token
-
-    session.forge.refreshToken =
-      token.refresh_token
+    session.forge.masterToken = token
   }
 
   /////////////////////////////////////////////////////////////////
@@ -147,7 +169,10 @@ export default class ForgeSvc extends BaseSvc {
 
         if (!session.forge) {
 
-          throw { status:404, msg: 'Not Found' }
+          return reject ({
+            status:404,
+            msg: 'Not Found'
+          })
         }
 
         var token = session.forge.masterToken
@@ -155,7 +180,8 @@ export default class ForgeSvc extends BaseSvc {
         if(this.getExpiry(token) < 60) {
 
           token = await this.refresh3LeggedToken (
-            token,  this._config.oauth.scope.join(' '))
+            session,
+            this._config.oauth.scope.join(' '))
 
           this.set3LeggedTokenMaster(
             session, token)
@@ -179,13 +205,7 @@ export default class ForgeSvc extends BaseSvc {
     //store current time
     token.time_stamp = moment().format()
 
-    session.forge = session.forge || {}
-
-    session.forge.clientToken =
-      token
-
-    session.forge.refreshToken =
-      token.refresh_token
+    session.forge.clientToken = token
   }
 
   /////////////////////////////////////////////////////////////////
@@ -200,17 +220,17 @@ export default class ForgeSvc extends BaseSvc {
 
         if (!session.forge) {
 
-          throw { status:404, msg: 'Not Found' }
+          return reject({
+            status:404,
+            msg: 'Not Found'
+          })
 
         } else if(!session.forge.clientToken) {
 
           // request a downgraded token to provide to client App
 
-          const masterToken = await this.get3LeggedTokenMaster(
-            session)
-
           const clientToken = await this.refresh3LeggedToken(
-            masterToken, 'data:read')
+            session, 'data:read')
 
           this.set3LeggedTokenClient(
             session, clientToken)
@@ -221,7 +241,7 @@ export default class ForgeSvc extends BaseSvc {
         if(this.getExpiry(token) < 60) {
 
           token = await this.refresh3LeggedToken (
-            token, 'data:read')
+            session, 'data:read')
 
           this.set3LeggedTokenClient(
             session, token)
@@ -246,10 +266,50 @@ export default class ForgeSvc extends BaseSvc {
   }
 
   /////////////////////////////////////////////////////////////////
+  // Ensure returned token has requested scope
+  //
+  /////////////////////////////////////////////////////////////////
+  refresh3LeggedToken (session, requestedScope) {
+
+    console.log('refresh3LeggedToken')
+
+    return new Promise(async(resolve, reject) => {
+
+      try {
+
+        let token = null
+
+        while (true) {
+
+          token = await this.__refresh3LeggedTokenMemo(
+            session, requestedScope)
+
+          if (token.scope !== requestedScope) {
+
+            this.sleep(1000)
+
+          } else {
+
+            break
+          }
+        }
+
+        console.log(token)
+        resolve (token)
+
+      } catch (ex) {
+
+        console.log(ex)
+        reject(ex)
+      }
+    })
+  }
+
+  /////////////////////////////////////////////////////////////////
   // Refresh 3-legged token with specified scope
   //
   /////////////////////////////////////////////////////////////////
-  refresh3LeggedToken (token, scope) {
+  __refresh3LeggedToken (session, scope) {
 
     return new Promise((resolve, reject) => {
 
@@ -266,7 +326,7 @@ export default class ForgeSvc extends BaseSvc {
         form: {
           client_secret: this._config.oauth.clientSecret,
           client_id: this._config.oauth.clientId,
-          refresh_token: token.refresh_token,
+          refresh_token: session.forge.refreshToken,
           grant_type: 'refresh_token',
           scope: scope
         }
@@ -297,13 +357,30 @@ export default class ForgeSvc extends BaseSvc {
             return reject(response)
           }
 
-          return resolve(body.data || body)
+          session.forge.refreshToken =
+            body.refresh_token
 
-        } catch(ex){
+          body.scope = scope
 
-          return reject(response)
+          return resolve (body)
+
+        } catch (ex) {
+
+          return reject(ex)
         }
       })
+    })
+  }
+
+  ///////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////
+  sleep (ms) {
+    return new Promise((resolve)=> {
+      setTimeout(()=> {
+        resolve()
+      }, ms)
     })
   }
 }

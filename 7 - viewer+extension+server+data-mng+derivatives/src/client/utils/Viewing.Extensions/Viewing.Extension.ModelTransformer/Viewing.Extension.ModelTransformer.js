@@ -30,6 +30,8 @@ class ModelTransformerExtension extends ExtensionBase {
 
       this.onAggregateSelectionChanged(e)
     }
+
+    this.selectedDbIdArray = []
   }
 
   /////////////////////////////////////////////////////////////////
@@ -48,6 +50,130 @@ class ModelTransformerExtension extends ExtensionBase {
   load () {
 
     this.loadControls()
+
+    const hotkeyMng = Autodesk.Viewing.theHotkeyManager
+
+    this.hotkeysId = ExtensionBase.guid()
+
+    const hotKeyTranslate = {
+
+      keycodes: [
+        hotkeyMng.KEYCODES.t
+      ],
+      onPress: (hotkeys) => {
+        //handled
+        return true
+      },
+      onRelease: (hotkeys) => {
+
+        var hitPoint = null
+
+        if (this.panel.rxTool.active) {
+
+          hitPoint = this.panel.rxTool.hitPoint()
+
+          this._viewer.toolController.deactivateTool(
+            this.panel.rxTool.getName())
+        }
+
+        if (!this.panel.txTool.active) {
+
+          this._viewer.toolController.activateTool(
+            this.panel.txTool.getName())
+
+          if (hitPoint) {
+
+            this.panel.txTool.setHitPoint(hitPoint)
+
+            const selections =
+              this._viewer.getAggregateSelection()
+
+            if (selections.length) {
+
+              const model = selections[0].model
+
+              const dbIdArray = selections[0].selection
+
+              ViewerToolkit.getFragIds(
+                model, dbIdArray).then((fragIdsArray) => {
+
+                  this.panel.txTool.setSelection({
+                    fragIdsArray,
+                    dbIdArray,
+                    model
+                  })
+                })
+            }
+          }
+        }
+
+        return true
+      }
+    }
+
+    const hotKeyRotate = {
+
+      keycodes: [
+        hotkeyMng.KEYCODES.r
+      ],
+      onPress: (hotkeys) => {
+        //handled
+        return true
+      },
+      onRelease: (hotkeys) => {
+
+        var hitPoint = null
+
+        if (this.panel.txTool.active) {
+
+          hitPoint = this.panel.txTool.hitPoint()
+
+          this._viewer.toolController.deactivateTool(
+            this.panel.txTool.getName())
+        }
+
+        if (!this.panel.rxTool.active) {
+
+          this._viewer.toolController.activateTool(
+            this.panel.rxTool.getName())
+
+          if (hitPoint) {
+
+            this.panel.rxTool.setHitPoint(hitPoint)
+
+            const selections =
+              this._viewer.getAggregateSelection()
+
+            if (selections.length) {
+
+              const model = selections[0].model
+
+              const dbIdArray = selections[0].selection
+
+              ViewerToolkit.getFragIds(
+                model, dbIdArray).then((fragIdsArray) => {
+
+                  this.panel.rxTool.setSelection({
+                    fragIdsArray,
+                    dbIdArray,
+                    model
+                  })
+                })
+            }
+          }
+        }
+
+        return true
+      }
+    }
+
+    hotkeyMng.pushHotkeys(
+      this.hotkeysId, [
+          hotKeyTranslate,
+          hotKeyRotate
+        ], {
+        tryUntilSuccess: true
+      })
 
     this._viewer.addEventListener(
       Autodesk.Viewing.GEOMETRY_LOADED_EVENT,
@@ -120,6 +246,8 @@ class ModelTransformerExtension extends ExtensionBase {
 
     this.panel.on('model.selected', (data) => {
 
+      this.currentSelection = data.selection
+
       if (data.fitToView) {
 
         this.fitModelToView(data.model)
@@ -128,7 +256,15 @@ class ModelTransformerExtension extends ExtensionBase {
 
     if (this._options.parentControl) {
 
-      this.parentControl = this._options.parentControl
+      if(typeof this._options.parentControl === 'string') {
+
+        this.parentControl = this._viewer.getToolbar().getControl(
+          this._options.parentControl)
+
+      } else if (typeof this._options.parentControl === 'object') {
+
+        this.parentControl = this._options.parentControl
+      }
 
     } else {
 
@@ -140,8 +276,11 @@ class ModelTransformerExtension extends ExtensionBase {
       viewerToolbar.addControl(this.parentControl)
     }
 
-    this.parentControl.addControl(
-      this.control)
+    if (this.parentControl) {
+
+      this.parentControl.addControl(
+        this.control)
+    }
   }
 
   /////////////////////////////////////////////////////////////////
@@ -161,8 +300,6 @@ class ModelTransformerExtension extends ExtensionBase {
         model.name = model.name ||
         'Model ' + (Object.keys(this.modelCollection).length + 1)
 
-        console.log(model)
-
         this.addModel(model)
       }
     }
@@ -173,6 +310,9 @@ class ModelTransformerExtension extends ExtensionBase {
   //
   /////////////////////////////////////////////////////////////////
   unload () {
+
+    Autodesk.Viewing.theHotkeyManager.popHotkeys(
+      this.hotkeysId)
 
     this._viewer.removeEventListener(
       Autodesk.Viewing.GEOMETRY_LOADED_EVENT,
@@ -202,6 +342,8 @@ class ModelTransformerExtension extends ExtensionBase {
     if (event.selections && event.selections.length) {
 
       var selection = event.selections[0]
+
+      this.selectedDbIdArray = event.selections[0].dbIdArray
 
       this.setStructure(selection.model)
     }
@@ -355,6 +497,8 @@ class ModelTransformerExtension extends ExtensionBase {
   //////////////////////////////////////////////////////////////////////////
   buildPlacementTransform (modelName) {
 
+    var placementTransform = new THREE.Matrix4()
+
     if (!this.firstModelLoaded) {
 
       this.firstModelLoaded = modelName
@@ -364,8 +508,6 @@ class ModelTransformerExtension extends ExtensionBase {
     // than other, so need to correct it
     // upon insertion
     const zOriented = ['rvt', 'nwc']
-
-    var placementTransform = new THREE.Matrix4()
 
     var firstExt = this.firstModelLoaded.split('.').pop(-1)
 
@@ -378,8 +520,8 @@ class ModelTransformerExtension extends ExtensionBase {
         placementTransform.makeRotationX(
           90 * Math.PI/180)
       }
-    }
-    else {
+
+    } else {
 
       if(zOriented.indexOf(modelExt) > -1) {
 

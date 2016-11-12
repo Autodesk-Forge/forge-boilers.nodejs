@@ -139,10 +139,10 @@ module.exports = function() {
             'ForgeSvc')
 
           var token = {
+            scope: config.forge.oauth.scope,
             expires_in: results.expires_in,
             refresh_token: refresh_token,
-            access_token: access_token,
-            scope: config.forge.oauth.scope
+            access_token: access_token
           }
 
           forgeSvc.set3LeggedTokenMaster(
@@ -196,8 +196,9 @@ module.exports = function() {
         req.session)
 
       res.json({
+        expires_in: forgeSvc.getExpiry(token),
         access_token: token.access_token,
-        expires_in: forgeSvc.getExpiry(token)
+        scope: token.scope
       })
 
     } catch (error) {

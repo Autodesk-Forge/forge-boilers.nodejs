@@ -16,7 +16,22 @@ export default class ToolPanelModal extends ToolPanelBase {
       shadow: true
     })
 
+    this.options = Object.assign({}, {
+      showCancel: true,
+      showOK: true
+    }, options)
+
     $(this.container).addClass('tool-panel-modal')
+
+    if(options.height) {
+
+      $(this.container).height(options.height)
+    }
+
+    if(options.width) {
+
+      $(this.container).width(options.width)
+    }
 
     $(window).resize(() => {
 
@@ -25,8 +40,18 @@ export default class ToolPanelModal extends ToolPanelBase {
 
       $(this.container).css({
         left: `calc(50% - ${w/2}px)`,
-        top: `calc(50% - ${h/2}px)`
+        top: `calc(40% - ${h/2}px)`
       })
+    })
+
+    $('#' + this.btnCancelId).css({
+
+      display: this.options.showCancel ? 'inline-block' : 'none'
+    })
+    
+    $('#' + this.btnOkId).css({
+
+      display: this.options.showOK ? 'inline-block' : 'none'
     })
   }
 

@@ -31,48 +31,58 @@ export default class DerivativesAPI extends ClientAPI {
   //
   //
   /////////////////////////////////////////////////////////////////
-  postSVFJob(input, designName, panelContainer) {
+  postJobWithProgress (args) {
 
     return new Promise(async(resolve, reject) => {
 
       var jobPanel = new JobPanel(
-        panelContainer,
-        designName)
+        args.panelContainer,
+        args.designName,
+        args.output.formats[0].type)
 
       jobPanel.setVisible(true)
 
       try {
 
-        const output = {
-          type: 'svf'
-        }
+        console.log('Posting Job:')
+
+        console.log(Object.assign({}, {
+          input: args.input,
+          output: args.output
+        }))
 
         var job = await this.postJob({
-          input,
-          output
+          input: args.input,
+          output: args.output
         })
 
         if (job.result === 'success' || job.result === 'created') {
 
-          var manifest = await this.waitJob(input.urn,
-            (progress) => {
+          const onProgress = (progress) => {
 
-              return jobPanel.updateProgress(progress)
-            })
+            jobPanel.updateProgress(progress)
+          }
+
+          const derivativeResult = await this.getDerivativeURN ({
+              input: args.input,
+              output:args.output
+            }, onProgress, true)
 
           jobPanel.done()
 
-          return resolve(manifest)
-        }
-        else {
+          resolve(derivativeResult)
+
+        } else {
 
           jobPanel.jobFailed(job)
+
           return reject(job)
         }
-      }
-      catch(ex) {
+
+      } catch(ex) {
 
         jobPanel.jobFailed(ex)
+
         return reject(ex)
       }
     })
@@ -150,50 +160,6 @@ export default class DerivativesAPI extends ClientAPI {
   //
   //
   ///////////////////////////////////////////////////////////////////
-  waitJob (urn, onProgress) {
-
-    return new Promise(async(resolve, reject) => {
-
-      try {
-
-        while(true) {
-
-          var manifest = await this.getManifest(urn)
-
-          if(manifest.status === 'failed') {
-
-            return reject(manifest)
-          }
-
-          if(manifest.status   === 'success' &&
-             manifest.progress === 'complete') {
-
-            return resolve(manifest)
-          }
-
-          var progress = manifest.progress.split(' ')[0]
-
-          var loop = onProgress ? onProgress(progress) : true
-
-          if(!loop) {
-
-            return reject('cancelled')
-          }
-
-          await sleep(1000)
-        }
-      }
-      catch(ex) {
-
-        return reject(ex)
-      }
-    })
-  }
-
-  ///////////////////////////////////////////////////////////////////
-  //
-  //
-  ///////////////////////////////////////////////////////////////////
   deleteManifest (urn) {
 
     const url = `${this.apiUrl}/manifest/${urn}`
@@ -208,42 +174,63 @@ export default class DerivativesAPI extends ClientAPI {
   //
   //
   ///////////////////////////////////////////////////////////////////
-  findDerivative (manifest, params) {
+  findDerivatives (manifest, params) {
 
     var parentDerivative = null
 
-    for(var i = 0; i < manifest.derivatives.length; ++i) {
+    for (var i = 0; i < manifest.derivatives.length; ++i) {
 
       var derivative = manifest.derivatives[i]
 
-      if (derivative.outputType === params.outputType) {
+      const outputType =
+        params.output.type ||
+        params.output.formats[0].type
+
+      if (derivative.outputType === outputType) {
 
         parentDerivative = derivative
 
         if (derivative.children) {
 
-          for(var j = 0; j < derivative.children.length; ++j) {
+          switch (derivative.outputType) {
 
-            var childDerivative = derivative.children[j]
+            case 'obj':
 
-            if(derivative.outputType !== 'obj'){
+              if (params.output.formats[0].advanced.objectIds) {
+
+                for(var j = 0; j < derivative.children.length; ++j) {
+
+                  var childDerivative = derivative.children[j]
+
+                  if(_.isEqual( // match objectIds
+                    childDerivative.objectIds,
+                    params.output.formats[0].advanced.objectIds)) {
+
+                    return {
+                      parent: parentDerivative,
+                      target: childDerivative
+                    }
+                  }
+                }
+
+              } else {
+
+                return derivative.children.map((childDerivative) => {
+                  return {
+                    parent: parentDerivative,
+                    target: childDerivative
+                  }
+                })
+              }
+
+              break
+
+            default:
 
               return {
                 parent: parentDerivative,
-                target: childDerivative
+                target: derivative.children[0]
               }
-            }
-
-            // match objectId
-            else if(_.isEqual(
-                childDerivative.objectIds,
-                params.objectIds)) {
-
-              return {
-                parent: parentDerivative,
-                target: childDerivative
-              }
-            }
           }
         }
       }
@@ -258,9 +245,9 @@ export default class DerivativesAPI extends ClientAPI {
   //
   //
   /////////////////////////////////////////////////////////////////
-  hasDerivative(manifest, params) {
+  hasDerivative (manifest, params) {
 
-    var derivativeResult = this.findDerivative(
+    var derivativeResult = this.findDerivatives(
       manifest, params)
 
     return derivativeResult.target ? true : false
@@ -276,10 +263,10 @@ export default class DerivativesAPI extends ClientAPI {
 
       try {
 
-        while(true) {
+        while (true) {
 
           var manifest = await this.getManifest(
-            params.urn)
+            params.input.urn)
 
           //if(manifest.status === 'failed') {
           //  return reject(manifest)
@@ -290,12 +277,12 @@ export default class DerivativesAPI extends ClientAPI {
             return reject(manifest)
           }
 
-          var derivativeResult = this.findDerivative(
+          var derivativeResult = this.findDerivatives(
             manifest, params)
 
-          if(derivativeResult.target) {
+          if (derivativeResult.target) {
 
-            var progress = manifest.progress.split(' ')[0]
+            let progress = manifest.progress.split(' ')[0]
 
             progress = (progress === 'complete' ? '100%' : progress)
 
@@ -306,8 +293,8 @@ export default class DerivativesAPI extends ClientAPI {
               onProgress ? onProgress('100%') : ''
 
               return resolve({
-                status: 'success',
-                derivativeUrn: derivativeResult.target.urn
+                urn: derivativeResult.target.urn,
+                status: 'success'
               })
 
             } else if (derivativeResult.target.status === 'failed') {
@@ -326,7 +313,12 @@ export default class DerivativesAPI extends ClientAPI {
 
           if(!derivativeResult.parent) {
 
-            onProgress ? onProgress('0%') : ''
+            if (manifest.status === 'inprogress') {
+
+              const progress = manifest.progress.split(' ')[0]
+
+              onProgress ? onProgress(progress) : ''
+            }
 
             if(!skipNotFound) {
 

@@ -2,6 +2,7 @@
 //
 //
 /////////////////////////////////////////////////////////////////
+import velocity from 'velocity-animate'
 import './ToolPanelBase.css'
 
 function getDefaultOptions () {
@@ -89,7 +90,14 @@ export default class ToolPanelBase extends
   // setVisible override
   //
   /////////////////////////////////////////////////////////////
-  setVisible(show = false) {
+  setVisible (show = false) {
+
+    if (show) {
+
+      $(this.container).velocity({
+        rotateY: [0, -90]
+      })
+    }
 
     if (show !== this._isVisible) {
 
@@ -235,15 +243,17 @@ export default class ToolPanelBase extends
       this._height = $(this.container).css('height')
 
       $(this.container).css({
-        'height':'32px',
-        'min-height':'32px'
+        'min-height':'32px',
+        overflow: 'hidden',
+        height:'32px'
       })
-    }
-    else {
+
+    } else {
 
       $(this.container).css({
-        'height':this._height,
-        'min-height':'100px'
+        height:this._height,
+        'min-height':'100px',
+        overflow: 'visible'
       })
     }
   }

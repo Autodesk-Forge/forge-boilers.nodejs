@@ -27,11 +27,12 @@
   border-top: 4px solid #fff;
   position: absolute;
   top: 45%;
-  right: -10px;
+  right: 10px;
 }
 
-.lmv-dropdown .dropdown-menu > li > a {
-  height: 14px;
-  line-height: 10px;
-  padding: 3px 20px;
+.lmv-dropdown .dropdown-menu>li>a {
+  padding: 0px 20px;
+  line-height: 24px;
+  height: 24px;
 }
+
