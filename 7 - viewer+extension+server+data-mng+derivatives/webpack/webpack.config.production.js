@@ -25,6 +25,7 @@ module.exports = {
       dry: false
     }),
 
+    new webpack.IgnorePlugin(/regenerator|nodent|js\-beautify/, /ajv/),
     new webpack.NoErrorsPlugin(),
     new webpack.optimize.DedupePlugin(),
     new webpack.optimize.OccurenceOrderPlugin(),
@@ -57,9 +58,9 @@ module.exports = {
     }),
 
     new html({
-      threeJS: 'https://autodeskviewer.com/viewers/2.10/three.min.js',
-      viewer3D: 'https://autodeskviewer.com/viewers/2.10/viewer3D.min.js',
-      viewerCSS: 'https://autodeskviewer.com/viewers/2.10/style.min.css',
+      threeJS: 'https://autodeskviewer.com/viewers/2.11/three.min.js',
+      viewer3D: 'https://autodeskviewer.com/viewers/2.11/viewer3D.min.js',
+      viewerCSS: 'https://autodeskviewer.com/viewers/2.11/style.min.css',
       template: './layout/index.ejs',
       bundle: 'bundle.min.js',
       title: 'Autodesk Forge',
@@ -89,6 +90,10 @@ module.exports = {
   module: {
 
     loaders: [
+      {
+        test: /\.json$/,
+        loader: 'json-loader'
+      },
       {
         test: /\.jsx?$/,
         exclude: /node_modules/,
