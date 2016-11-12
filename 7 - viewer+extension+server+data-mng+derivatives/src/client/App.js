@@ -418,23 +418,20 @@ export default class App {
 
     const aboutDlg = new ToolPanelModal(
       this.panelContainers.app, {
-        title: 'About this sample ...',
-        showCancel: false
+        title: 'About Roomedit3dv3...',
+        showCancel: false,
+        showOK: false,
       })
 
     aboutDlg.bodyContent (`
       <div>
-        <br>
-        Written by <a href="https://twitter.com/F3lipek"
-          target="_blank">
-          Philippe Leefsma
-        </a>, November 2016
-        <hr class="about"/>
-        Source on
-        <a href="https://github.com/Autodesk-Forge/forge-boilers.nodejs"
-          target="_blank">
-          Github
-        </a>
+        <br/><a href="https://twitter.com/F3lipek"
+          target="_blank">Philippe Leefsma</a>
+        &amp; <a href="http://thebuildingcoder.typepad.com"
+          target="_blank">Jeremy Tammik</a>, November 2016.
+        <br/><br/>Source on
+        <a href="https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/roomedit3d"
+          target="_blank">Github</a>.
       </div>
     `)
 
