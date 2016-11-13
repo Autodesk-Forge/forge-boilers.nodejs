@@ -202,27 +202,24 @@ export default class OSSPanel extends UIComponent {
         const urn = window.btoa(data.node.details.objectId).replace(
             new RegExp('=', 'g'), '')
 
-        const input = {
-          urn: urn
+        const job = {
+          input: {
+            urn: urn
+          },
+          output: {
+            force: true,
+            formats:[{
+              type: 'svf',
+              views: ['2d', '3d']
+            }]
+          }
         }
 
-        const output = {
-          force: true,
-          formats:[{
-            type: 'svf',
-            views: ['2d', '3d']
-          }]
-        }
-
-        console.log('Posting SVF Job: ')
-        console.log(input)
-
-        await this.derivativesAPI.postJobWithProgress({
+        await this.derivativesAPI.postJobWithProgress(
+          job, {
           designName: data.node.details.objectKey,
-          panelContainer: viewerContainer,
-          output,
-          input
-        })
+          panelContainer: viewerContainer
+        }, { type: 'geometry' })
 
         setTimeout(() => {
           this.onObjectNodeAddedHandler (data.node)
@@ -287,8 +284,8 @@ export default class OSSPanel extends UIComponent {
         if (manifest.status   === 'success' &&
             manifest.progress === 'complete') {
 
-          if (this.derivativesAPI.hasDerivative(
-              manifest, { output: {type: 'svf' }})) {
+          if (this.derivativesAPI.hasDerivative (
+              manifest, { type: 'geometry'})) {
 
             node.parent.classList.add('derivated')
 
@@ -341,8 +338,8 @@ export default class OSSPanel extends UIComponent {
 
     if (node.type === 'oss.object' && node.manifest) {
 
-      if (this.derivativesAPI.hasDerivative(
-          node.manifest, { output: {type: 'svf' }})) {
+      if (this.derivativesAPI.hasDerivative (
+          node.manifest, { type: 'geometry'})) {
 
         node.showLoader(true)
 

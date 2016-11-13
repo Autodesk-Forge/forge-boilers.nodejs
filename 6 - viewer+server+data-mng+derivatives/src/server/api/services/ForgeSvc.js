@@ -271,8 +271,6 @@ export default class ForgeSvc extends BaseSvc {
   /////////////////////////////////////////////////////////////////
   refresh3LeggedToken (session, requestedScope) {
 
-    console.log('refresh3LeggedToken')
-
     return new Promise(async(resolve, reject) => {
 
       try {
@@ -286,7 +284,7 @@ export default class ForgeSvc extends BaseSvc {
 
           if (token.scope !== requestedScope) {
 
-            this.sleep(1000)
+            await this.sleep(1000)
 
           } else {
 
@@ -294,7 +292,6 @@ export default class ForgeSvc extends BaseSvc {
           }
         }
 
-        console.log(token)
         resolve (token)
 
       } catch (ex) {
@@ -311,13 +308,11 @@ export default class ForgeSvc extends BaseSvc {
   /////////////////////////////////////////////////////////////////
   __refresh3LeggedToken (session, scope) {
 
-    return new Promise((resolve, reject) => {
-
-      var url = this._config.oauth.baseUri +
-        this._config.oauth.refreshTokenUri
+    return new Promise(async(resolve, reject) => {
 
       request({
-        url: url,
+        url: this._config.oauth.baseUri +
+          this._config.oauth.refreshTokenUri,
         method: "POST",
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -337,7 +332,6 @@ export default class ForgeSvc extends BaseSvc {
 
           if (err) {
 
-            console.log('error: ' + url)
             console.log(err)
 
             return reject(err)
@@ -345,7 +339,6 @@ export default class ForgeSvc extends BaseSvc {
 
           if (body && body.errors) {
 
-            console.log('body error: ' + url)
             console.log(body.errors)
 
             return reject(body.errors)

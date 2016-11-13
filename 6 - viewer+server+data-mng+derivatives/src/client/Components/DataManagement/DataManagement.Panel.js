@@ -137,15 +137,16 @@ export default class DataManagementPanel extends UIComponent {
           input.compressedUrn = true
         }
 
-        console.log('Posting SVF Job: ')
-        console.log(input)
-
-        await this.derivativesAPI.postJobWithProgress({
-          panelContainer: viewerContainer,
-          designName: data.node.name,
+        const job = {
           output,
           input
-        })
+        }
+
+        await this.derivativesAPI.postJobWithProgress(
+          job, {
+            panelContainer: viewerContainer,
+            designName: data.node.name
+          }, { type: 'geometry' })
 
         setTimeout(() => {
           this.onItemNodeAddedHandler (data.node)
@@ -153,7 +154,7 @@ export default class DataManagementPanel extends UIComponent {
 
       } catch (ex) {
 
-        console.log('SVf Job failed')
+        console.log('SVF Job failed')
         console.log(ex)
 
         data.node.showLoader(false)
@@ -296,7 +297,7 @@ export default class DataManagementPanel extends UIComponent {
           manifest.progress === 'complete') {
 
           if (this.derivativesAPI.hasDerivative(
-              manifest, { output:{ type: 'svf' }})) {
+              manifest, { type: 'geometry'})) {
 
             node.parent.classList.add('derivated')
 
@@ -350,7 +351,7 @@ export default class DataManagementPanel extends UIComponent {
     if (node.type === 'items' && node.manifest) {
 
       if (this.derivativesAPI.hasDerivative(
-          node.manifest, { output: {type: 'svf' }})) {
+          node.manifest, { type: 'geometry'})) {
 
         node.showLoader(true)
 

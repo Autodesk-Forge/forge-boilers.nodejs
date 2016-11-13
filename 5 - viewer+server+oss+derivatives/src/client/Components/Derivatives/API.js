@@ -1,5 +1,6 @@
 import JobPanel from './JobPanel/JobPanel.js'
 import ClientAPI from 'ClientAPI'
+import _ from 'lodash'
 
 export default class DerivativesAPI extends ClientAPI {
 
@@ -31,46 +32,68 @@ export default class DerivativesAPI extends ClientAPI {
   //
   //
   /////////////////////////////////////////////////////////////////
-  postJobWithProgress (args) {
+  buildDefaultJobQuery (job) {
+
+    switch (job.output.formats[0].type) {
+
+      case 'obj':
+
+        const objIds = job.output.formats[0].advanced.objectIds
+
+        if (objIds) {
+
+          return (derivative) => {
+            return (
+              derivative.role === 'obj' &&
+              _.isEqual(derivative.objectIds, objIds)
+            )
+          }
+        }
+
+      default:
+
+        return { role: job.output.formats[0].type }
+    }
+  }
+
+  /////////////////////////////////////////////////////////////////
+  //
+  //
+  /////////////////////////////////////////////////////////////////
+  postJobWithProgress (job, opts, query = null) {
 
     return new Promise(async(resolve, reject) => {
 
       var jobPanel = new JobPanel(
-        args.panelContainer,
-        args.designName,
-        args.output.formats[0].type)
+        opts.panelContainer,
+        opts.designName,
+        job.output.formats[0].type)
 
       jobPanel.setVisible(true)
 
       try {
 
         console.log('Posting Job:')
+        console.log(job)
 
-        console.log(Object.assign({}, {
-          input: args.input,
-          output: args.output
-        }))
+        var jobRes = await this.postJob(job)
 
-        var job = await this.postJob({
-          input: args.input,
-          output: args.output
-        })
-
-        if (job.result === 'success' || job.result === 'created') {
+        if (jobRes.result === 'success' || jobRes.result === 'created') {
 
           const onProgress = (progress) => {
 
             jobPanel.updateProgress(progress)
           }
 
-          const derivativeResult = await this.getDerivativeURN ({
-              input: args.input,
-              output:args.output
-            }, onProgress, true)
+          const derivative = await this.getDerivative (
+            job.input.urn,
+            query || this.buildDefaultJobQuery(job),
+            job.output.formats[0].type,
+            onProgress, true)
 
           jobPanel.done()
 
-          resolve(derivativeResult)
+          resolve(derivative)
 
         } else {
 
@@ -174,90 +197,67 @@ export default class DerivativesAPI extends ClientAPI {
   //
   //
   ///////////////////////////////////////////////////////////////////
-  findDerivatives (manifest, params) {
+  findDerivatives (parent, query) {
 
-    var parentDerivative = null
+    const derivatives = parent.derivatives || parent.children
 
-    for (var i = 0; i < manifest.derivatives.length; ++i) {
+    if (derivatives) {
 
-      var derivative = manifest.derivatives[i]
+      const matches = derivatives.filter((derivative) => {
 
-      const outputType =
-        params.output.type ||
-        params.output.formats[0].type
+        derivative.parent = parent
 
-      if (derivative.outputType === outputType) {
+        if (typeof query === 'object') {
 
-        parentDerivative = derivative
+          var match = true
 
-        if (derivative.children) {
+          for (const key in query) {
 
-          switch (derivative.outputType) {
+            if (query[key] !== derivative[key]) {
 
-            case 'obj':
-
-              if (params.output.formats[0].advanced.objectIds) {
-
-                for(var j = 0; j < derivative.children.length; ++j) {
-
-                  var childDerivative = derivative.children[j]
-
-                  if(_.isEqual( // match objectIds
-                    childDerivative.objectIds,
-                    params.output.formats[0].advanced.objectIds)) {
-
-                    return {
-                      parent: parentDerivative,
-                      target: childDerivative
-                    }
-                  }
-                }
-
-              } else {
-
-                return derivative.children.map((childDerivative) => {
-                  return {
-                    parent: parentDerivative,
-                    target: childDerivative
-                  }
-                })
-              }
-
-              break
-
-            default:
-
-              return {
-                parent: parentDerivative,
-                target: derivative.children[0]
-              }
+              match = false
+            }
           }
+
+          return match
+
+        } else if (typeof query === 'function') {
+
+          return query (derivative)
         }
-      }
+      })
+
+      const childResults = derivatives.map((derivative) => {
+
+        return this.findDerivatives (
+          derivative, query)
+      })
+
+      return _.flattenDeep([...matches, ...childResults])
     }
 
-    return {
-      parent: parentDerivative
-    }
+    return []
   }
 
   /////////////////////////////////////////////////////////////////
   //
   //
   /////////////////////////////////////////////////////////////////
-  hasDerivative (manifest, params) {
+  hasDerivative (manifest, query) {
 
-    var derivativeResult = this.findDerivatives(
-      manifest, params)
+    var derivatives = this.findDerivatives(
+      manifest, query)
 
-    return derivativeResult.target ? true : false
+    return derivatives.length > 0
   }
 
   ///////////////////////////////////////////////////////////////////
   //
   //
   ///////////////////////////////////////////////////////////////////
-  getDerivativeURN (params, onProgress = null, skipNotFound = false) {
+  getDerivative (urn, query, outputType,
+                 onProgress = null,
+                 skipNotFound = false) {
 
     return new Promise(async(resolve, reject) => {
 
@@ -265,8 +265,7 @@ export default class DerivativesAPI extends ClientAPI {
 
         while (true) {
 
-          var manifest = await this.getManifest(
-            params.input.urn)
+          var manifest = await this.getManifest(urn)
 
           //if(manifest.status === 'failed') {
           //  return reject(manifest)
@@ -277,10 +276,12 @@ export default class DerivativesAPI extends ClientAPI {
             return reject(manifest)
           }
 
-          var derivativeResult = this.findDerivatives(
-            manifest, params)
+          var derivatives = this.findDerivatives(
+            manifest, query)
 
-          if (derivativeResult.target) {
+          if (derivatives.length) {
+
+            const derivative = derivatives[0]
 
             let progress = manifest.progress.split(' ')[0]
 
@@ -288,22 +289,21 @@ export default class DerivativesAPI extends ClientAPI {
 
             onProgress ? onProgress(progress) : ''
 
-            if (derivativeResult.target.status === 'success') {
+            const status =
+              derivative.status ||
+              derivative.parent.status
+
+            if (status === 'success') {
 
               onProgress ? onProgress('100%') : ''
 
-              return resolve({
-                urn: derivativeResult.target.urn,
-                status: 'success'
-              })
+              return resolve(derivative)
 
-            } else if (derivativeResult.target.status === 'failed') {
+            } else if (status === 'failed') {
 
               onProgress ? onProgress('failed') : ''
 
-              return reject({
-                status: 'failed'
-              })
+              return reject(derivative)
             }
           }
 
@@ -311,7 +311,10 @@ export default class DerivativesAPI extends ClientAPI {
           // OR
           // if parent complete and no target -> derivative not requested
 
-          if(!derivativeResult.parent) {
+          const parentDerivatives = this.findDerivatives(
+            manifest, { outputType })
+
+          if (!parentDerivatives.length) {
 
             if (manifest.status === 'inprogress') {
 
@@ -327,9 +330,9 @@ export default class DerivativesAPI extends ClientAPI {
               })
             }
 
-          } else if(derivativeResult.parent.status === 'success') {
+          } else if(parentDerivatives[0].status === 'success') {
 
-            if(!derivativeResult.target) {
+            if(!derivatives.length) {
 
               onProgress ? onProgress('0%') : ''
 

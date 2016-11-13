@@ -181,6 +181,10 @@
     color: #0ecc1f
 }
 
+.tooltip {
+    border-bottom: 0px;
+}
+
 div.tooltip-inner {
     border: 1px solid #b4b4b4;
     background-color: #f8f8f8;

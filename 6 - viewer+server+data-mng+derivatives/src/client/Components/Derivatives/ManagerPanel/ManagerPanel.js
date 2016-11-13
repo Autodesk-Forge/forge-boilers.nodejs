@@ -122,7 +122,8 @@ export default class DerivativesManagerPanel extends UIComponent {
             this.urn,
             this.modelGuid)
 
-        this.properties = properties.data.collection
+        this.properties = properties.data ?
+          properties.data.collection : []
 
         this.hierarchy = hierarchy.data
 
@@ -132,6 +133,8 @@ export default class DerivativesManagerPanel extends UIComponent {
       }
 
     } catch (ex) {
+
+      console.log(ex)
 
       this.loadManifest(
         this.manifest)
@@ -380,13 +383,13 @@ export default class DerivativesManagerPanel extends UIComponent {
 
     $('#' + btnPostJobId).click(async() => {
 
-      const payload = this.editor.get()
+      const job = this.editor.get()
 
       await this.derivativesAPI.postJobWithProgress(
-        Object.assign({}, payload, {
+        job, {
           panelContainer: this.viewerContainer,
           designName: this.designName
-        }))
+        })
 
       this.manifest =
         await this.derivativesAPI.getManifest(
@@ -439,27 +442,32 @@ export default class DerivativesManagerPanel extends UIComponent {
 
       return new Promise(async(resolve) => {
 
-        const derivative =
-          await this.derivativesAPI.postJobWithProgress(
-            Object.assign({}, node, {
+        try {
+
+          const derivative =
+            await this.derivativesAPI.postJobWithProgress(
+              node.job, {
               panelContainer: this.viewerContainer,
               designName: this.designName
-            }))
+            }, node.query)
 
-        resolve(derivative)
+          resolve(derivative)
 
-        this.manifest =
-          await this.derivativesAPI.getManifest(
+        } finally {
+
+          this.manifest =
+            await this.derivativesAPI.getManifest(
             this.urn)
 
-        this.loadManifest (this.manifest)
+          this.loadManifest (this.manifest)
 
-        this.loadExports(
-          this.urn,
-          this.designName,
-          this.manifest,
-          this.modelGuid,
-          false)
+          this.loadExports(
+            this.urn,
+            this.designName,
+            this.manifest,
+            this.modelGuid,
+            false)
+        }
       })
 
     })

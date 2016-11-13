@@ -14,7 +14,7 @@ const Formats = {
   ],
     "obj": [
     "f3d", "fbx", "iam", "ipt", "step", "stp",
-    "stpz", "wire","rvt", "dwf", "dwfx"
+    "stpz", "wire","rvt", "dwf", "dwfx", "nwc"
   ],
     "svf": [
     "3dm",
@@ -80,71 +80,7 @@ const Formats = {
     "neu\\.\\d+$",
     "prt\\.\\d+$"
   ],
-    "thumbnail": [
-    "3dm",
-    "3ds",
-    "asm",
-    "catpart",
-    "catproduct",
-    "cgr",
-    "collaboration",
-    "dae",
-    "dgn",
-    "dlv3",
-    "dwf",
-    "dwfx",
-    "dwg",
-    "dwt",
-    "dxf",
-    "exp",
-    "f3d",
-    "fbx",
-    "g",
-    "gbxml",
-    "iam",
-    "idw",
-    "ifc",
-    "ige",
-    "iges",
-    "igs",
-    "ipt",
-    "jt",
-    "max",
-    "model",
-    "neu",
-    "nwc",
-    "nwd",
-    "obj",
-    "pdf",
-    "prt",
-    "rcp",
-    "rvt",
-    "sab",
-    "sat",
-    "session",
-    "skp",
-    "sldasm",
-    "sldprt",
-    "smb",
-    "smt",
-    "ste",
-    "step",
-    "stl",
-    "stla",
-    "stlb",
-    "stp",
-    "stpz",
-    "wire",
-    "x_b",
-    "x_t",
-    "xas",
-    "xpr",
-    "zip",
-    "asm\\.\\d+$",
-    "neu\\.\\d+$",
-    "prt\\.\\d+$"
-  ],
-    "fbx": [
+  "fbx": [
     "f3d"
   ],
     "ifc": [
@@ -224,24 +160,6 @@ const Payloads = {
         type: 'svf',
         views: ['2d', '3d']
       }],
-      destination: {
-        region: 'us'
-      }
-    }
-  },
-  thumbnail: {
-    input:{
-
-    },
-    output:{
-      force: true,
-      type: 'thumbnail',
-      formats:{
-        advanced: {
-          width: 400,
-          height: 400
-        }
-      },
       destination: {
         region: 'us'
       }

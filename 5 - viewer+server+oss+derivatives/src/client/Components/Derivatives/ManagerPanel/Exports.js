@@ -1,5 +1,6 @@
 import { BaseTreeDelegate, TreeNode } from 'TreeView'
 import EventsEmitter from 'EventsEmitter'
+import _ from 'lodash'
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -64,7 +65,7 @@ export class ExportsTreeDelegate
 
     $(parent).append(label)
 
-    if (node.type.indexOf('-export') > -1) {
+    node.createDownloader = () => {
 
       const downloadId = this.guid()
 
@@ -86,7 +87,7 @@ export class ExportsTreeDelegate
         node.showLoader(true)
 
         const uri = this.derivativesAPI.getDownloadURI(
-          node.input.urn,
+          node.urn,
           derivativeUrn,
           node.exportFilename)
 
@@ -137,6 +138,16 @@ export class ExportsTreeDelegate
         'display',
         show ? 'block' : 'none')
     }
+
+    node.expand = () => {
+      $(parent).parent().removeClass('collapsed')
+      $(parent).parent().addClass('expanded')
+    }
+
+    node.collapse = () => {
+      $(parent).parent().removeClass('expanded')
+      $(parent).parent().addClass('collapsed')
+    }
   }
 
   /////////////////////////////////////////////////////////////
@@ -154,105 +165,211 @@ export class ExportsTreeDelegate
           let exportNode = {
             exportFilename: this.designName + '.' + format,
             type: 'formats.' + format + '-export',
-            output: { formats:[{type: format}] },
-            input: { urn: this.urn },
+            job: {
+              output: {formats: [{type: format}]},
+              input: {urn: this.urn}
+            },
+            query: { role: format },
             id: this.guid(),
+            urn: this.urn,
             group: true,
             name: format
           }
 
-          if (format === 'obj') {
+          addChildCallback(exportNode)
 
-            if (this.modelGuid) {
-
-              let objFormat =
-                exportNode.output.formats[0]
-
-              objFormat.advanced = {
-                modelGuid: this.modelGuid,
-                objectIds: [-1]
-              }
-
-              addChildCallback(exportNode)
-
-              if (this.manifest) {
-
-                // add specific OBJ nodes, if any ...
-
-                const genericObj = {
-                  output: {
-                    formats:[{
-                      type: 'obj',
-                      advanced: {
-                        modelGuid: this.modelGuid
-                      }
-                    }]
-                  },
-                  input: { urn: this.urn }
-                }
-
-                const results =
-                  this.derivativesAPI.findDerivatives(
-                    this.manifest, genericObj)
-
-                if(Array.isArray(results)) {
-
-                  results.forEach((result) => {
-
-                    if (result.target) {
-
-                      const ids = result.target.objectIds.join('-')
-
-                      // excludes full model
-                      if (ids !== '-1') {
-
-                        let extraExportNode = {
-                          exportFilename: this.designName + '-' + ids + '.' + format,
-                          type: 'formats.' + format + '-export',
-                          output: { formats:[{
-                            type: format,
-                            advanced: {
-                              modelGuid: this.modelGuid,
-                              objectIds: result.target.objectIds
-                            }}] },
-                          input: { urn: this.urn },
-                          id: this.guid(),
-                          group: true,
-                          name: format + ` [${result.target.objectIds.join(', ')}]`
-                        }
-
-                        addChildCallback(extraExportNode)
-
-                        extraExportNode.parent.classList.add('derivated')
-
-                        extraExportNode.derivative = result.target
-                      }
-                    }
-                  })
-                }
-              }
-            }
-
-          } else {
-
-            addChildCallback(exportNode)
-          }
-
-          if (this.manifest) {
-
-            if(this.derivativesAPI.hasDerivative (
-                this.manifest, exportNode)) {
-
-              exportNode.parent.classList.add('derivated')
-
-              this.derivativesAPI.getDerivativeURN(
-                exportNode).then((derivative) => {
-
-                  exportNode.derivative = derivative
-                })
-            }
-          }
+          exportNode.collapse()
         })
+
+        let thumbnailsNode = {
+          type: 'formats.thumbnails-export',
+          name: 'thumbnails',
+          id: this.guid(),
+          group: true
+        }
+
+        addChildCallback(thumbnailsNode)
+
+        thumbnailsNode.collapse()
+
+        break
+
+      case 'formats.obj-export':
+
+        if (this.modelGuid) {
+
+          const objFullNode = {
+            exportFilename: this.designName + '.obj',
+            type: 'formats.obj-export-full',
+            job: {
+              output: {
+                formats: [{
+                  type: 'obj',
+                  advanced: {
+                    modelGuid: this.modelGuid,
+                    objectIds: [-1]
+                  }
+                }]
+              },
+              input: {urn: this.urn}
+            },
+            query: (derivative) => {
+              return (
+                derivative.role === 'obj' &&
+                _.isEqual(derivative.objectIds, [-1])
+              )
+            },
+            name: 'Full Model',
+            id: this.guid(),
+            urn: this.urn,
+            group: true
+          }
+
+          addChildCallback(objFullNode)
+
+          const objDerivatives =
+            this.derivativesAPI.findDerivatives(
+              this.manifest, (derivative) => {
+                return (
+                derivative.role === 'obj' &&
+                !_.isEqual(derivative.objectIds, [-1]))
+              })
+
+          objDerivatives.forEach((obj) => {
+
+            const ids = obj.objectIds.join('-')
+
+            let objComponentNode = {
+              exportFilename: this.designName + '-' + ids + '.obj',
+              name: `Components: [${obj.objectIds.join(', ')}]`,
+              type: 'formats.obj-export-component',
+              query: { guid: obj.guid },
+              id: this.guid(),
+              urn: this.urn,
+              group: true
+            }
+
+            addChildCallback(objComponentNode)
+          })
+        }
+
+        break
+
+      case 'formats.dwg-export':
+
+        const dwgDerivatives =
+          this.derivativesAPI.findDerivatives(
+            this.manifest, { role: 'dwg' })
+
+       if (dwgDerivatives.length) {
+
+          dwgDerivatives.forEach((dwg) => {
+
+            const sheet = dwg.urn.split('/').pop(-1)
+
+            const dwgSheetNode = {
+              type: 'formats.dwg-export-sheet',
+              exportFilename: sheet + '.dwg',
+              query: { guid: dwg.guid },
+              id: this.guid(),
+              urn: this.urn,
+              group: true,
+              name: sheet
+            }
+
+            addChildCallback(dwgSheetNode)
+          })
+
+        } else {
+
+          const dwgRequestNode = {
+            exportFilename: this.designName + '.dwg',
+            type: 'formats.dwg-export-sheet',
+            job: {
+              output: {
+                formats: [{
+                  type: 'dwg',
+                  guid: 0
+                }]
+              },
+              input: {urn: this.urn}
+            },
+            id: this.guid(),
+            group: true,
+            name: 'Request dwg exports ... '
+          }
+
+          addChildCallback(dwgRequestNode)
+        }
+
+        break
+
+      case 'formats.thumbnails-export':
+
+        if (this.manifest) {
+
+          const thumbnailDerivatives =
+            this.derivativesAPI.findDerivatives(
+              this.manifest, {role: 'thumbnail'})
+
+          thumbnailDerivatives.forEach((thumbnail) => {
+
+            const res =
+              thumbnail.resolution[0]
+              + 'x' +
+              thumbnail.resolution[1]
+
+            const thumbnailNode = {
+              exportFilename: this.designName + '-' + res + '.png',
+              type: 'formats.thumbnail-export',
+              query: {guid: thumbnail.guid},
+              id: this.guid(),
+              urn: this.urn,
+              group: true,
+              name: res
+            }
+
+            addChildCallback(thumbnailNode)
+          })
+        }
+
+        break
+
+      case 'formats.svf-export':
+
+        if (this.manifest) {
+
+          const derivatives =
+            this.derivativesAPI.findDerivatives(
+              this.manifest, { type: 'geometry' })
+
+          if(derivatives.length > 0) {
+
+            node.parent.classList.add('derivated')
+
+            node.derivative = derivatives[0]
+          }
+        }
+
+        break
+
+      default:
+
+        node.createDownloader()
+
+        if (this.manifest) {
+
+          const derivatives =
+            this.derivativesAPI.findDerivatives(
+              this.manifest, node.query)
+
+          if(derivatives.length > 0) {
+
+            node.parent.classList.add('derivated')
+
+            node.derivative = derivatives[0]
+          }
+        }
 
         break
     }
