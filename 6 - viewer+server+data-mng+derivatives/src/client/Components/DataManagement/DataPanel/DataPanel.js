@@ -3,16 +3,16 @@
 // by Philippe Leefsma, September 2016
 //
 /////////////////////////////////////////////////////////////////////
-import ContextMenu from './DataManagement.ContextMenu'
 import { BaseTreeDelegate, TreeNode } from 'TreeView'
 import {API as DerivativesAPI} from 'Derivatives'
-import DMAPI from './DataManagement.API'
+import ContextMenu from './ContextMenu'
 import UIComponent from 'UIComponent'
 import TabManager from 'TabManager'
 import Dropzone from 'dropzone'
-import './DataManagement.css'
+import DMAPI from '../API'
+import './DataPanel.scss'
 
-export default class DataManagementPanel extends UIComponent {
+export default class DataPanel extends UIComponent {
 
   constructor () {
 
@@ -32,6 +32,13 @@ export default class DataManagementPanel extends UIComponent {
 
       this.onNodeIconClick (node)
     }
+
+    this.onNodeVersionsClickHandler = (node) => {
+
+      this.onNodeVersionsClick (node)
+    }
+
+    this.treeMap = {}
   }
 
   ///////////////////////////////////////////////////////////////////
@@ -111,10 +118,10 @@ export default class DataManagementPanel extends UIComponent {
 
         data.node.showLoader(true)
 
-        var version = data.node.versions[ data.node.versions.length - 1 ]
+        var version = data.node.activeVersion
 
         let input = {
-          urn: this.getLastVersionURN(data.node)
+          urn: this.getVersionURN(version)
         }
 
         const output = {
@@ -163,7 +170,7 @@ export default class DataManagementPanel extends UIComponent {
 
     this.contextMenu.on('context.viewable.delete', (data) => {
 
-      let urn = this.getLastVersionURN(data.node)
+      let urn = this.getVersionURN(data.node.activeVersion)
 
       data.node.showLoader(true)
 
@@ -195,11 +202,9 @@ export default class DataManagementPanel extends UIComponent {
   //
   //
   ///////////////////////////////////////////////////////////////////
-  getLastVersionURN (node) {
+  getVersionURN (version) {
 
-    var version = node.versions[ node.versions.length - 1 ]
-
-    if(version.relationships.storage) {
+    if (version.relationships.storage) {
 
       var urn = window.btoa(
         version.relationships.storage.data.id)
@@ -218,53 +223,59 @@ export default class DataManagementPanel extends UIComponent {
   ///////////////////////////////////////////////////////////////////
   onCreateItemNode (tree, data) {
 
-      let { parent, item, version } = data
+    let { parent, item, version } = data
 
-      let node = tree.nodeIdToNode[item.id]
+    let node = tree.nodeIdToNode[item.id]
 
-      if (!node) {
+    if (!node) {
 
-        node = new TreeNode({
-          name: item.attributes.displayName,
-          projectId: parent.projectId,
-          folderId: parent.folderId,
-          hubId: parent.hubId,
-          type: item.type,
-          itemId: item.id,
-          details: item,
-          tooltip: true,
-          id: item.id,
-          group: true
-        })
+      node = new TreeNode({
+        name: item.attributes.displayName,
+        projectId: parent.projectId,
+        folderId: parent.folderId,
+        hubId: parent.hubId,
+        type: item.type,
+        itemId: item.id,
+        details: item,
+        tooltip: true,
+        id: item.id,
+        group: true
+      })
 
-        this.dmAPI.getVersions(
-          node.projectId, node.id).then((versions) => {
+      this.dmAPI.getVersions(
+        node.projectId, node.id).then((versions) => {
 
-            node.versions = versions.data
+          node.versions = versions.data
 
-            if(!node.name) {
+          if (node.versions.length) {
+
+            node.activeVersion = node.versions[0]
+
+            if (!node.name) {
 
               // fix for BIM Docs - displayName doesn't appear in item
-              node.name = node.versions[
-                node.versions.length-1].attributes.displayName
+              node.name = node.activeVersion.attributes.displayName
             }
+          }
 
-            parent.addChild(node)
+          parent.addChild(node)
 
-            node.showLoader(true)
+          node.showLoader(true)
 
-            this.onItemNodeAdded(node)
-          })
+          this.onItemNodeAdded(node)
+        })
 
-      } else {
+    } else {
 
-        if(node.versions) {
+      if (node.versions) {
 
-          node.versions.push(version)
-        }
+        node.versions.unshift(version)
+
+        node.activeVersion = version
       }
+    }
 
-      return node
+    return node
   }
 
   ///////////////////////////////////////////////////////////////////
@@ -273,7 +284,7 @@ export default class DataManagementPanel extends UIComponent {
   ///////////////////////////////////////////////////////////////////
   onItemNodeAdded (node) {
 
-    var version = node.versions[ node.versions.length - 1 ]
+    var version = node.activeVersion
 
     if (!version.relationships.storage) {
 
@@ -286,7 +297,7 @@ export default class DataManagementPanel extends UIComponent {
       return
     }
 
-    var urn = this.getLastVersionURN(node)
+    var urn = this.getVersionURN(version)
 
     this.derivativesAPI.getManifest(
       urn).then((manifest) => {
@@ -294,7 +305,7 @@ export default class DataManagementPanel extends UIComponent {
         node.manifest = manifest
 
         if (manifest.status   === 'success' &&
-          manifest.progress === 'complete') {
+            manifest.progress === 'complete') {
 
           if (this.derivativesAPI.hasDerivative(
               manifest, { type: 'geometry'})) {
@@ -355,7 +366,7 @@ export default class DataManagementPanel extends UIComponent {
 
         node.showLoader(true)
 
-        this.emit('loadItem', node).then(() => {
+        this.emit('loadVersion', node.activeVersion).then(() => {
 
           node.showLoader(false)
 
@@ -384,6 +395,18 @@ export default class DataManagementPanel extends UIComponent {
     }
   }
 
+  ///////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////
+  onNodeVersionsClick (node) {
+
+    this.emit('loadItemDetails', node).then(() => {
+
+      node.showLoader(false)
+    })
+  }
+
   /////////////////////////////////////////////////////////////
   //
   //
@@ -394,7 +417,7 @@ export default class DataManagementPanel extends UIComponent {
 
     hubs.data.forEach((hub) => {
 
-      let treeContainerId = guid()
+      let treeContainerId = this.guid()
 
       this.TabManager.addTab({
         name: 'Hub: ' + hub.attributes.name,
@@ -435,7 +458,7 @@ export default class DataManagementPanel extends UIComponent {
       console.log('Hub Loaded: ' + rootNode.name)
     })
 
-    let tree = new Autodesk.Viewing.UI.Tree(
+    const tree = new Autodesk.Viewing.UI.Tree(
       delegate, rootNode, treeContainer, {
         excludeRoot: false,
         localize: true
@@ -451,6 +474,11 @@ export default class DataManagementPanel extends UIComponent {
 
     delegate.on('node.iconClick',
       this.onNodeIconClickHandler)
+
+    delegate.on('node.versionsClick',
+      this.onNodeVersionsClickHandler)
+
+    this.treeMap[hub.id] = tree
   }
 }
 
@@ -495,7 +523,7 @@ class DMTreeDelegate extends BaseTreeDelegate {
   /////////////////////////////////////////////////////////////
   createTreeNode (node, parent, options = {}) {
 
-    parent.id = guid()
+    parent.id = this.guid()
 
     node.parent = parent
 
@@ -508,7 +536,7 @@ class DMTreeDelegate extends BaseTreeDelegate {
       text = Autodesk.Viewing.i18n.translate(text)
     }
 
-    let labelId = guid()
+    let labelId = this.guid()
 
     if (node.tooltip) {
 
@@ -519,7 +547,7 @@ class DMTreeDelegate extends BaseTreeDelegate {
               ${options && options.localize?"data-i18n=" + text : ''}
                 data-placement="right"
                 data-toggle="tooltip"
-                data-delay='{"show":"1000", "hide":"100"}'
+                data-delay='{"show":"800", "hide":"100"}'
                 title="loading item ...">
               ${text}
             </label>
@@ -566,7 +594,7 @@ class DMTreeDelegate extends BaseTreeDelegate {
           <button" class="btn c${parent.id}"
               data-placement="right"
               data-toggle="tooltip"
-              data-delay='{"show":"1000", "hide":"100"}'
+              data-delay='{"show":"800", "hide":"100"}'
               title="Upload files to that folder">
             <span class="glyphicon glyphicon-cloud-upload">
             </span>
@@ -589,7 +617,7 @@ class DMTreeDelegate extends BaseTreeDelegate {
         autoQueue: true,
         init: function() {
 
-          let dropzone = this
+          const dropzone = this
 
           dropzone.on('dragenter', () => {
             $(parent).addClass('drop-target')
@@ -636,23 +664,29 @@ class DMTreeDelegate extends BaseTreeDelegate {
 
     } else if(node.type === 'items') {
 
-      if(node.versions) {
+      $(parent).find('icon').attr({
+        'data-delay':'{"show":"800", "hide":"100"}',
+        'title':'Show model derivatives',
+        'data-placement':'right',
+        'data-toggle':'tooltip'
+      })
 
-        // access latest item version by default
-        let version = node.versions[ node.versions.length - 1 ]
+      if (node.activeVersion) {
+
+        const version = node.activeVersion
 
         // checks if storage available
         if (version.relationships.storage) {
 
           // creates download button
-          let downloadId = guid()
+          const downloadId = this.guid()
 
           $(parent).find('icon').before(`
             <div class="cloud-download">
                 <button" id="${downloadId}" class="btn c${parent.id}"
                   data-placement="right"
                   data-toggle="tooltip"
-                  data-delay='{"show":"1000", "hide":"100"}'
+                  data-delay='{"show":"800", "hide":"100"}'
                   title="Download ${version.attributes.displayName}">
                 <span class="glyphicon glyphicon-cloud-download">
                 </span>
@@ -668,6 +702,26 @@ class DMTreeDelegate extends BaseTreeDelegate {
             this.dmAPI.download(version)
           })
         }
+
+        const itemBtnId = this.guid()
+
+        $(parent).find('icon').before(`
+            <div class="item-details-icon" id="${itemBtnId}">
+                <span class="fa fa-clock-o item-details-span"
+                  data-placement="right"
+                  data-toggle="tooltip"
+                  data-delay='{"show":"800", "hide":"100"}'
+                  title="Show item versions">
+                </span>
+            </div>
+          `)
+
+        $(`#${itemBtnId}`).click(() => {
+
+          node.showLoader(true)
+
+          this.emit('node.versionsClick', node)
+        })
       }
     }
 
@@ -681,7 +735,7 @@ class DMTreeDelegate extends BaseTreeDelegate {
       $(parent).parent().addClass('collapsed')
     }
 
-    let loadDivId = guid()
+    const loadDivId = this.guid()
 
     node.showLoader = (show, timeout = 0) => {
 
@@ -780,8 +834,8 @@ class DMTreeDelegate extends BaseTreeDelegate {
                       details: project,
                       folderId: rootId,
                       hubId: node.id,
-                      id: project.id,
-                      group: true
+                      group: true,
+                      id: rootId
                     })
 
                     child.on('childrenLoaded', (children) => {
@@ -853,12 +907,12 @@ class DMTreeDelegate extends BaseTreeDelegate {
             node.children = []
 
             this.dmAPI.getProject(
-              node.hubId, node.id).then((project) => {
+              node.hubId, node.projectId).then((project) => {
 
                 const rootId = project.data.relationships.rootFolder.data.id
 
                 this.dmAPI.getFolderContent(
-                  node.id, rootId).then((folderItemsRes) => {
+                  node.projectId, rootId).then((folderItemsRes) => {
 
                     const folderItems = _.sortBy(folderItemsRes.data,
                       (folderItem) => {
@@ -881,10 +935,10 @@ class DMTreeDelegate extends BaseTreeDelegate {
 
                           let child = new TreeNode({
                             name: folderItem.attributes.displayName,
+                            projectId: node.projectId,
                             folderId: folderItem.id,
                             type: folderItem.type,
                             details: folderItem,
-                            projectId: node.id,
                             hubId: node.hubId,
                             id: folderItem.id,
                             group: true
@@ -967,7 +1021,7 @@ class DMTreeDelegate extends BaseTreeDelegate {
             node.children = []
 
             this.dmAPI.getFolderContent(
-              node.projectId, node.id).then((folderItems) => {
+              node.projectId, node.folderId).then((folderItems) => {
 
                 let folderItemTasks = folderItems.data.map((folderItem) => {
 
@@ -1051,21 +1105,6 @@ class DMTreeDelegate extends BaseTreeDelegate {
       item
     })
   }
-}
-
-function guid(format = 'xxxxxxxxxx') {
-
-  let d = new Date().getTime()
-
-  let guid = format.replace(
-    /[xy]/g,
-    function (c) {
-      let r = (d + Math.random() * 16) % 16 | 0
-      d = Math.floor(d / 16)
-      return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16)
-    })
-
-  return guid
 }
 
 

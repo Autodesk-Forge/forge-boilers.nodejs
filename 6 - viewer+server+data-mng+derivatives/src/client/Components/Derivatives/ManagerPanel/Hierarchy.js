@@ -45,6 +45,16 @@ export class HierarchyTreeDelegate
     }
 
     label.textContent = text;
+
+    node.expand = () => {
+      $(parent).parent().removeClass('collapsed')
+      $(parent).parent().addClass('expanded')
+    }
+
+    node.collapse = () => {
+      $(parent).parent().removeClass('expanded')
+      $(parent).parent().addClass('collapsed')
+    }
   }
 
   /////////////////////////////////////////////////////////////
@@ -93,6 +103,8 @@ export class HierarchyTreeDelegate
             }
 
             addChildCallback(objectNode)
+
+            objectNode.collapse()
           })
         }
 

@@ -234,6 +234,11 @@ class ModelTransformerExtension extends ExtensionBase {
       this.applyTransform(data.model)
 
       this._viewer.impl.sceneUpdated(true)
+
+      if (data.fitToView) {
+
+        this.fitModelToView(data.model)
+      }
     })
 
     this.panel.on('model.delete', (data) => {

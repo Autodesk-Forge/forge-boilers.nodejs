@@ -41,7 +41,7 @@ export default class DMSvc extends BaseSvc {
   /////////////////////////////////////////////////////////////////
   getUser (token) {
 
-    let url = 'https://developer.api.autodesk.com' +
+    const url = 'https://developer.api.autodesk.com' +
       '/userprofile/v1/users/@me'
 
     return requestAsync({
@@ -116,7 +116,7 @@ export default class DMSvc extends BaseSvc {
 
     this._APIAuth.accessToken = token
 
-    let payload = createStoragePayload (
+    const payload = this.createStoragePayload (
       folderId, filename)
 
     return this._projectsAPI.postStorage(
@@ -132,7 +132,7 @@ export default class DMSvc extends BaseSvc {
 
     this._APIAuth.accessToken = token
 
-    let payload = createItemPayload(
+    const payload = this.createItemPayload(
       folderId, objectId, filename)
 
     return this._projectsAPI.postItem(
@@ -148,11 +148,40 @@ export default class DMSvc extends BaseSvc {
 
     this._APIAuth.accessToken = token
 
-    let payload = createVersionPayload(
+    const payload = this.createVersionPayload(
       itemId, objectId, filename)
 
     return this._projectsAPI.postVersion(
       projectId, JSON.stringify(payload))
+  }
+
+  /////////////////////////////////////////////////////////////////
+  // Get Version relationship references
+  //
+  /////////////////////////////////////////////////////////////////
+  getVersionRelationshipsRefs (
+    token, projectId, versionId, opts = {}) {
+
+    this._APIAuth.accessToken = token
+
+    return this._versionsAPI.getVersionRelationshipsRefs(
+      projectId, versionId, opts)
+  }
+
+  /////////////////////////////////////////////////////////////////
+  // Create Version relationship reference
+  //
+  /////////////////////////////////////////////////////////////////
+  createVersionRelationshipRef (
+    token, projectId, targetVersionId, refVersionId, opts = {}) {
+
+    this._APIAuth.accessToken = token
+
+    const payload = this.createRelationshipRefPayload(
+      refVersionId)
+
+    return this._versionsAPI.postVersionRelationshipsRef(
+      projectId, targetVersionId, payload, opts)
   }
 
   /////////////////////////////////////////////////////////////////
@@ -299,62 +328,21 @@ export default class DMSvc extends BaseSvc {
       }
     })
   }
-}
 
-/////////////////////////////////////////////////////////////////
-// Creates storage payload
-//
-/////////////////////////////////////////////////////////////////
-function createStoragePayload (folderId, filename) {
+  /////////////////////////////////////////////////////////////////
+  // Creates storage payload
+  //
+  /////////////////////////////////////////////////////////////////
+  createStoragePayload (folderId, filename) {
 
-  return {
-    data: {
-      type: 'objects',
-      attributes: {
-        name: filename
-      },
-      relationships: {
-        target: {
-          data: {
-            type: 'folders',
-            id: folderId
-          }
-        }
-      }
-    }
-  }
-}
-
-/////////////////////////////////////////////////////////////////
-// Creates item payload
-//
-/////////////////////////////////////////////////////////////////
-function createItemPayload (
-  folderId, objectId, filename, displayName = null) {
-  
-  return {
-  
-    jsonapi: {
-      version: '1.0'
-    },
-    data: [
-      {
-        type: 'items',
+    return {
+      data: {
+        type: 'objects',
         attributes: {
-          name: filename,
-          extension: {
-            type: 'items:autodesk.core:File',
-            version: '1.0'
-          }
+          name: filename
         },
         relationships: {
-          tip: {
-            data: {
-              type: 'versions',
-              id: '1'
-            }
-          },
-          parent: {
+          target: {
             data: {
               type: 'folders',
               id: folderId
@@ -362,8 +350,48 @@ function createItemPayload (
           }
         }
       }
-    ],
-    included: [ {
+    }
+  }
+
+  /////////////////////////////////////////////////////////////////
+  // Creates item payload
+  //
+  /////////////////////////////////////////////////////////////////
+  createItemPayload (
+    folderId, objectId, filename, displayName = null) {
+
+    return {
+
+      jsonapi: {
+        version: '1.0'
+      },
+      data: [
+        {
+          type: 'items',
+          attributes: {
+            name: filename,
+            extension: {
+              type: 'items:autodesk.core:File',
+              version: '1.0'
+            }
+          },
+          relationships: {
+            tip: {
+              data: {
+                type: 'versions',
+                id: '1'
+              }
+            },
+            parent: {
+              data: {
+                type: 'folders',
+                id: folderId
+              }
+            }
+          }
+        }
+      ],
+      included: [ {
         type: 'versions',
         id: '1',
         attributes: {
@@ -378,42 +406,68 @@ function createItemPayload (
           }
         }
       }
-    ]
+      ]
+    }
   }
-}
 
-/////////////////////////////////////////////////////////////////
-// Creates version payload
-//
-/////////////////////////////////////////////////////////////////
-function createVersionPayload (
-  itemId, objectId, filename) {
+  /////////////////////////////////////////////////////////////////
+  // Creates version payload
+  //
+  /////////////////////////////////////////////////////////////////
+  createVersionPayload (
+    itemId, objectId, filename) {
 
-  return {
+    return {
 
-    jsonapi: {
-      version: '1.0'
-    },
-    data: {
-      type: 'versions',
-      attributes: {
-        name: filename,
-        extension: {
-          type: 'versions:autodesk.core:File',
-          version: '1.0'
-        }
+      jsonapi: {
+        version: '1.0'
       },
-      relationships: {
-        item: {
-          data: {
-            type: 'items',
-            id: itemId
+      data: {
+        type: 'versions',
+        attributes: {
+          name: filename,
+          extension: {
+            type: 'versions:autodesk.core:File',
+            version: '1.0'
           }
         },
-        storage: {
-          data: {
-            type: 'objects',
-            id: objectId
+        relationships: {
+          item: {
+            data: {
+              type: 'items',
+              id: itemId
+            }
+          },
+          storage: {
+            data: {
+              type: 'objects',
+              id: objectId
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /////////////////////////////////////////////////////////////////
+  // Creates relationship payload
+  //
+  /////////////////////////////////////////////////////////////////
+  createRelationshipRefPayload (
+    refVersionId) {
+
+    return {
+
+      jsonapi: {
+        version: '1.0'
+      },
+      data: {
+        type: 'versions',
+          id: refVersionId,
+          meta: {
+          extension: {
+            type: 'auxiliary:autodesk.core:Attachment',
+            version: '1.0'
           }
         }
       }

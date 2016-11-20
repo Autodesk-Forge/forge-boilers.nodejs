@@ -16,7 +16,6 @@
 // UNINTERRUPTED OR ERROR FREE.
 /////////////////////////////////////////////////////////////////////
 import ModelTransformerExtension from 'Viewing.Extension.ModelTransformer'
-import DMPanel from 'Components/DataManagement/DataManagement.Panel'
 import {ManagerPanel as DerivativesManagerPanel} from 'Derivatives'
 import ViewerPanel from 'Components/Viewer/Viewer.Panel'
 import ServiceManager from 'Services/SvcManager'
@@ -24,6 +23,8 @@ import {clientConfig as config} from 'c0nfig'
 import 'jquery-ui/themes/base/resizable.css'
 import ToolPanelModal from 'ToolPanelModal'
 import SocketSvc from 'Services/SocketSvc'
+import {DataPanel} from 'DataManagement'
+import {ItemPanel} from 'DataManagement'
 import 'jquery-ui/ui/widgets/resizable'
 import 'font-awesome-webpack'
 import 'bootstrap-webpack'
@@ -39,7 +40,9 @@ export default class App {
     this.viewerPanel = new ViewerPanel(
       config.forge.token3LeggedUrl)
 
-    this.dmPanel = new DMPanel()
+    this.dataPanel = new DataPanel()
+
+    this.itemPanel = new ItemPanel()
 
     this.$toggleDM = $('#dm-toggle')
 
@@ -209,6 +212,7 @@ export default class App {
             this.panelContainers = {
               derivatives: document.getElementById('derivatives-panel'),
               viewer: document.getElementById('viewer-panel'),
+              item: document.getElementById('item-panel'),
               app: document.getElementById('app-panel'),
               dm: document.getElementById('dm-panel')
             }
@@ -218,19 +222,58 @@ export default class App {
               this.panelContainers.app,
               this.panelContainers.viewer)
 
-            this.dmPanel.initialize(
+            this.itemPanel.initialize(
+              this.panelContainers.item,
+              this.panelContainers.app,
+              this.panelContainers.viewer)
+
+            this.itemPanel.on('setActiveVersion', (node) => {
+
+
+            })
+
+            this.itemPanel.on('loadVersion', (version) => {
+
+              return this.onLoadVersion (version)
+            })
+
+            this.itemPanel.on('itemCreated', (data) => {
+
+              const tree = this.dataPanel.treeMap[data.node.hubId]
+
+              if (tree) {
+
+                const parent = tree.nodeIdToNode[data.node.folderId]
+
+                if (parent) {
+
+                  this.dataPanel.onCreateItemNode (tree, {
+                    version: data.version,
+                    item: data.item,
+                    parent
+                  })
+                }
+              }
+            })
+
+            this.dataPanel.initialize(
               this.panelContainers.dm,
               this.panelContainers.app,
               this.panelContainers.viewer)
 
-            this.dmPanel.on('loadItem', (item) => {
+            this.dataPanel.on('loadVersion', (version) => {
 
-              return this.onLoadItem (item)
+              return this.onLoadVersion (version)
             })
 
-            this.dmPanel.on('loadDerivatives', (node) => {
+            this.dataPanel.on('loadDerivatives', (node) => {
 
               return this.onLoadDerivatives (node)
+            })
+
+            this.dataPanel.on('loadItemDetails', (node) => {
+
+              return this.onLoadItemDetails (node)
             })
 
             let socketSvc = new SocketSvc({
@@ -282,11 +325,11 @@ export default class App {
   //
   //
   ///////////////////////////////////////////////////////////////////
-  onLoadItem (item) {
+  onLoadVersion (version) {
 
     return new Promise(async(resolve, reject) => {
 
-      var version = item.versions[ item.versions.length - 1 ]
+      const name = version.attributes.displayName
 
       let urn = window.btoa(
         version.relationships.storage.data.id)
@@ -312,7 +355,7 @@ export default class App {
         ModelTransformerExtension)
 
       const placementTransform = extInstance.buildPlacementTransform(
-        item.name)
+        name)
 
       const loadOptions = {
         placementTransform
@@ -320,7 +363,7 @@ export default class App {
 
       viewer.loadModel(path, loadOptions, (model) => {
 
-        model.name = item.name
+        model.name = name
 
         resolve(model)
       })
@@ -333,11 +376,15 @@ export default class App {
   ///////////////////////////////////////////////////////////////////
   onLoadDerivatives (node) {
 
+    $('.derivatives-panel').css('display', 'block')
+    $('.item-panel').css('display', 'none')
+
     return new Promise((resolve, reject) => {
 
-      const urn = this.dmPanel.getLastVersionURN(node)
+      const urn = this.dataPanel.getVersionURN(node.activeVersion)
 
-      $('#model-name').text(node.name)
+      $('#item-title').text('Model Derivatives: ')
+      $('#item-name').text(node.name)
 
       this.derivativesPanel.off()
 
@@ -347,6 +394,27 @@ export default class App {
       })
 
       this.derivativesPanel.load(urn, node.name).then(() => {
+
+        resolve()
+      })
+    })
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////
+  onLoadItemDetails (node) {
+
+    $('.derivatives-panel').css('display', 'none')
+    $('.item-panel').css('display', 'block')
+
+    return new Promise((resolve) => {
+
+      $('#item-title').text('Item: ')
+      $('#item-name').text(node.name)
+
+      this.itemPanel.load(node).then(() => {
 
         resolve()
       })
@@ -377,7 +445,7 @@ export default class App {
 
     this.viewerPanel.onResize()
 
-    this.dmPanel.loadData()
+    this.dataPanel.loadData()
   }
 
   ///////////////////////////////////////////////////////////////////
@@ -395,7 +463,7 @@ export default class App {
         display: 'none'
       })
 
-      this.dmPanel.clear()
+      this.dataPanel.clear()
 
       this.viewerPanel.onResize()
 

@@ -18,7 +18,7 @@ export default class DataManagementAPI extends ClientAPI {
   ///////////////////////////////////////////////////////////////////
   getHubs () {
 
-    var url = `${this.apiUrl}/hubs`
+    const url = `${this.apiUrl}/hubs`
 
     return this.ajax(url)
   }
@@ -29,7 +29,7 @@ export default class DataManagementAPI extends ClientAPI {
   ///////////////////////////////////////////////////////////////////
   getProjects (hubId) {
 
-    var url = `${this.apiUrl}/hubs/${hubId}/projects`
+    const url = `${this.apiUrl}/hubs/${hubId}/projects`
 
     return this.ajax(url)
   }
@@ -40,7 +40,7 @@ export default class DataManagementAPI extends ClientAPI {
   ///////////////////////////////////////////////////////////////////
   getProject (hubId, projectId) {
 
-    var url = `${this.apiUrl}/hubs/${hubId}/projects/${projectId}`
+    const url = `${this.apiUrl}/hubs/${hubId}/projects/${projectId}`
 
     return this.ajax(url)
   }
@@ -51,7 +51,20 @@ export default class DataManagementAPI extends ClientAPI {
   ///////////////////////////////////////////////////////////////////
   getFolderContent (projectId, folderId) {
 
-    var url = `${this.apiUrl}/projects/${projectId}/folders/${folderId}`
+    const url = `${this.apiUrl}/projects/${projectId}` +
+      `/folders/${folderId}`
+
+    return this.ajax(url)
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  // GET /projects/:projectId/folders/:folderId
+  //
+  ///////////////////////////////////////////////////////////////////
+  getItem (projectId, folderId, itemId) {
+    
+    const url = `${this.apiUrl}/projects/${projectId}/folders/` +
+      `${folderId}/items/${itemId}`
 
     return this.ajax(url)
   }
@@ -62,9 +75,44 @@ export default class DataManagementAPI extends ClientAPI {
   ///////////////////////////////////////////////////////////////////
   getVersions (projectId, itemId) {
 
-    var url = `${this.apiUrl}/projects/${projectId}/items/${itemId}/versions`
+    const url = `${this.apiUrl}/projects/${projectId}/items/` +
+      `${itemId}/versions`
 
     return this.ajax(url)
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  // GET /projects/:projectId/versions/:versionId/relationships/refs
+  //
+  ///////////////////////////////////////////////////////////////////
+  getVersionRelationshipsRefs (projectId, versionId) {
+
+    const url = `${this.apiUrl}/projects/${projectId}/versions/` +
+      `${encodeURIComponent(versionId)}/relationships/refs`
+
+    return this.ajax(url)
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  // POST /projects/:projectId/versions/:versionId/relationships
+  //
+  ///////////////////////////////////////////////////////////////////
+  postVersionRelationshipRef (projectId, versionId, refVersionId) {
+
+    const url = `${this.apiUrl}/projects/${projectId}/versions/` +
+      `${encodeURIComponent(versionId)}/relationships/refs`
+
+    const data = {
+      payload: JSON.stringify({
+        refVersionId
+      })
+    }
+
+    return this.ajax({
+      type: 'POST',
+      data,
+      url
+    })
   }
 
   ///////////////////////////////////////////////////////////////////

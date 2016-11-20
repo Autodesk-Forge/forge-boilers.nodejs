@@ -65,7 +65,7 @@ export class ExportsTreeDelegate
 
     $(parent).append(label)
 
-    node.createDownloader = () => {
+    node.createDownloader = (filename) => {
 
       const downloadId = this.guid()
 
@@ -75,7 +75,7 @@ export class ExportsTreeDelegate
                 data-placement="right"
                 data-toggle="tooltip"
                 data-delay='{"show":"1000", "hide":"100"}'
-                title="Download ${node.objectKey}">
+                title="Download ${filename}">
               <span class="glyphicon glyphicon-cloud-download">
               </span>
             </button>
@@ -269,8 +269,8 @@ export class ExportsTreeDelegate
 
             const dwgSheetNode = {
               type: 'formats.dwg-export-sheet',
-              exportFilename: sheet + '.dwg',
               query: { guid: dwg.guid },
+              exportFilename: sheet,
               id: this.guid(),
               urn: this.urn,
               group: true,
@@ -283,7 +283,6 @@ export class ExportsTreeDelegate
         } else {
 
           const dwgRequestNode = {
-            exportFilename: this.designName + '.dwg',
             type: 'formats.dwg-export-sheet',
             job: {
               output: {
@@ -316,17 +315,21 @@ export class ExportsTreeDelegate
 
             const res =
               thumbnail.resolution[0]
-              + 'x' +
+              + ' x ' +
               thumbnail.resolution[1]
 
+            const name =
+              (thumbnail.parent.name || this.designName) +
+                ' - ' + res
+
             const thumbnailNode = {
-              exportFilename: this.designName + '-' + res + '.png',
               type: 'formats.thumbnail-export',
               query: {guid: thumbnail.guid},
+              exportFilename: name + '.png',
               id: this.guid(),
               urn: this.urn,
               group: true,
-              name: res
+              name: name
             }
 
             addChildCallback(thumbnailNode)
@@ -355,7 +358,7 @@ export class ExportsTreeDelegate
 
       default:
 
-        node.createDownloader()
+        node.createDownloader(node.exportFilename)
 
         if (this.manifest) {
 
@@ -373,57 +376,5 @@ export class ExportsTreeDelegate
 
         break
     }
-  }
-
-  /////////////////////////////////////////////////////////////////
-  // onDerivativeProgress
-  //
-  /////////////////////////////////////////////////////////////////
-  onDerivativeProgress (node) {
-
-    return (progress) => {
-
-      console.log(progress)
-
-      node.setProgress(progress)
-    }
-  }
-
-  /////////////////////////////////////////////////////////////////
-  // getDerivativeNodeProgress
-  //
-  /////////////////////////////////////////////////////////////////
-  getDerivativeNodeProgress (node) {
-
-    this.extension.api.getDerivativeURN(
-      node, this.onDerivativeProgress(node)).then(
-      (derivativeResult) => {
-
-        console.log('derivativeResult')
-        console.log(derivativeResult)
-
-        node.derivativeResult = derivativeResult
-
-        if(derivativeResult.status === 'not found') {
-
-          node.setProgress('0%')
-
-        } else {
-
-          node.setProgress('100%')
-        }
-
-      }, (error) => {
-
-        console.log('derivativeResult ERROR')
-        console.log(error)
-
-        node.setProgress('0%')
-
-        if(error.status === 'failed') {
-
-          node.setProgress('failed')
-        }
-      })
   }
 }

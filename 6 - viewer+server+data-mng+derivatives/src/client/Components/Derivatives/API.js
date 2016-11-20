@@ -148,22 +148,38 @@ export default class DerivativesAPI extends ClientAPI {
   //
   //
   ///////////////////////////////////////////////////////////////////
-  getProperties (urn, guid) {
+  async getProperties (urn, guid, retry = 3) {
 
     const url = `${this.apiUrl}/properties/${urn}/${guid}`
 
-    return this.ajax(url)
+    let res = null
+
+    do {
+
+      res = await this.ajax(url)
+
+    } while (retry-- && (!res || !res.data))
+
+    return res
   }
 
   ///////////////////////////////////////////////////////////////////
   //
   //
   ///////////////////////////////////////////////////////////////////
-  getHierarchy (urn, guid) {
+  async getHierarchy (urn, guid, retry = 3) {
 
     const url = `${this.apiUrl}/hierarchy/${urn}/${guid}`
 
-    return this.ajax(url)
+    let res = null
+
+    do {
+
+      res = await this.ajax(url)
+
+    } while (retry-- && (!res || !res.data))
+
+    return res
   }
 
   ///////////////////////////////////////////////////////////////////
@@ -198,6 +214,11 @@ export default class DerivativesAPI extends ClientAPI {
   //
   ///////////////////////////////////////////////////////////////////
   findDerivatives (parent, query) {
+
+    if(!parent) {
+      
+      return []
+    }
 
     const derivatives = parent.derivatives || parent.children
 

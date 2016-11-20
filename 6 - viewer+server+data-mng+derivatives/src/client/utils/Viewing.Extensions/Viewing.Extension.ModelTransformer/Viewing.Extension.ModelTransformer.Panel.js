@@ -48,7 +48,7 @@ export default class ModelTransformerPanel extends ToolPanelBase {
       }
     })
 
-    var applyTransform = (model) => {
+    var applyTransform = (model, fitToView = false) => {
 
       this.txTool.clearSelection()
       this.rxTool.clearSelection()
@@ -58,6 +58,8 @@ export default class ModelTransformerPanel extends ToolPanelBase {
         this.emit('model.transform', {
 
           model: model,
+
+          fitToView,
 
           transform: {
             translation: this.getTranslation(),
@@ -213,7 +215,7 @@ export default class ModelTransformerPanel extends ToolPanelBase {
       $(`#${this.container.id}-Sy`).val(scale)
       $(`#${this.container.id}-Sz`).val(scale)
 
-      applyTransform(this.currentModel)
+      applyTransform(this.currentModel, true)
     })
 
     $('#' + this.transPickBtnId).click(() => {

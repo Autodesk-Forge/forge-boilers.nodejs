@@ -128,6 +128,7 @@ export default class DerivativesManagerPanel extends UIComponent {
         this.hierarchy = hierarchy.data
 
         this.loadHierarchy(
+          urn,
           this.hierarchy,
           this.properties)
       }
@@ -139,15 +140,16 @@ export default class DerivativesManagerPanel extends UIComponent {
       this.loadManifest(
         this.manifest)
 
-      this.loadHierarchy(
-        this.hierarchy,
-        this.properties)
-
       this.loadExports(
         this.urn,
         this.designName,
         this.manifest,
         this.modelGuid)
+
+      this.loadHierarchy(
+        urn,
+        this.hierarchy,
+        this.properties)
     }
   }
 
@@ -272,7 +274,12 @@ export default class DerivativesManagerPanel extends UIComponent {
   //
   //
   ///////////////////////////////////////////////////////////////////
-  loadHierarchy (hierarchy, properties) {
+  loadHierarchy (urn, hierarchy, properties) {
+
+    if (urn !== this.urn) {
+      // prevents async loading
+      return
+    }
 
     $('.hierarchy-tree').empty()
 
@@ -469,7 +476,6 @@ export default class DerivativesManagerPanel extends UIComponent {
             false)
         }
       })
-
     })
 
     const domContainer = $('.exports-tree')[0]

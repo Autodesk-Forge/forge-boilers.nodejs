@@ -105,7 +105,7 @@ export default class DataManagementContextMenu extends
 
         } else {
 
-          if(node.versions[node.versions.length-1].relationships.storage) {
+          if(node.activeVersion.relationships.storage) {
 
             menu.push({
               title: 'Generate viewable',

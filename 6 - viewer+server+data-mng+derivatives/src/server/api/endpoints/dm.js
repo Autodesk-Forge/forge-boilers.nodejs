@@ -170,7 +170,8 @@ module.exports = function() {
   // Get item details
   //
   /////////////////////////////////////////////////////////////////////////////
-  router.get('/projects/:projectId/folders/:folderId/items/:itemId', async (req, res) => {
+  router.get('/projects/:projectId/folders/:folderId/items/:itemId',
+    async (req, res) => {
 
     try {
 
@@ -191,10 +192,16 @@ module.exports = function() {
       var response = await dmSvc.getFolderContent(
         token.access_token, projectId, folderId)
 
-      res.json(response.data.filter((folderItem) => {
+      const items = response.data.filter((folderItem) => {
 
         return folderItem.id === itemId
-      }))
+      })
+
+      const item = items.length ? items[0] : null
+
+      res.status(item ? 200 : 404)
+
+      res.json(item)
 
     } catch (ex) {
 
@@ -208,7 +215,8 @@ module.exports = function() {
   // Get all item versions
   //
   /////////////////////////////////////////////////////////////////////////////
-  router.get('/projects/:projectId/items/:itemId/versions', async (req, res) => {
+  router.get('/projects/:projectId/items/:itemId/versions',
+    async (req, res) => {
 
     try {
       
@@ -217,7 +225,7 @@ module.exports = function() {
       var itemId = req.params.itemId
 
       var forgeSvc = ServiceManager.getService(
-        'ForgeSvc');
+        'ForgeSvc')
 
       var token = await forgeSvc.get3LeggedTokenMaster(
         req.session)
@@ -226,6 +234,77 @@ module.exports = function() {
 
       var response = await dmSvc.getVersions(
         token.access_token, projectId, itemId)
+
+      res.json(response)
+
+    } catch (ex) {
+
+      res.status(ex.status || 500)
+      res.json(ex)
+    }
+  })
+
+  /////////////////////////////////////////////////////////////////////////////
+  // GET /project/{projectId}/versions/{versionId}/relationships/refs
+  // Get version relationship references
+  //
+  /////////////////////////////////////////////////////////////////////////////
+  router.get('/projects/:projectId/versions/:versionId/relationships/refs',
+    async (req, res) => {
+
+    try {
+
+      var projectId = req.params.projectId
+
+      var versionId = req.params.versionId
+
+      var forgeSvc = ServiceManager.getService(
+        'ForgeSvc')
+
+      var token = await forgeSvc.get3LeggedTokenMaster(
+        req.session)
+
+      var dmSvc = ServiceManager.getService('DMSvc')
+
+      var response = await dmSvc.getVersionRelationshipsRefs(
+        token.access_token, projectId, versionId)
+
+      res.json(response)
+
+    } catch (ex) {
+
+      res.status(ex.status || 500)
+      res.json(ex)
+    }
+  })
+
+  /////////////////////////////////////////////////////////////////////////////
+  // POST /project/{projectId}/versions/{versionId}/relationships/refs
+  // Create version relationship ref
+  //
+  /////////////////////////////////////////////////////////////////////////////
+  router.post('/projects/:projectId/versions/:versionId/relationships/refs',
+    async (req, res) => {
+
+    try {
+
+      var payload = JSON.parse(req.body.payload)
+
+      var projectId = req.params.projectId
+
+      var versionId = req.params.versionId
+
+      var forgeSvc = ServiceManager.getService(
+        'ForgeSvc')
+
+      var token = await forgeSvc.get3LeggedTokenMaster(
+        req.session)
+
+      var dmSvc = ServiceManager.getService('DMSvc')
+
+      var response = await dmSvc.createVersionRelationshipRef(
+        token.access_token, projectId, versionId,
+        payload.refVersionId)
 
       res.json(response)
 
