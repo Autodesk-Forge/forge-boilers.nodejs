@@ -4,13 +4,13 @@
   height: 100%;
 }
 
-.item-details .json-view {
+.item-details .item-json-view {
   overflow: auto;
   height: 100%;
 }
 
-.item-details .json-view .string,
-.item-details .json-view .num {
+.item-details .item-json-view .string,
+.item-details .item-json-view .num {
   user-select: text;
 }
 
@@ -45,6 +45,11 @@
 .item-versions-tree .treeview header {
   width: calc(110% - 0px);
   height: 32px;
+}
+
+.item-versions-tree .treeview header.drop-target {
+  background-color: rgba(103, 168, 253, 0.31);
+  border-radius: 6px;
 }
 
 .item-versions-tree .treeview group label:hover {
@@ -131,4 +136,21 @@
 
 .item-versions .glyphicon-cloud-download {
   color: #0ecc1f
+}
+
+.item-versions .cloud-download.attachment {
+  position: relative;
+  margin-right: 6px;
+  float: left;
+  left: 5px;
+  top: 5px;
+}
+
+.item-versions .versions-attachment {
+  margin-right: 4px;
+  margin-left: 4px;
+  margin-top: 6px;
+  font-size: 20px;
+  color: #424242;
+  float: left;
 }

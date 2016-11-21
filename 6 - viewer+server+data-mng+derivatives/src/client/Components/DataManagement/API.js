@@ -73,10 +73,22 @@ export default class DataManagementAPI extends ClientAPI {
   // GET /projects/:projectId/items/:itemId/versions
   //
   ///////////////////////////////////////////////////////////////////
-  getVersions (projectId, itemId) {
+  getItemVersions (projectId, itemId) {
 
     const url = `${this.apiUrl}/projects/${projectId}/items/` +
       `${itemId}/versions`
+
+    return this.ajax(url)
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  // GET /projects/:projectId/versions/:versionId
+  //
+  ///////////////////////////////////////////////////////////////////
+  getVersion (projectId, versionId) {
+
+    const url = `${this.apiUrl}/projects/${projectId}/versions/` +
+      `${encodeURIComponent(versionId)}`
 
     return this.ajax(url)
   }

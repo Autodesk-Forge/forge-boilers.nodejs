@@ -100,12 +100,24 @@ export default class DMSvc extends BaseSvc {
   // Returns Versions for specific Item
   //
   /////////////////////////////////////////////////////////////////
-  getVersions (token, projectId, itemId, opts = {}) {
+  getItemVersions (token, projectId, itemId, opts = {}) {
 
     this._APIAuth.accessToken = token
 
     return this._itemsAPI.getItemVersions(
       projectId, itemId, opts)
+  }
+
+  /////////////////////////////////////////////////////////////////
+  // Returns Version for specific versionId
+  //
+  /////////////////////////////////////////////////////////////////
+  getVersion (token, projectId, versionId) {
+
+    this._APIAuth.accessToken = token
+
+    return this._versionsAPI.getVersion(
+      projectId, versionId)
   }
 
   /////////////////////////////////////////////////////////////////
@@ -173,7 +185,7 @@ export default class DMSvc extends BaseSvc {
   //
   /////////////////////////////////////////////////////////////////
   createVersionRelationshipRef (
-    token, projectId, targetVersionId, refVersionId, opts = {}) {
+    token, projectId, targetVersionId, refVersionId) {
 
     this._APIAuth.accessToken = token
 
@@ -181,7 +193,7 @@ export default class DMSvc extends BaseSvc {
       refVersionId)
 
     return this._versionsAPI.postVersionRelationshipsRef(
-      projectId, targetVersionId, payload, opts)
+      projectId, targetVersionId, JSON.stringify(payload))
   }
 
   /////////////////////////////////////////////////////////////////

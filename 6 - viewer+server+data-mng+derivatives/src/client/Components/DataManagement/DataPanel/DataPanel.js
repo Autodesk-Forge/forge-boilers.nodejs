@@ -98,20 +98,6 @@ export default class DataPanel extends UIComponent {
       }
     })
 
-    this.contextMenu.on('context.versions', (data) => {
-
-      if(data.node.versions) {
-
-        console.log({
-          versions: data.node.versions
-        })
-
-        this.showPayload(
-          `api/dm/projects/${data.node.projectId}/items/` +
-            `${data.node.itemId}/versions`)
-      }
-    })
-
     this.contextMenu.on('context.viewable.create', async(data) => {
 
       try {
@@ -242,7 +228,7 @@ export default class DataPanel extends UIComponent {
         group: true
       })
 
-      this.dmAPI.getVersions(
+      this.dmAPI.getItemVersions(
         node.projectId, node.id).then((versions) => {
 
           node.versions = versions.data
@@ -1037,7 +1023,7 @@ class DMTreeDelegate extends BaseTreeDelegate {
 
                     } else {
 
-                      let child = new TreeNode({
+                      const child = new TreeNode({
                         name: folderItem.attributes.displayName,
                         projectId: node.projectId,
                         folderId: folderItem.id,

@@ -232,8 +232,41 @@ module.exports = function() {
 
       var dmSvc = ServiceManager.getService('DMSvc')
 
-      var response = await dmSvc.getVersions(
+      var response = await dmSvc.getItemVersions(
         token.access_token, projectId, itemId)
+
+      res.json(response)
+
+    } catch (ex) {
+
+      res.status(ex.status || 500)
+      res.json(ex)
+    }
+  })
+
+  /////////////////////////////////////////////////////////////////////////////
+  // GET /projects/{projectId}/versions/{versionId}
+  // Get version by Id
+  //
+  /////////////////////////////////////////////////////////////////////////////
+  router.get('/projects/:projectId/versions/:versionId', async (req, res) => {
+
+    try {
+
+      var projectId = req.params.projectId
+
+      var versionId = req.params.versionId
+
+      var forgeSvc = ServiceManager.getService(
+        'ForgeSvc');
+
+      var token = await forgeSvc.get3LeggedTokenMaster(
+        req.session)
+
+      var dmSvc = ServiceManager.getService('DMSvc')
+
+      var response = await dmSvc.getVersion(
+        token.access_token, projectId, versionId)
 
       res.json(response)
 
