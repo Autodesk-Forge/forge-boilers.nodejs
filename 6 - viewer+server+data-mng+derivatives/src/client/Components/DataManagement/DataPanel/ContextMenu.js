@@ -1,7 +1,7 @@
 
 import EventsEmitter from 'EventsEmitter'
 
-export default class DataManagementContextMenu extends
+export default class ContextMenu extends
   EventsEmitter.Composer (Autodesk.Viewing.UI.ObjectContextMenu) {
 
   /////////////////////////////////////////////////////////////////
@@ -124,7 +124,7 @@ export default class DataManagementContextMenu extends
 
     if (menu && 0 < menu.length) {
 
-      this.contextMenu.show(event, menu);
+      this.contextMenu.show(event, menu)
     }
   }
 }

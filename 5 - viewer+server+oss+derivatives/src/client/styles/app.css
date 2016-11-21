@@ -169,7 +169,14 @@ body{
 }
 
 .menuItem {
+    border: 1px solid rgba(245, 199, 10, 0.47);
     border-radius: 4px;
+    color: #f5c70a;
+}
+
+.menuItem:hover {
+    background-color: rgb(134, 134, 134);
+    color: #f5cb05;
 }
 
 hr.about {

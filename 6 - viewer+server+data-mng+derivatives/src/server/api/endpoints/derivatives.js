@@ -263,7 +263,7 @@ module.exports = function() {
       var response = await derivativesSvc.download(
         token.access_token, urn, derivativeUrn)
 
-      res.set('Content-Type', 'application/obj')
+      res.set('Content-Type', 'application/octet-stream')
 
       res.set('Content-Disposition',
         `attachment filename="${filename}"`)

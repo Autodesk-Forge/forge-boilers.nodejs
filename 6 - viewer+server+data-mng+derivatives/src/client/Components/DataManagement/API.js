@@ -94,6 +94,18 @@ export default class DataManagementAPI extends ClientAPI {
   }
 
   ///////////////////////////////////////////////////////////////////
+  // GET /projects/:projectId/items/:itemId/relationships/refs
+  //
+  ///////////////////////////////////////////////////////////////////
+  getItemRelationshipsRefs (projectId, itemId) {
+
+    const url = `${this.apiUrl}/projects/${projectId}/items/` +
+      `${itemId}/relationships/refs`
+
+    return this.ajax(url)
+  }
+
+  ///////////////////////////////////////////////////////////////////
   // GET /projects/:projectId/versions/:versionId/relationships/refs
   //
   ///////////////////////////////////////////////////////////////////
@@ -103,6 +115,28 @@ export default class DataManagementAPI extends ClientAPI {
       `${encodeURIComponent(versionId)}/relationships/refs`
 
     return this.ajax(url)
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  // POST /projects/:projectId/items/:itemId/relationships
+  //
+  ///////////////////////////////////////////////////////////////////
+  postItemRelationshipRef (projectId, itemId, refVersionId) {
+
+    const url = `${this.apiUrl}/projects/${projectId}/items/` +
+      `${itemId}/relationships/refs`
+
+    const data = {
+      payload: JSON.stringify({
+        refVersionId
+      })
+    }
+
+    return this.ajax({
+      type: 'POST',
+      data,
+      url
+    })
   }
 
   ///////////////////////////////////////////////////////////////////

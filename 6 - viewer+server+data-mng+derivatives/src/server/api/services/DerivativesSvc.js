@@ -2,7 +2,6 @@
 import ForgeModelDerivative from 'forge-model-derivative'
 import BaseSvc from './BaseSvc'
 import request from 'request'
-import util from 'util'
 
 export default class DerivativeSvc extends BaseSvc {
 
@@ -114,12 +113,11 @@ export default class DerivativeSvc extends BaseSvc {
 
     this._APIAuth.accessToken = token
 
-    //TODO: not working?
+    //TODO SDK KO
     //return this._derivativesAPI.deleteManifest (urn)
 
-    var url = util.format(
-      `${DerivativeSvc.SERVICE_BASE_URL}/designdata/%s/manifest`,
-      urn)
+    var url = `${DerivativeSvc.SERVICE_BASE_URL}/designdata/` +
+      `${urn}/manifest`
 
     return requestAsync({
       method: 'DELETE',
@@ -135,10 +133,37 @@ export default class DerivativeSvc extends BaseSvc {
   /////////////////////////////////////////////////////////////////
   download (token, urn, derivativeURN, opts = {}) {
 
-    this._APIAuth.accessToken = token
+    // TODO SDK KO
+    //this._APIAuth.accessToken = token
+    //
+    //return this._derivativesAPI.getDerivativeManifest(
+    //  urn,
+    //  derivativeURN,
+    //  opts)
 
-    return this._derivativesAPI.getDerivativeManifest(
-      urn, derivativeURN, opts)
+    return new Promise((resolve, reject) => {
+
+      const url =
+        `${DerivativeSvc.SERVICE_BASE_URL}/designdata/` +
+        `${encodeURIComponent(urn)}/manifest/` +
+        `${encodeURIComponent(derivativeURN)}`
+
+      request({
+        url: url,
+        headers: {
+          'Authorization': 'Bearer ' + token
+        },
+        encoding: null
+      }, function(err, response, body) {
+
+        if(err) {
+
+          return reject(err)
+        }
+
+        resolve(body)
+      })
+    })
   }
 
   /////////////////////////////////////////////////////////////////
@@ -147,11 +172,12 @@ export default class DerivativeSvc extends BaseSvc {
   /////////////////////////////////////////////////////////////////
   getThumbnail (token, urn, options = {width: 100, height: 100}) {
 
-    //TODO: change to SDK code
+    //TODO: SDK KO
 
-    var url = util.format(
-      `${DerivativeSvc.SERVICE_BASE_URL}/designdata/%s/thumbnail?width=%s&height=%s`,
-      urn, options.width, options.height)
+    const url = `${DerivativeSvc.SERVICE_BASE_URL}/designdata/` +
+        `${urn}/thumbnail?` +
+        `width=${options.width}&` +
+        `height=${options.height}`
 
     return new Promise((resolve, reject) => {
 

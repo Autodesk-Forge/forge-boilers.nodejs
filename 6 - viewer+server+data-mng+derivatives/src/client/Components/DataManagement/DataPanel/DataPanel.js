@@ -228,6 +228,14 @@ export default class DataPanel extends UIComponent {
         group: true
       })
 
+      // BIM Docs items have no name :( ...
+      if (node.name) {
+
+        parent.addChild(node)
+
+        node.showLoader(true)
+      }
+
       this.dmAPI.getItemVersions(
         node.projectId, node.id).then((versions) => {
 
@@ -241,12 +249,14 @@ export default class DataPanel extends UIComponent {
 
               // fix for BIM Docs - displayName doesn't appear in item
               node.name = node.activeVersion.attributes.displayName
+
+              parent.addChild(node)
+
+              node.showLoader(true)
             }
+
+            node.addVersionControl()
           }
-
-          parent.addChild(node)
-
-          node.showLoader(true)
 
           this.onItemNodeAdded(node)
         })
@@ -657,12 +667,10 @@ class DMTreeDelegate extends BaseTreeDelegate {
         'data-toggle':'tooltip'
       })
 
-      if (node.activeVersion) {
-
-        const version = node.activeVersion
+      node.addVersionControl = () => {
 
         // checks if storage available
-        if (version.relationships.storage) {
+        if (node.activeVersion.relationships.storage) {
 
           // creates download button
           const downloadId = this.guid()
@@ -673,7 +681,7 @@ class DMTreeDelegate extends BaseTreeDelegate {
                   data-placement="right"
                   data-toggle="tooltip"
                   data-delay='{"show":"800", "hide":"100"}'
-                  title="Download ${version.attributes.displayName}">
+                  title="Download ${node.name}">
                 <span class="glyphicon glyphicon-cloud-download">
                 </span>
               </button>
@@ -685,7 +693,7 @@ class DMTreeDelegate extends BaseTreeDelegate {
             node.showLoader(true, 3000)
 
             // downloads object associated with version
-            this.dmAPI.download(version)
+            this.dmAPI.download(node.activeVersion)
           })
         }
 
@@ -905,49 +913,59 @@ class DMTreeDelegate extends BaseTreeDelegate {
                         return folderItem.attributes.displayName.toLowerCase()
                       })
 
-                    let folderItemTasks = folderItems.map((folderItem) => {
+                    const folders = folderItems.filter((folderItem) => {
+
+                      return (folderItem.type === 'folders')
+                    })
+
+                    const items = folderItems.filter((folderItem) => {
+
+                      return (folderItem.type === 'items')
+                    })
+
+                    const folderTasks = folders.map((folder) => {
 
                       return new Promise((resolve, reject) => {
 
-                        if (folderItem.type === 'items') {
+                        let child = new TreeNode({
+                          name: folder.attributes.displayName,
+                          projectId: node.projectId,
+                          folderId: folder.id,
+                          type: folder.type,
+                          hubId: node.hubId,
+                          details: folder,
+                          id: folder.id,
+                          group: true
+                        })
 
-                          var itemNode = this.createItemNode(
-                            node,
-                            folderItem)
+                        child.on('childrenLoaded', (children) => {
 
-                          resolve(itemNode)
+                          child.loadStatus = 'loaded'
 
-                        } else {
+                          child.showLoader(false)
 
-                          let child = new TreeNode({
-                            name: folderItem.attributes.displayName,
-                            projectId: node.projectId,
-                            folderId: folderItem.id,
-                            type: folderItem.type,
-                            details: folderItem,
-                            hubId: node.hubId,
-                            id: folderItem.id,
-                            group: true
-                          })
+                          resolve(child)
+                        })
 
-                          child.on('childrenLoaded', (children) => {
+                        addChildCallback(child)
 
-                            child.loadStatus = 'loaded'
+                        node.children.push(child)
 
-                            child.showLoader(false)
+                        if (loadingMode !== 'firstLevel') {
 
-                            resolve(child)
-                          })
-
-                          addChildCallback(child)
-
-                          node.children.push(child)
-
-                          if (loadingMode !== 'firstLevel') {
-
-                            child.loadChildren(loadingMode)
-                          }
+                          child.loadChildren(loadingMode)
                         }
+                      })
+                    })
+
+                    const itemTasks = items.map((item) => {
+
+                      return new Promise((resolve, reject) => {
+
+                        var itemNode = this.createItemNode(
+                          node, item)
+
+                        resolve(itemNode)
                       })
                     })
 
@@ -958,7 +976,9 @@ class DMTreeDelegate extends BaseTreeDelegate {
                       node.showLoader(false)
                     }
 
-                    Promise.all(folderItemTasks).then((children) => {
+                    const tasks = [...folderTasks, ...itemTasks]
+
+                    Promise.all(tasks).then((children) => {
 
                       node.emit('childrenLoaded', children)
                     })
@@ -1007,51 +1027,66 @@ class DMTreeDelegate extends BaseTreeDelegate {
             node.children = []
 
             this.dmAPI.getFolderContent(
-              node.projectId, node.folderId).then((folderItems) => {
+              node.projectId, node.folderId).then((folderItemsRes) => {
 
-                let folderItemTasks = folderItems.data.map((folderItem) => {
+                const folderItems = _.sortBy(folderItemsRes.data,
+                  (folderItem) => {
+                    return folderItem.attributes.displayName.toLowerCase()
+                  })
+
+                const folders = folderItems.filter((folderItem) => {
+
+                  return (folderItem.type === 'folders')
+                })
+
+                const items = folderItems.filter((folderItem) => {
+
+                  return (folderItem.type === 'items')
+                })
+
+                const folderTasks = folders.map((folder) => {
 
                   return new Promise((resolve, reject) => {
 
-                    if (folderItem.type === 'items') {
+                    let child = new TreeNode({
+                      name: folder.attributes.displayName,
+                      projectId: node.projectId,
+                      folderId: folder.id,
+                      type: folder.type,
+                      hubId: node.hubId,
+                      details: folder,
+                      id: folder.id,
+                      group: true
+                    })
 
-                      var itemNode = this.createItemNode(
-                        node,
-                        folderItem)
+                    child.on('childrenLoaded', (children) => {
 
-                      resolve(itemNode)
+                      child.loadStatus = 'loaded'
 
-                    } else {
+                      child.showLoader(false)
 
-                      const child = new TreeNode({
-                        name: folderItem.attributes.displayName,
-                        projectId: node.projectId,
-                        folderId: folderItem.id,
-                        type: folderItem.type,
-                        details: folderItem,
-                        hubId: node.hubId,
-                        id: folderItem.id,
-                        group: true
-                      })
+                      resolve(child)
+                    })
 
-                      child.on('childrenLoaded', (children) => {
+                    addChildCallback(child)
 
-                        child.loadStatus = 'loaded'
+                    node.children.push(child)
 
-                        child.showLoader(false)
+                    if (loadingMode !== 'firstLevel') {
 
-                        resolve(child)
-                      })
-
-                      addChildCallback(child)
-
-                      node.children.push(child)
-
-                      if (loadingMode !== 'firstLevel') {
-
-                        child.loadChildren(loadingMode)
-                      }
+                      child.loadChildren(loadingMode)
                     }
+                  })
+                })
+
+                const itemTasks = items.map((item) => {
+
+                  return new Promise((resolve, reject) => {
+
+                    var itemNode = this.createItemNode(
+                      node, item)
+
+                    resolve(itemNode)
                   })
                 })
 
@@ -1062,7 +1097,9 @@ class DMTreeDelegate extends BaseTreeDelegate {
                   node.showLoader(false)
                 }
 
-                Promise.all(folderItemTasks).then((children) => {
+                const tasks = [...folderTasks, ...itemTasks]
+
+                Promise.all(tasks).then((children) => {
 
                   node.emit('childrenLoaded', children)
                 })

@@ -168,6 +168,35 @@ export default class DMSvc extends BaseSvc {
   }
 
   /////////////////////////////////////////////////////////////////
+  // Get Item relationship References
+  //
+  /////////////////////////////////////////////////////////////////
+  getItemRelationshipsRefs (
+    token, projectId, itemId, opts = {}) {
+
+    this._APIAuth.accessToken = token
+
+    return this._itemsAPI.getItemRelationshipsRefs(
+      projectId, itemId, opts)
+  }
+
+  /////////////////////////////////////////////////////////////////
+  // Create Item relationship reference
+  //
+  /////////////////////////////////////////////////////////////////
+  createItemRelationshipRef (
+    token, projectId, targetItemId, refVersionId) {
+
+    this._APIAuth.accessToken = token
+
+    const payload = this.createRelationshipRefPayload(
+      refVersionId)
+
+    return this._itemsAPI.postItemRelationshipsRef(
+      projectId, targetItemId, JSON.stringify(payload))
+  }
+
+  /////////////////////////////////////////////////////////////////
   // Get Version relationship references
   //
   /////////////////////////////////////////////////////////////////
@@ -231,16 +260,16 @@ export default class DMSvc extends BaseSvc {
 
         if(items.length > 0) {
 
-          var item = items[0]
+          const item = items[0]
 
-          var version = await this.createVersion(
+          const version = await this.createVersion(
             token,
             projectId,
             item.id,
             storage.data.id,
             filename)
 
-          var response = {
+          const response = {
             version: version.data,
             storage: storage.data,
             item: item,
@@ -251,15 +280,17 @@ export default class DMSvc extends BaseSvc {
 
         } else {
 
-          var item = await this.createItem(
-            token,
-            projectId,
-            folderId,
+          const item = await this.createItem(
+            token, projectId, folderId,
             storage.data.id,
             filename,
             displayName)
 
-          var response = {
+          const versions = await this.getItemVersions(
+            token, projectId, item.data.id)
+
+          const response = {
+            version: versions.data[0],
             storage: storage.data,
             item: item.data,
             object

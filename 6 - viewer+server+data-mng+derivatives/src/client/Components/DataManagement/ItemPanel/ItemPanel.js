@@ -55,6 +55,10 @@ export default class ItemPanel extends UIComponent {
     this.TabManager = new TabManager(
       this.domElement)
 
+    this.contextMenu = new ContextMenu({
+      container: document.body
+    })
+
     this.createItemDetailsTab()
 
     this.createVersionsTab()
@@ -168,7 +172,9 @@ export default class ItemPanel extends UIComponent {
     $('.item-versions-tree').empty()
 
     const delegate = new ItemVersionsTreeDelegate(
-      item, this.dmAPI, this.derivativesAPI)
+      item, this.dmAPI,
+      this.derivativesAPI,
+      this.contextMenu)
 
     delegate.on('node.dblClick',
       this.onNodeDblClickHandler)
@@ -186,9 +192,9 @@ export default class ItemPanel extends UIComponent {
     const rootNode = {
       projectId: item.projectId,
       folderId: item.folderId,
-      type: 'versions.root',
       itemId: item.itemId,
       hubId: item.hubId,
+      type: 'item.root',
       name: item.name,
       id: this.guid(),
       group: true
@@ -238,9 +244,9 @@ class ItemVersionsTreeDelegate extends BaseTreeDelegate {
   //
   //
   /////////////////////////////////////////////////////////////
-  constructor (item, dmAPI, derivativesAPI) {
+  constructor (item, dmAPI, derivativesAPI, contextMenu) {
 
-    super ()
+    super (null, contextMenu)
 
     this.derivativesAPI = derivativesAPI
 
@@ -343,6 +349,7 @@ class ItemVersionsTreeDelegate extends BaseTreeDelegate {
     switch (node.type) {
 
       case 'versions.attachments':
+      case 'item.attachments':
 
         $(parent).find('icon').before(`
           <div class="cloud-upload">
@@ -350,7 +357,7 @@ class ItemVersionsTreeDelegate extends BaseTreeDelegate {
                 data-placement="right"
                 data-toggle="tooltip"
                 data-delay='{"show":"800", "hide":"100"}'
-                title="Upload attachment to that version">
+                title="Upload attachment">
               <span class="glyphicon glyphicon-cloud-upload">
               </span>
             </button>
@@ -408,10 +415,20 @@ class ItemVersionsTreeDelegate extends BaseTreeDelegate {
 
             console.log(response)
 
-            this.dmAPI.postVersionRelationshipRef (
-              node.projectId,
-              node.versionId,
-              response.version.id).then((refRes) => {
+            const postAPI = (node.type === 'item.attachments' ?
+
+              this.dmAPI.postItemRelationshipRef (
+                  node.projectId,
+                  node.itemId,
+                  response.version.id)
+              :
+              this.dmAPI.postVersionRelationshipRef (
+                  node.projectId,
+                  node.versionId,
+                  response.version.id)
+              )
+
+            postAPI.then((refRes) => {
 
                 console.log(refRes)
 
@@ -487,6 +504,7 @@ class ItemVersionsTreeDelegate extends BaseTreeDelegate {
         break
 
       case 'versions.attachment':
+      case 'item.attachment':
 
         const refVersion = node.refVersion
 
@@ -523,7 +541,7 @@ class ItemVersionsTreeDelegate extends BaseTreeDelegate {
         }
 
         $(parent).before(`
-          <div class="versions-attachment">
+          <div class="data-attachment">
               <span class="fa fa-link">
               </span>
             </button>
@@ -580,7 +598,7 @@ class ItemVersionsTreeDelegate extends BaseTreeDelegate {
 
     switch (node.type) {
 
-      case 'versions.root':
+      case 'item.root':
 
         this.item.versions.forEach((version) => {
 
@@ -602,19 +620,28 @@ class ItemVersionsTreeDelegate extends BaseTreeDelegate {
           addChildCallback(versionNode)
         })
 
-        const itemAttachmentsNode = {
+        const itemAttachmentsNode = new TreeNode({
           type: 'item.attachments',
           name: 'Item attachments',
           projectId: node.projectId,
           versionId: node.versionId,
           folderId: node.folderId,
+          itemId: node.itemId,
           hubId: node.hubId,
           id: this.guid(),
           item: this.item,
           group: true
-        }
+        })
+
+        itemAttachmentsNode.on('childrenLoaded',
+          (children) => {
+
+            itemAttachmentsNode.showLoader(false)
+          })
 
         addChildCallback(itemAttachmentsNode)
+
+        itemAttachmentsNode.showLoader(true)
 
         itemAttachmentsNode.collapse()
 
@@ -691,10 +718,64 @@ class ItemVersionsTreeDelegate extends BaseTreeDelegate {
 
         break
 
+      case 'item.attachments':
+
+        this.dmAPI.getItemRelationshipsRefs(
+          node.projectId, node.itemId).then((response) => {
+
+            const attachmentTasks = response.data.map((attachment) => {
+
+              return new Promise((resolve, reject) => {
+
+                this.dmAPI.getVersion(
+                  node.projectId, attachment.id).then(
+                  (versionRes) => {
+
+                    const refVersion = versionRes.data
+
+                    const refVerNum = refVersion.id.split('=')[1]
+
+                    const attachmentNode = {
+                      name: refVersion.attributes.displayName +
+                      ` (v${refVerNum})`,
+                      projectId: node.projectId,
+                      versionId: node.versionId,
+                      folderId: node.folderId,
+                      type: 'item.attachment',
+                      refVersion: refVersion,
+                      itemId: node.itemId,
+                      hubId: node.hubId,
+                      id: this.guid(),
+                      group: false,
+                      refVerNum
+                    }
+
+                    addChildCallback(attachmentNode)
+
+                    resolve(attachmentNode)
+                  })
+              })
+            })
+
+            Promise.all(attachmentTasks).then((results) => {
+
+              node.emit('childrenLoaded', results)
+
+            }, () => {
+
+              node.emit('childrenLoaded')
+            })
+          })
+
+        break
+
       case 'versions.attachments':
 
           this.dmAPI.getVersionRelationshipsRefs(
             node.projectId, node.versionId).then((response) => {
+
+              console.log('version relationships refs:')
+              console.log(response.data)
 
               const attachmentTasks = response.data.map((attachment) => {
 

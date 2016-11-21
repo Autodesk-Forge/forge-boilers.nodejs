@@ -278,6 +278,40 @@ module.exports = function() {
   })
 
   /////////////////////////////////////////////////////////////////////////////
+  // GET /project/{projectId}/items/{itemId}/relationships/refs
+  // Get item relationship references
+  //
+  /////////////////////////////////////////////////////////////////////////////
+  router.get('/projects/:projectId/items/:itemId/relationships/refs',
+    async (req, res) => {
+
+    try {
+
+      var projectId = req.params.projectId
+
+      var itemId = req.params.itemId
+
+      var forgeSvc = ServiceManager.getService(
+        'ForgeSvc')
+
+      var token = await forgeSvc.get3LeggedTokenMaster(
+        req.session)
+
+      var dmSvc = ServiceManager.getService('DMSvc')
+
+      var response = await dmSvc.getItemRelationshipsRefs(
+        token.access_token, projectId, itemId)
+
+      res.json(response)
+
+    } catch (ex) {
+
+      res.status(ex.status || 500)
+      res.json(ex)
+    }
+  })
+
+  /////////////////////////////////////////////////////////////////////////////
   // GET /project/{projectId}/versions/{versionId}/relationships/refs
   // Get version relationship references
   //
@@ -301,6 +335,43 @@ module.exports = function() {
 
       var response = await dmSvc.getVersionRelationshipsRefs(
         token.access_token, projectId, versionId)
+
+      res.json(response)
+
+    } catch (ex) {
+
+      res.status(ex.status || 500)
+      res.json(ex)
+    }
+  })
+
+  /////////////////////////////////////////////////////////////////////////////
+  // POST /project/{projectId}/items/{itemId}/relationships/refs
+  // Create item relationship ref
+  //
+  /////////////////////////////////////////////////////////////////////////////
+  router.post('/projects/:projectId/items/:itemId/relationships/refs',
+    async (req, res) => {
+
+    try {
+
+      var payload = JSON.parse(req.body.payload)
+
+      var projectId = req.params.projectId
+
+      var itemId = req.params.itemId
+
+      var forgeSvc = ServiceManager.getService(
+        'ForgeSvc')
+
+      var token = await forgeSvc.get3LeggedTokenMaster(
+        req.session)
+
+      var dmSvc = ServiceManager.getService('DMSvc')
+
+      var response = await dmSvc.createItemRelationshipRef(
+        token.access_token, projectId, itemId,
+        payload.refVersionId)
 
       res.json(response)
 
@@ -386,3 +457,5 @@ module.exports = function() {
 
   return router
 }
+
+
