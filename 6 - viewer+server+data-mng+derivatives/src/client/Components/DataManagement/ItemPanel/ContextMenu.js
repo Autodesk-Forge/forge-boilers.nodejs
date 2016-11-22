@@ -35,6 +35,54 @@ export default class ContextMenu extends
         })
 
         break
+
+      case 'versions.file':
+
+        menu.push({
+          title: 'Show version details',
+          target: () => {
+            this.emit('context.details', {
+              event, node, title: 'Version Details'
+            })
+          }
+        })
+
+        if (node.manifest) {
+
+          menu.push({
+            title: 'Re-generate viewable',
+            target: () => {
+              this.emit('context.viewable.create', {
+                event, node
+              })
+            }
+          })
+
+          menu.push({
+            title: 'Delete viewable',
+            target: () => {
+              this.emit('context.viewable.delete', {
+                event, node
+              })
+            }
+          })
+
+        } else {
+
+          if (node.version.relationships.storage) {
+
+            menu.push({
+              title: 'Generate viewable',
+              target: () => {
+                this.emit('context.viewable.create', {
+                  event, node
+                })
+              }
+            })
+          }
+        }
+
+        break
     }
 
     return menu

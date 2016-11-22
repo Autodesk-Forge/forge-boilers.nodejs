@@ -59,9 +59,119 @@ export default class ItemPanel extends UIComponent {
       container: document.body
     })
 
+    this.contextMenu.on('context.details', (data) => {
+
+      switch (data.node.type) {
+
+        case 'versions.file':
+          this.showPayload(
+            `${this.dmAPI.apiUrl}/projects/` +
+            `${data.node.projectId}/versions/` +
+            `${encodeURIComponent(data.node.versionId)}`)
+          break
+      }
+    })
+
+    this.contextMenu.on('context.viewable.create', async(data) => {
+
+      try {
+
+        data.node.showLoader(true)
+
+        const version = data.node.version
+
+        let input = {
+          urn: this.getVersionURN(version)
+        }
+
+        const output = {
+          force: true,
+          formats:[{
+            type: 'svf',
+            views: ['2d', '3d']
+          }]
+        }
+
+        const fileExtType = (version.attributes && version.attributes.extension) ?
+          version.attributes.extension.type : null
+
+        if (fileExtType === 'versions:autodesk.a360:CompositeDesign') {
+
+          input.rootFilename = version.attributes ?
+            version.attributes.name :
+            null
+
+          input.compressedUrn = true
+        }
+
+        const job = {
+          output,
+          input
+        }
+
+        await this.derivativesAPI.postJobWithProgress(
+          job, {
+            panelContainer: viewerContainer,
+            designName: data.node.name
+          }, { type: 'geometry' })
+
+        setTimeout(() => {
+          this.onFileNodeAdded (data.node)
+        }, 500)
+
+      } catch (ex) {
+
+        console.log('SVF Job failed')
+        console.log(ex)
+
+        data.node.showLoader(false)
+      }
+    })
+
+    this.contextMenu.on('context.viewable.delete', (data) => {
+
+      const urn = this.getVersionURN(data.node.version)
+
+      data.node.showLoader(true)
+
+      this.derivativesAPI.deleteManifest(urn).then(() => {
+
+        data.node.setTooltip('no SVF derivative on this item')
+
+        data.node.parent.classList.remove('derivated')
+
+        data.node.showLoader(false)
+
+        data.node.manifest = null
+
+      }, (err) => {
+
+        data.node.showLoader(false)
+      })
+    })
+
     this.createItemDetailsTab()
 
     this.createVersionsTab()
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////
+  getVersionURN (version) {
+
+    if (version.relationships.storage) {
+
+      var urn = window.btoa(
+        version.relationships.storage.data.id)
+
+      return urn.replace(new RegExp('=', 'g'), '')
+
+    } else {
+
+      return null
+    }
   }
 
   ///////////////////////////////////////////////////////////////////
@@ -189,6 +299,11 @@ export default class ItemPanel extends UIComponent {
       this.emit('itemCreated', data)
     })
 
+    delegate.on('fileNodeAdded', (node) => {
+
+      this.onFileNodeAdded(node)
+    })
+
     const rootNode = {
       projectId: item.projectId,
       folderId: item.folderId,
@@ -231,6 +346,81 @@ export default class ItemPanel extends UIComponent {
         })
       }
     }
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////
+  onFileNodeAdded (node) {
+
+    var version = node.version
+
+    if (!version.relationships.storage) {
+
+      node.setTooltip('derivatives unavailable on this item')
+
+      node.parent.classList.add('unavailable')
+
+      node.showLoader(false)
+
+      return
+    }
+
+    var urn = this.getVersionURN(version)
+
+    this.derivativesAPI.getManifest(
+      urn).then((manifest) => {
+
+        node.manifest = manifest
+
+        if (manifest.status   === 'success' &&
+            manifest.progress === 'complete') {
+
+          if (this.derivativesAPI.hasDerivative(
+              manifest, { type: 'geometry'})) {
+
+            node.parent.classList.add('derivated')
+
+            this.derivativesAPI.getThumbnail(
+              urn, {
+                width: 200,
+                height: 200
+              }).then((thumbnail) => {
+
+                let img = `<img width="150" height="150"
+                    src='data:image/png;base64,${thumbnail}'/>`
+
+                node.setTooltip(img)
+
+                node.showLoader(false)
+              })
+
+          } else {
+
+            node.setTooltip('no SVF derivative on this item')
+
+            node.showLoader(false)
+          }
+
+        } else {
+
+          node.showLoader(false)
+        }
+
+      }, (err) => {
+
+        node.setTooltip('no derivative on this item')
+
+        node.showLoader(false)
+
+        // file not derivated have no manifest
+        // skip those errors
+        if (err !== 'Not Found') {
+
+          console.warn(err)
+        }
+      })
   }
 }
 
@@ -620,30 +810,32 @@ class ItemVersionsTreeDelegate extends BaseTreeDelegate {
           addChildCallback(versionNode)
         })
 
-        const itemAttachmentsNode = new TreeNode({
-          type: 'item.attachments',
-          name: 'Item attachments',
-          projectId: node.projectId,
-          versionId: node.versionId,
-          folderId: node.folderId,
-          itemId: node.itemId,
-          hubId: node.hubId,
-          id: this.guid(),
-          item: this.item,
-          group: true
-        })
+        //TODO: item attachment API broken
 
-        itemAttachmentsNode.on('childrenLoaded',
-          (children) => {
-
-            itemAttachmentsNode.showLoader(false)
-          })
-
-        addChildCallback(itemAttachmentsNode)
-
-        itemAttachmentsNode.showLoader(true)
-
-        itemAttachmentsNode.collapse()
+        //const itemAttachmentsNode = new TreeNode({
+        //  type: 'item.attachments',
+        //  name: 'Item attachments',
+        //  projectId: node.projectId,
+        //  versionId: node.versionId,
+        //  folderId: node.folderId,
+        //  itemId: node.itemId,
+        //  hubId: node.hubId,
+        //  id: this.guid(),
+        //  item: this.item,
+        //  group: true
+        //})
+        //
+        //itemAttachmentsNode.on('childrenLoaded',
+        //  (children) => {
+        //
+        //    itemAttachmentsNode.showLoader(false)
+        //  })
+        //
+        //addChildCallback(itemAttachmentsNode)
+        //
+        //itemAttachmentsNode.showLoader(true)
+        //
+        //itemAttachmentsNode.collapse()
 
         break
 
@@ -660,6 +852,7 @@ class ItemVersionsTreeDelegate extends BaseTreeDelegate {
           verNum: node.verNum,
           hubId: node.hubId,
           id: this.guid(),
+          tooltip: true,
           group: true
         }
 
@@ -696,25 +889,7 @@ class ItemVersionsTreeDelegate extends BaseTreeDelegate {
 
       case 'versions.file':
 
-        const urn = this.getVersionURN(node.version)
-
-        this.derivativesAPI.getManifest(
-          urn).then((manifest) => {
-
-            node.manifest = manifest
-
-            if (this.derivativesAPI.hasDerivative(
-                manifest, { type: 'geometry'})) {
-
-              node.parent.classList.add('derivated')
-            }
-
-            node.showLoader(false)
-
-          }, () => {
-
-            node.showLoader(false)
-          })
+        this.emit('fileNodeAdded', node)
 
         break
 

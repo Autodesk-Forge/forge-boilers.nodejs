@@ -74,25 +74,30 @@ export default class DataPanel extends UIComponent {
 
           case 'hubs':
             this.showPayload(
-              `api/dm/hubs/${data.node.hubId}/projects`)
+              `${this.dmAPI.apiUrl}/hubs/` +
+              `${data.node.hubId}/projects`)
             break
 
           case 'projects':
             this.showPayload(
-              `api/dm/hubs/${data.node.hubId}/projects/` +
-                `${data.node.projectId}`)
+              `${this.dmAPI.apiUrl}/hubs/` +
+              `${data.node.hubId}/projects/` +
+              `${data.node.projectId}`)
             break
 
           case 'folders':
             this.showPayload(
-              `api/dm/projects/${data.node.projectId}/folders/` +
-                `${data.node.folderId}`)
+              `${this.dmAPI.apiUrl}/projects/` +
+              `${data.node.projectId}/folders/` +
+              `${data.node.folderId}`)
             break
 
           case 'items':
             this.showPayload(
-              `api/dm/projects/${data.node.projectId}/folders/` +
-                `${data.node.folderId}/items/${data.node.itemId}`)
+              `${this.dmAPI.apiUrl}/projects/` +
+              `${data.node.projectId}/folders/` +
+              `${data.node.folderId}/items/` +
+              `${data.node.itemId}`)
             break
         }
       }
@@ -162,11 +167,13 @@ export default class DataPanel extends UIComponent {
 
       this.derivativesAPI.deleteManifest(urn).then(() => {
 
-        data.node.manifest = null
+        data.node.setTooltip('no SVF derivative on this item')
 
         data.node.parent.classList.remove('derivated')
 
         data.node.showLoader(false)
+
+        data.node.manifest = null
 
       }, (err) => {
 
@@ -416,8 +423,8 @@ export default class DataPanel extends UIComponent {
       let treeContainerId = this.guid()
 
       this.TabManager.addTab({
+        active: !Object.keys(this.treeMap).length,
         name: 'Hub: ' + hub.attributes.name,
-        active: true,
         html: `<div id=${treeContainerId}
                 class="tree-container">
               </div>`
@@ -494,9 +501,9 @@ class DMTreeDelegate extends BaseTreeDelegate {
 
     this.dmAPI = dmAPI
 
-    this.on('node.click node.iconClick', (node) => {
+    this.on('node.click node.iconClick', (node, collapsed) => {
 
-      if (node.loadChildren) {
+      if (node.loadChildren && collapsed) {
 
         node.loadChildren('firstLevel')
       }
@@ -801,6 +808,12 @@ class DMTreeDelegate extends BaseTreeDelegate {
 
                 child.loadChildren(loadingMode)
               })
+
+            } else {
+
+              node.loadStatus = 'idle'
+
+              node.showLoader(false)
             }
 
           } else {
@@ -828,8 +841,8 @@ class DMTreeDelegate extends BaseTreeDelegate {
                       details: project,
                       folderId: rootId,
                       hubId: node.id,
-                      group: true,
-                      id: rootId
+                      id: project.id,
+                      group: true
                     })
 
                     child.on('childrenLoaded', (children) => {
@@ -894,6 +907,12 @@ class DMTreeDelegate extends BaseTreeDelegate {
 
                 child.loadChildren(loadingMode)
               })
+
+            } else {
+
+              node.loadStatus = 'idle'
+
+              node.showLoader(false)
             }
 
           } else {
@@ -1020,6 +1039,12 @@ class DMTreeDelegate extends BaseTreeDelegate {
 
                 child.loadChildren(loadingMode)
               })
+
+            } else {
+
+              node.loadStatus = 'idle'
+
+              node.showLoader(false)
             }
 
           } else {

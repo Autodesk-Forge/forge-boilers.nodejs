@@ -50,9 +50,10 @@ export class BaseTreeDelegate extends
 
     this.clickTimeout = setTimeout(() => {
 
-      tree.setCollapsed(node, !tree.isCollapsed(node))
+      this.emit('node.iconClick',
+        node, tree.isCollapsed(node))
 
-      this.emit('node.iconClick', node)
+      tree.setCollapsed(node, !tree.isCollapsed(node))
 
     }, 200)
   }
@@ -80,7 +81,8 @@ export class BaseTreeDelegate extends
 
       this.clickTimeout = setTimeout(() => {
 
-        this.emit('node.click', node)
+        this.emit('node.click',
+          node, tree.isCollapsed(node))
 
         tree.setCollapsed(node, !tree.isCollapsed(node))
 

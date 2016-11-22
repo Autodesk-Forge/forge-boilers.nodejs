@@ -243,7 +243,10 @@ export default class App {
 
               if (tree) {
 
-                const parent = tree.nodeIdToNode[data.node.folderId]
+                //need to check both, parent can be a folder or project!
+                const parent =
+                  (tree.nodeIdToNode[data.node.folderId] ||
+                   tree.nodeIdToNode[data.node.projectId])
 
                 if (parent) {
 
