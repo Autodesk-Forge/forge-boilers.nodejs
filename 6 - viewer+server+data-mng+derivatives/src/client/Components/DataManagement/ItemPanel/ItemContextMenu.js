@@ -1,16 +1,19 @@
 
 import EventsEmitter from 'EventsEmitter'
+import ContextMenu from 'ContextMenu'
 
-export default class ContextMenu extends
+export default class ItemContextMenu extends
   EventsEmitter.Composer (Autodesk.Viewing.UI.ObjectContextMenu) {
 
   /////////////////////////////////////////////////////////////////
   // Class constructor
   //
   /////////////////////////////////////////////////////////////////
-  constructor (viewer) {
+  constructor (opts) {
 
-    super (viewer)
+    super (opts)
+
+    this.contextMenu = new ContextMenu(opts)
   }
 
   /////////////////////////////////////////////////////////////////
@@ -23,60 +26,51 @@ export default class ContextMenu extends
 
     switch (node.type) {
 
-      case 'hubs':
+      case 'item.root':
 
         menu.push({
-          title: 'Show hub details',
+          title: 'Show item versions details',
+          className: 'fa fa-share',
           target: () => {
             this.emit('context.details', {
-              event, node, title: 'Hub Details'
+              event, node, title: 'Version Details'
             })
           }
         })
 
         break
 
-      case 'projects':
+      case 'versions.version':
 
         menu.push({
-          title: 'Show project details',
+          title: 'Show version details',
+          className: 'fa fa-share',
           target: () => {
             this.emit('context.details', {
-              event, node, title: 'Project Details'
+              event, node, title: 'Version Details'
+            })
+          }
+        })
+
+        menu.push({
+          title: 'Set as Active version',
+          className: 'fa fa-check',
+          target: () => {
+            this.emit('context.setActiveVersion', {
+              event, node
             })
           }
         })
 
         break
 
-      case 'folders':
-
-        menu.push({
-          title: 'Show folder details',
-          target: () => {
-            this.emit('context.details', {
-              event, node, title: 'Folder Details'
-            })
-          }
-        })
-
-        break
-
-      case 'items':
-
-        menu.push({
-          title: 'Show item details',
-          target: () => {
-            this.emit('context.details', {
-              event, node, title: 'Item Details'
-            })
-          }
-        })
+      case 'versions.file':
 
         if (node.manifest) {
 
           menu.push({
             title: 'Re-generate viewable',
+            className: 'fa fa-refresh',
             target: () => {
               this.emit('context.viewable.create', {
                 event, node
@@ -86,6 +80,7 @@ export default class ContextMenu extends
 
           menu.push({
             title: 'Delete viewable',
+            className: 'fa fa-times',
             target: () => {
               this.emit('context.viewable.delete', {
                 event, node
@@ -95,10 +90,11 @@ export default class ContextMenu extends
 
         } else {
 
-          if(node.activeVersion.relationships.storage) {
+          if (node.version.relationships.storage) {
 
             menu.push({
               title: 'Generate viewable',
+              className: 'fa fa-cog',
               target: () => {
                 this.emit('context.viewable.create', {
                   event, node
@@ -107,6 +103,30 @@ export default class ContextMenu extends
             })
           }
         }
+
+        break
+
+      case 'versions.attachments':
+
+        menu.push({
+          title: 'Show attachments details',
+          className: 'fa fa-share',
+          target: () => {
+            this.emit('context.details', {
+              event, node, title: 'Attachments Details'
+            })
+          }
+        })
+
+        menu.push({
+          title: 'Attach by version Id',
+          className: 'fa fa-link',
+          target: () => {
+            this.emit('context.attachment.addById', {
+              event, node
+            })
+          }
+        })
 
         break
     }

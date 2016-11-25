@@ -73,8 +73,8 @@ module.exports = function() {
         file)
 
       res.json(response)
-    }
-    catch (ex) {
+
+    } catch (ex) {
 
       console.log(ex)
 
@@ -84,11 +84,12 @@ module.exports = function() {
   })
 
   /////////////////////////////////////////////////////////////////////////////
-  // POST /upload/dm/:projectId/:folderId
+  // POST /dm/projects/:projectId/folders/:folderId
   // Upload file to DataManagement
   //
   /////////////////////////////////////////////////////////////////////////////
-  router.post('/dm/:projectId/:folderId', upload.any(), async (req, res) => {
+  router.post('/dm/projects/:projectId/folders/:folderId',
+    upload.any(), async (req, res) => {
 
     try {
 
@@ -113,10 +114,8 @@ module.exports = function() {
         file)
 
       res.json(response)
-    }
-    catch (ex) {
 
-      console.log(ex)
+    } catch (ex) {
 
       res.status(ex.status || 500)
       res.json(ex)

@@ -8,7 +8,6 @@ export default class DerivativeSvc extends BaseSvc {
   static get SERVICE_BASE_URL () {
 
     return 'https://developer.api.autodesk.com/modelderivative/v2'
-
   }
 
   /////////////////////////////////////////////////////////////////

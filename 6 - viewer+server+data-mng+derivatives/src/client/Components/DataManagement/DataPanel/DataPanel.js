@@ -4,8 +4,9 @@
 //
 /////////////////////////////////////////////////////////////////////
 import { BaseTreeDelegate, TreeNode } from 'TreeView'
+import CreateFolderPanel from './CreateFolderPanel'
 import {API as DerivativesAPI} from 'Derivatives'
-import ContextMenu from './ContextMenu'
+import ContextMenu from './DataContextMenu'
 import UIComponent from 'UIComponent'
 import TabManager from 'TabManager'
 import Dropzone from 'dropzone'
@@ -70,7 +71,7 @@ export default class DataPanel extends UIComponent {
 
         console.log(data.node.details)
 
-        switch(data.node.type) {
+        switch(data.type) {
 
           case 'hubs':
             this.showPayload(
@@ -92,6 +93,13 @@ export default class DataPanel extends UIComponent {
               `${data.node.folderId}`)
             break
 
+          case 'folders.content':
+            this.showPayload(
+              `${this.dmAPI.apiUrl}/projects/` +
+              `${data.node.projectId}/folders/` +
+              `${data.node.folderId}/content`)
+            break
+
           case 'items':
             this.showPayload(
               `${this.dmAPI.apiUrl}/projects/` +
@@ -101,6 +109,52 @@ export default class DataPanel extends UIComponent {
             break
         }
       }
+    })
+
+    this.contextMenu.on('context.folder.create', (data) => {
+
+      const dlg = new CreateFolderPanel(appContainer)
+
+      dlg.setVisible(true)
+
+      dlg.on('close', (event) => {
+
+        if (event.result === 'OK') {
+
+          const node = data.node
+
+          node.showLoader(true)
+
+          this.dmAPI.postFolder (
+            node.projectId,
+            node.folderId,
+            dlg.folderName).then((folderRes) => {
+
+            const folder = folderRes.data
+
+            const folderNode = new TreeNode({
+              projectId: node.projectId,
+              name: dlg.folderName,
+              folderId: folder.id,
+              hubId: node.hubId,
+              type: folder.type,
+              details: folder,
+              id: folder.id,
+              group: true
+            })
+
+            node.insert(folderNode)
+
+            node.showLoader(false)
+
+          }, (err) => {
+
+            console.log(err)
+
+            node.showLoader(false)
+          })
+        }
+      })
     })
 
     this.contextMenu.on('context.viewable.create', async(data) => {
@@ -216,7 +270,12 @@ export default class DataPanel extends UIComponent {
   ///////////////////////////////////////////////////////////////////
   onCreateItemNode (tree, data) {
 
-    let { parent, item, version } = data
+    let { parent, item, version , insert } = data
+
+    if (!parent.loadStatus) {
+
+      return null
+    }
 
     let node = tree.nodeIdToNode[item.id]
 
@@ -238,7 +297,14 @@ export default class DataPanel extends UIComponent {
       // BIM Docs items have no name :( ...
       if (node.name) {
 
-        parent.addChild(node)
+        if (insert) {
+
+          parent.insert(node)
+
+        } else {
+
+          parent.addChild(node)
+        }
 
         node.showLoader(true)
       }
@@ -257,7 +323,14 @@ export default class DataPanel extends UIComponent {
               // fix for BIM Docs - displayName doesn't appear in item
               node.name = node.activeVersion.attributes.displayName
 
-              parent.addChild(node)
+              if (insert) {
+
+                parent.insert(node)
+
+              } else {
+
+                parent.addChild(node)
+              }
 
               node.showLoader(true)
             }
@@ -275,6 +348,8 @@ export default class DataPanel extends UIComponent {
         node.versions.unshift(version)
 
         node.activeVersion = version
+
+        this.onItemNodeAdded(node)
       }
     }
 
@@ -286,6 +361,8 @@ export default class DataPanel extends UIComponent {
   //
   ///////////////////////////////////////////////////////////////////
   onItemNodeAdded (node) {
+
+    node.manifest = null
 
     var version = node.activeVersion
 
@@ -299,6 +376,8 @@ export default class DataPanel extends UIComponent {
 
       return
     }
+
+    node.showLoader(true)
 
     var urn = this.getVersionURN(version)
 
@@ -425,9 +504,11 @@ export default class DataPanel extends UIComponent {
       this.TabManager.addTab({
         active: !Object.keys(this.treeMap).length,
         name: 'Hub: ' + hub.attributes.name,
-        html: `<div id=${treeContainerId}
-                class="tree-container">
-              </div>`
+        html: `
+          <div id=${treeContainerId}
+            class="tree-container">
+          </div>
+        `
       })
 
       this.loadHub(treeContainerId, hub)
@@ -467,7 +548,7 @@ export default class DataPanel extends UIComponent {
         localize: true
     })
 
-    delegate.on('createItemNode', (data)=> {
+    delegate.on('createItemNode', (data) => {
 
       this.onCreateItemNode(tree, data)
     })
@@ -552,7 +633,7 @@ class DMTreeDelegate extends BaseTreeDelegate {
                 data-toggle="tooltip"
                 data-delay='{"show":"800", "hide":"100"}'
                 title="loading item ...">
-              ${text}
+                ${text}
             </label>
         </div>
       `
@@ -612,7 +693,9 @@ class DMTreeDelegate extends BaseTreeDelegate {
       let container = this.container
 
       $(parent).dropzone({
-        url: `/api/upload/dm/${node.projectId}/${node.folderId}`,
+        url: `/api/upload/dm/` +
+          `projects/${node.projectId}/` +
+          `folders/${node.folderId}`,
         clickable: `.btn.c${parent.id}`,
         dictDefaultMessage: ' - upload',
         previewTemplate: '<div></div>',
@@ -661,7 +744,8 @@ class DMTreeDelegate extends BaseTreeDelegate {
           this.createItemNode(
             node,
             response.item,
-            response.version)
+            response.version,
+            true)
         }
       })
 
@@ -760,6 +844,39 @@ class DMTreeDelegate extends BaseTreeDelegate {
           node.showLoader(false)
         }, timeout)
       }
+    }
+
+    node.insert = (child) => {
+
+      const $group = $(node.parent).parent()
+
+      let index = 0
+
+      $group.find('> group').each(function(idx) {
+
+        if ($(this).find('header').hasClass(child.type)) {
+
+          const name =
+            $(this).find('.label-container').text().
+              replace(/^(?=\n)$|^\s*|\s*$|\n\n+/gm, '').
+              replace(/(\r\n|\n|\r)/gm, '')
+
+          if (child.name.localeCompare(name) > 0) {
+
+            index = idx
+          }
+
+        } else if (child.type === 'items') {
+
+          index = idx
+        }
+      })
+
+      node.addChild(child)
+
+      const element = $(child.parent).parent().detach()
+
+      $group.insertAt(index + 2, element)
     }
 
     // collapse node by default
@@ -1145,11 +1262,12 @@ class DMTreeDelegate extends BaseTreeDelegate {
   //
   //
   /////////////////////////////////////////////////////////////
-  createItemNode (parent, item, version) {
+  createItemNode (parent, item, version, insert = false) {
 
     return this.emit('createItemNode', {
       version,
       parent,
+      insert,
       item
     })
   }

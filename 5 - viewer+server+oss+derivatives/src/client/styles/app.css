@@ -175,8 +175,8 @@ body{
 }
 
 .menuItem:hover {
-    background-color: rgb(134, 134, 134);
-    color: #f5cb05;
+    background-color: #f5c70a;
+    color: black;
 }
 
 hr.about {

@@ -3,16 +3,19 @@
 // by Philippe Leefsma, November 2016
 //
 /////////////////////////////////////////////////////////////////////
+
 import JSONView from 'jquery-jsonview/dist/jquery.jsonview'
 import { BaseTreeDelegate, TreeNode } from 'TreeView'
 import 'jquery-jsonview/dist/jquery.jsonview.css'
 import {API as DerivativesAPI} from 'Derivatives'
-import ContextMenu from './ContextMenu'
+import VersionIdPanel from './VersionIdPanel'
+import ContextMenu from './ItemContextMenu'
 import UIComponent from 'UIComponent'
 import TabManager from 'TabManager'
 import Dropzone from 'dropzone'
 import DMAPI from '../API'
 import './ItemPanel.scss'
+
 
 export default class ItemPanel extends UIComponent {
 
@@ -63,11 +66,25 @@ export default class ItemPanel extends UIComponent {
 
       switch (data.node.type) {
 
-        case 'versions.file':
+        case 'item.root':
+          this.showPayload(`${this.dmAPI.apiUrl}/projects/` +
+          `${data.node.projectId}/items/` +
+          `${data.node.itemId}/versions`)
+          break
+
+        case 'versions.version':
           this.showPayload(
             `${this.dmAPI.apiUrl}/projects/` +
             `${data.node.projectId}/versions/` +
             `${encodeURIComponent(data.node.versionId)}`)
+          break
+
+        case 'versions.attachments':
+          this.showPayload(
+            `${this.dmAPI.apiUrl}/projects/` +
+            `${data.node.projectId}/versions/` +
+            `${encodeURIComponent(data.node.versionId)}` +
+            `/relationships/refs`)
           break
       }
     })
@@ -128,6 +145,16 @@ export default class ItemPanel extends UIComponent {
       }
     })
 
+    this.contextMenu.on('context.setActiveVersion', (data) => {
+
+      $('.versions.version.active-version').toggleClass(
+        'active-version')
+
+      data.node.parent.classList.add('active-version')
+
+      this.emit('setActiveVersion', data.node)
+    })
+
     this.contextMenu.on('context.viewable.delete', (data) => {
 
       const urn = this.getVersionURN(data.node.version)
@@ -147,6 +174,55 @@ export default class ItemPanel extends UIComponent {
       }, (err) => {
 
         data.node.showLoader(false)
+      })
+    })
+
+    this.contextMenu.on('context.attachment.addById', (data) => {
+
+      const dlg = new VersionIdPanel(appContainer)
+
+      dlg.setVisible(true)
+
+      dlg.on('close', (event) => {
+
+        if (event.result === 'OK') {
+
+          const node = data.node
+
+          node.showLoader(true)
+
+          this.dmAPI.postVersionRelationshipRef (
+            node.projectId,
+            node.versionId,
+            dlg.versionId).then(async(refRes) => {
+
+            const refVersionRes = await this.dmAPI.getVersion(
+              node.projectId,
+              dlg.versionId)
+
+            const refVersion = refVersionRes.data
+
+            const refVerNum = refVersion.id.split('=')[1]
+
+            const attachmentNode = {
+              name: refVersion.attributes.displayName +
+              ` (v${refVerNum})`,
+              type: 'versions.attachment',
+              projectId: node.projectId,
+              versionId: node.versionId,
+              folderId: node.folderId,
+              refVersion: refVersion,
+              hubId: node.hubId,
+              id: this.guid(),
+              group: false,
+              refVerNum
+            }
+
+            node.addChild(attachmentNode)
+
+            node.showLoader(false)
+          })
+        }
       })
     })
 
@@ -244,8 +320,6 @@ export default class ItemPanel extends UIComponent {
   ///////////////////////////////////////////////////////////////////
   createVersionsTab () {
 
-    const btnShowInTabId = this.guid()
-
     this.TabManager.addTab({
       name: 'Versions',
       active: true,
@@ -253,23 +327,7 @@ export default class ItemPanel extends UIComponent {
        <div class="item-tab-container item-versions">
          <div class="item-versions-tree">
          </div>
-         <div class="controls">
-          <button id="${btnShowInTabId}" class="btn">
-            <span class="glyphicon glyphicon-share-alt">
-            </span>
-            Show in new tab ...
-          </button>
-         </div>
        </div>`
-    })
-
-    $('#' + btnShowInTabId).click(() => {
-
-      const uri = `${this.dmAPI.apiUrl}/projects/` +
-        `${this.item.projectId}/items/` +
-        `${this.item.itemId}/versions`
-
-      this.showPayload(uri)
     })
   }
 
@@ -277,22 +335,17 @@ export default class ItemPanel extends UIComponent {
   //
   //
   ///////////////////////////////////////////////////////////////////
-  loadVersions (item) {
+  loadVersions (itemNode) {
 
     $('.item-versions-tree').empty()
 
     const delegate = new ItemVersionsTreeDelegate(
-      item, this.dmAPI,
+      itemNode, this.dmAPI,
       this.derivativesAPI,
       this.contextMenu)
 
     delegate.on('node.dblClick',
       this.onNodeDblClickHandler)
-
-    delegate.on('setActiveVersion', (node) => {
-
-      this.emit('setActiveVersion', node)
-    })
 
     delegate.on('itemCreated', (data) => {
 
@@ -305,12 +358,13 @@ export default class ItemPanel extends UIComponent {
     })
 
     const rootNode = {
-      projectId: item.projectId,
-      folderId: item.folderId,
-      itemId: item.itemId,
-      hubId: item.hubId,
+      activeVersion: itemNode.activeVersion,
+      projectId: itemNode.projectId,
+      folderId: itemNode.folderId,
+      itemId: itemNode.itemId,
+      hubId: itemNode.hubId,
+      name: itemNode.name,
       type: 'item.root',
-      name: item.name,
       id: this.guid(),
       group: true
     }
@@ -354,11 +408,13 @@ export default class ItemPanel extends UIComponent {
   ///////////////////////////////////////////////////////////////////
   onFileNodeAdded (node) {
 
+    node.showLoader(true)
+
     var version = node.version
 
     if (!version.relationships.storage) {
 
-      node.setTooltip('derivatives unavailable on this item')
+      node.setTooltip('derivatives unavailable on this version')
 
       node.parent.classList.add('unavailable')
 
@@ -561,7 +617,9 @@ class ItemVersionsTreeDelegate extends BaseTreeDelegate {
         const container = this.container
 
         $(parent).dropzone({
-          url: `/api/upload/dm/${node.projectId}/${node.folderId}`,
+          url: `/api/upload/dm/` +
+            `projects/${node.projectId}/` +
+            `folders/${node.folderId}`,
           clickable: `.btn.c${parent.id}`,
           dictDefaultMessage: ' - upload',
           previewTemplate: '<div></div>',
@@ -790,6 +848,8 @@ class ItemVersionsTreeDelegate extends BaseTreeDelegate {
 
       case 'item.root':
 
+        const activeVerNum = node.activeVersion.id.split('=')[1]
+
         this.item.versions.forEach((version) => {
 
           const verNum = version.id.split('=')[1]
@@ -799,6 +859,7 @@ class ItemVersionsTreeDelegate extends BaseTreeDelegate {
             type: 'versions.version',
             folderId: node.folderId,
             versionId: version.id,
+            itemId: node.itemId,
             name: 'v' + verNum,
             hubId: node.hubId,
             version: version,
@@ -810,7 +871,7 @@ class ItemVersionsTreeDelegate extends BaseTreeDelegate {
           addChildCallback(versionNode)
         })
 
-        //TODO: item attachment API broken
+        //TODO: item attachment not avail yet in DM API
 
         //const itemAttachmentsNode = new TreeNode({
         //  type: 'item.attachments',
@@ -857,8 +918,6 @@ class ItemVersionsTreeDelegate extends BaseTreeDelegate {
         }
 
         addChildCallback(versionFileNode)
-
-        versionFileNode.showLoader(true)
 
         const versionAttachmentsNode = new TreeNode({
           name: `Attachments (v${node.verNum})`,
@@ -948,9 +1007,6 @@ class ItemVersionsTreeDelegate extends BaseTreeDelegate {
 
           this.dmAPI.getVersionRelationshipsRefs(
             node.projectId, node.versionId).then((response) => {
-
-              console.log('version relationships refs:')
-              console.log(response.data)
 
               const attachmentTasks = response.data.map((attachment) => {
 

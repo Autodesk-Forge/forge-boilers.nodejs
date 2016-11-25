@@ -229,12 +229,23 @@ export default class App {
 
             this.itemPanel.on('setActiveVersion', (node) => {
 
+              const tree = this.dataPanel.treeMap[node.hubId]
 
+              let itemNode = tree.nodeIdToNode[node.itemId]
+
+              if (itemNode) {
+
+                itemNode.activeVersion = node.version
+
+                this.dataPanel.onItemNodeAdded (itemNode)
+              }
             })
 
             this.itemPanel.on('loadVersion', (version) => {
 
-              return this.onLoadVersion (version)
+              return this.onLoadVersion (version, {
+                showVersionNumber: true
+              })
             })
 
             this.itemPanel.on('itemCreated', (data) => {
@@ -253,6 +264,7 @@ export default class App {
                   this.dataPanel.onCreateItemNode (tree, {
                     version: data.version,
                     item: data.item,
+                    insert: true,
                     parent
                   })
                 }
@@ -328,7 +340,7 @@ export default class App {
   //
   //
   ///////////////////////////////////////////////////////////////////
-  onLoadVersion (version) {
+  onLoadVersion (version, opts = {}) {
 
     return new Promise(async(resolve, reject) => {
 
@@ -367,6 +379,13 @@ export default class App {
       viewer.loadModel(path, loadOptions, (model) => {
 
         model.name = name
+
+        if (opts.showVersionNumber) {
+
+          const verNum = version.id.split('=')[1]
+
+          model.name += ' ' + verNum
+        }
 
         resolve(model)
       })

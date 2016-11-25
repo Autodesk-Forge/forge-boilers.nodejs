@@ -49,10 +49,22 @@ export default class DataManagementAPI extends ClientAPI {
   // GET /projects/:projectId/folders/:folderId
   //
   ///////////////////////////////////////////////////////////////////
-  getFolderContent (projectId, folderId) {
+  getFolder (projectId, folderId) {
 
     const url = `${this.apiUrl}/projects/${projectId}` +
       `/folders/${folderId}`
+
+    return this.ajax(url)
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  // GET /projects/:projectId/folders/:folderId
+  //
+  ///////////////////////////////////////////////////////////////////
+  getFolderContent (projectId, folderId) {
+
+    const url = `${this.apiUrl}/projects/${projectId}` +
+      `/folders/${folderId}/content`
 
     return this.ajax(url)
   }
@@ -162,6 +174,28 @@ export default class DataManagementAPI extends ClientAPI {
   }
 
   ///////////////////////////////////////////////////////////////////
+  // POST /projects/:projectId/folders
+  //
+  ///////////////////////////////////////////////////////////////////
+  postFolder (projectId, parentFolderId, folderName) {
+
+    const url = `${this.apiUrl}/projects/${projectId}/folders`
+
+    const data = {
+      payload: JSON.stringify({
+        parentFolderId,
+        folderName
+      })
+    }
+
+    return this.ajax({
+      type: 'POST',
+      data,
+      url
+    })
+  }
+
+  ///////////////////////////////////////////////////////////////////
   // parse an objectId to return {bucketKey, objectKey} pair
   //
   ///////////////////////////////////////////////////////////////////
@@ -193,7 +227,7 @@ export default class DataManagementAPI extends ClientAPI {
     var uri = `${this.apiUrl}/buckets/` +
       `${objectId.bucketKey}/objects/${objectId.objectKey}`
 
-    var link = document.createElement("a")
+    var link = document.createElement('a')
 
     link.download = version.attributes.displayName
     link.href = uri

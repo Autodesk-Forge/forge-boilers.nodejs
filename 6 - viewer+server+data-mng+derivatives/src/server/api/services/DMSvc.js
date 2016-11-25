@@ -7,6 +7,11 @@ import util from 'util'
 
 export default class DMSvc extends BaseSvc {
 
+  static get SERVICE_BASE_URL () {
+
+    return 'https://developer.api.autodesk.com/data/v1'
+  }
+
   /////////////////////////////////////////////////////////////////
   // DataManagement Service
   //
@@ -85,6 +90,18 @@ export default class DMSvc extends BaseSvc {
   }
 
   /////////////////////////////////////////////////////////////////
+  // Returns Folder
+  //
+  /////////////////////////////////////////////////////////////////
+  getFolder (token, projectId, folderId) {
+
+    this._APIAuth.accessToken = token
+
+    return this._foldersAPI.getFolder(
+      projectId, folderId)
+  }
+
+  /////////////////////////////////////////////////////////////////
   // Returns Folder content
   //
   /////////////////////////////////////////////////////////////////
@@ -145,10 +162,11 @@ export default class DMSvc extends BaseSvc {
     this._APIAuth.accessToken = token
 
     const payload = this.createItemPayload(
-      folderId, objectId, filename)
+      folderId, objectId, filename, displayName)
 
     return this._projectsAPI.postItem(
-      projectId, JSON.stringify(payload))
+      projectId,
+      JSON.stringify(payload))
   }
 
   /////////////////////////////////////////////////////////////////
@@ -164,7 +182,8 @@ export default class DMSvc extends BaseSvc {
       itemId, objectId, filename)
 
     return this._projectsAPI.postVersion(
-      projectId, JSON.stringify(payload))
+      projectId,
+      JSON.stringify(payload))
   }
 
   /////////////////////////////////////////////////////////////////
@@ -189,7 +208,7 @@ export default class DMSvc extends BaseSvc {
 
     this._APIAuth.accessToken = token
 
-    const payload = this.createRelationshipRefPayload(
+    const payload = this.createItemRelationshipRefPayload(
       refVersionId)
 
     return this._itemsAPI.postItemRelationshipsRef(
@@ -218,7 +237,7 @@ export default class DMSvc extends BaseSvc {
 
     this._APIAuth.accessToken = token
 
-    const payload = this.createRelationshipRefPayload(
+    const payload = this.createVersionRelationshipRefPayload(
       refVersionId)
 
     return this._versionsAPI.postVersionRelationshipsRef(
@@ -226,19 +245,48 @@ export default class DMSvc extends BaseSvc {
   }
 
   /////////////////////////////////////////////////////////////////
+  // Create new folder
+  //
+  /////////////////////////////////////////////////////////////////
+  createFolder (
+    token, projectId, parentFolderId, folderName) {
+
+    const url =
+      `${DMSvc.SERVICE_BASE_URL}/projects/` +
+      `${projectId}/folders`
+
+    const payload = this.createFolderPayload(
+      parentFolderId,
+      folderName)
+
+    const headers = {
+      'Content-Type': 'application/vnd.api+json',
+      'Authorization': 'Bearer ' + token
+    }
+
+    return requestAsync({
+      method: 'POST',
+      body: payload,
+      json: true,
+      headers,
+      url
+    })
+  }
+
+  /////////////////////////////////////////////////////////////////
   // Upload file to create new item or new version
   //
   /////////////////////////////////////////////////////////////////
-  upload (token, projectId, folderId, file, displayName = null) {
+  upload (token, projectId, folderId, file) {
 
     return new Promise(async(resolve, reject) => {
 
       try {
 
-        var filename = file.originalname
+        var displayName = file.originalname
 
         var storage = await this.createStorage(
-          token, projectId, folderId, filename)
+          token, projectId, folderId, displayName)
 
         var ossSvc = ServiceManager.getService('OssSvc')
 
@@ -255,7 +303,7 @@ export default class DMSvc extends BaseSvc {
           token,
           projectId,
           folderId, {
-            displayName: filename
+            displayName
           })
 
         if(items.length > 0) {
@@ -267,7 +315,7 @@ export default class DMSvc extends BaseSvc {
             projectId,
             item.id,
             storage.data.id,
-            filename)
+            displayName)
 
           const response = {
             version: version.data,
@@ -283,7 +331,6 @@ export default class DMSvc extends BaseSvc {
           const item = await this.createItem(
             token, projectId, folderId,
             storage.data.id,
-            filename,
             displayName)
 
           const versions = await this.getItemVersions(
@@ -400,19 +447,17 @@ export default class DMSvc extends BaseSvc {
   // Creates item payload
   //
   /////////////////////////////////////////////////////////////////
-  createItemPayload (
-    folderId, objectId, filename, displayName = null) {
+  createItemPayload (folderId, objectId, displayName) {
 
     return {
 
       jsonapi: {
         version: '1.0'
       },
-      data: [
-        {
+      data: {
           type: 'items',
           attributes: {
-            name: filename,
+            displayName: displayName,
             extension: {
               type: 'items:autodesk.core:File',
               version: '1.0'
@@ -421,8 +466,7 @@ export default class DMSvc extends BaseSvc {
           relationships: {
             tip: {
               data: {
-                type: 'versions',
-                id: '1'
+                type: 'versions', id: '1'
               }
             },
             parent: {
@@ -432,13 +476,16 @@ export default class DMSvc extends BaseSvc {
               }
             }
           }
-        }
-      ],
+      },
       included: [ {
         type: 'versions',
         id: '1',
         attributes: {
-          name: displayName || filename
+          name: displayName,
+          extension: {
+            type: 'versions:autodesk.core:File',
+            version: '1.0'
+          }
         },
         relationships: {
           storage: {
@@ -448,8 +495,7 @@ export default class DMSvc extends BaseSvc {
             }
           }
         }
-      }
-      ]
+      }]
     }
   }
 
@@ -457,8 +503,7 @@ export default class DMSvc extends BaseSvc {
   // Creates version payload
   //
   /////////////////////////////////////////////////////////////////
-  createVersionPayload (
-    itemId, objectId, filename) {
+  createVersionPayload (itemId, objectId, displayName) {
 
     return {
 
@@ -468,7 +513,7 @@ export default class DMSvc extends BaseSvc {
       data: {
         type: 'versions',
         attributes: {
-          name: filename,
+          name: displayName,
           extension: {
             type: 'versions:autodesk.core:File',
             version: '1.0'
@@ -493,11 +538,10 @@ export default class DMSvc extends BaseSvc {
   }
 
   /////////////////////////////////////////////////////////////////
-  // Creates relationship payload
+  // Creates item relationship payload
   //
   /////////////////////////////////////////////////////////////////
-  createRelationshipRefPayload (
-    refVersionId) {
+  createItemRelationshipRefPayload (refVersionId) {
 
     return {
 
@@ -506,11 +550,66 @@ export default class DMSvc extends BaseSvc {
       },
       data: {
         type: 'versions',
-          id: refVersionId,
-          meta: {
+        id: refVersionId,
+        meta: {
           extension: {
             type: 'auxiliary:autodesk.core:Attachment',
             version: '1.0'
+          }
+        }
+      }
+    }
+  }
+
+  /////////////////////////////////////////////////////////////////
+  // Creates version relationship payload
+  //
+  /////////////////////////////////////////////////////////////////
+  createVersionRelationshipRefPayload (refVersionId) {
+
+    return {
+
+      jsonapi: {
+        version: '1.0'
+      },
+      data: {
+        type: 'versions',
+        id: refVersionId,
+        meta: {
+          extension: {
+            type: 'auxiliary:autodesk.core:Attachment',
+            version: '1.0'
+          }
+        }
+      }
+    }
+  }
+
+  /////////////////////////////////////////////////////////////////
+  // Creates new folder payload
+  //
+  /////////////////////////////////////////////////////////////////
+  createFolderPayload (parentFolderId, folderName) {
+
+    return {
+      jsonapi: {
+        version: '1.0'
+      },
+      data: {
+        type: 'folders',
+        attributes: {
+          name: folderName,
+          extension: {
+            type: 'folders:autodesk.core:Folder',
+            version: '1.0'
+          }
+        },
+        relationships: {
+          parent: {
+            data: {
+              type: 'folders',
+              id: parentFolderId
+            }
           }
         }
       }
@@ -563,10 +662,15 @@ function requestAsync(params) {
         if (response && [200, 201, 202].indexOf(
             response.statusCode) < 0) {
 
+          console.log('status error: ' +
+            response.statusCode)
+
+          console.log(response.statusMessage)
+
           return reject(response.statusMessage)
         }
 
-        return resolve(body.data || body)
+        return resolve(body)
 
       } catch(ex){
 

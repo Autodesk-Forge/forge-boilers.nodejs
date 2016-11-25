@@ -121,7 +121,8 @@ module.exports = function() {
       var dmSvc = ServiceManager.getService('DMSvc')
 
       var response = await dmSvc.getProject(
-        token.access_token, hubId, projectId)
+        token.access_token,
+        hubId, projectId)
 
       res.json(response)
 
@@ -134,10 +135,46 @@ module.exports = function() {
 
   /////////////////////////////////////////////////////////////////////////////
   // GET /projects/{projectId}/folders/{folderId}
+  // Get folder
+  //
+  /////////////////////////////////////////////////////////////////////////////
+  router.get('/projects/:projectId/folders/:folderId',
+    async (req, res) => {
+
+    try {
+
+      var projectId = req.params.projectId
+
+      var folderId = req.params.folderId
+
+      var forgeSvc = ServiceManager.getService(
+        'ForgeSvc');
+
+      var token = await forgeSvc.get3LeggedTokenMaster(
+        req.session)
+
+      var dmSvc = ServiceManager.getService('DMSvc')
+
+      var response = await dmSvc.getFolder(
+        token.access_token,
+        projectId, folderId)
+
+      res.json(response)
+
+    } catch (ex) {
+
+      res.status(ex.status || 500)
+      res.json(ex)
+    }
+  })
+
+  /////////////////////////////////////////////////////////////////////////////
+  // GET /projects/{projectId}/folders/{folderId}/content
   // Get folder content
   //
   /////////////////////////////////////////////////////////////////////////////
-  router.get('/projects/:projectId/folders/:folderId', async (req, res) => {
+  router.get('/projects/:projectId/folders/:folderId/content',
+    async (req, res) => {
 
     try {
       
@@ -409,6 +446,42 @@ module.exports = function() {
       var response = await dmSvc.createVersionRelationshipRef(
         token.access_token, projectId, versionId,
         payload.refVersionId)
+
+      res.json(response)
+
+    } catch (ex) {
+
+      res.status(ex.status || 500)
+      res.json(ex)
+    }
+  })
+
+  /////////////////////////////////////////////////////////////////////////////
+  // POST /project/{projectId}/folders
+  // Create new folder
+  //
+  /////////////////////////////////////////////////////////////////////////////
+  router.post('/projects/:projectId/folders', async (req, res) => {
+
+    try {
+
+      var payload = JSON.parse(req.body.payload)
+
+      var projectId = req.params.projectId
+
+      var forgeSvc = ServiceManager.getService(
+        'ForgeSvc')
+
+      var token = await forgeSvc.get3LeggedTokenMaster(
+        req.session)
+
+      var dmSvc = ServiceManager.getService('DMSvc')
+
+      var response = await dmSvc.createFolder(
+        token.access_token,
+        projectId,
+        payload.parentFolderId,
+        payload.folderName)
 
       res.json(response)
 
