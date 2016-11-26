@@ -30,7 +30,7 @@ export default class ItemContextMenu extends
 
         menu.push({
           title: 'Show item versions details',
-          className: 'fa fa-share',
+          className: 'fa fa-clone',
           target: () => {
             this.emit('context.details', {
               event, node, title: 'Version Details'
@@ -44,7 +44,7 @@ export default class ItemContextMenu extends
 
         menu.push({
           title: 'Show version details',
-          className: 'fa fa-share',
+          className: 'fa fa-clock-o',
           target: () => {
             this.emit('context.details', {
               event, node, title: 'Version Details'
@@ -110,7 +110,7 @@ export default class ItemContextMenu extends
 
         menu.push({
           title: 'Show attachments details',
-          className: 'fa fa-share',
+          className: 'fa fa-paperclip',
           target: () => {
             this.emit('context.details', {
               event, node, title: 'Attachments Details'

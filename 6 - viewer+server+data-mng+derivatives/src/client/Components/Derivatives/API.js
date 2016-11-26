@@ -380,6 +380,20 @@ export default class DerivativesAPI extends ClientAPI {
   //
   //
   ///////////////////////////////////////////////////////////////////
+  getDerivativeData (urn, derivativeUrn, opts = {}) {
+
+    const url = `${this.apiUrl}/download?` +
+      `urn=${urn}&` +
+      `base64=${opts.base64 ? true : false}&` +
+      `derivativeUrn=${encodeURIComponent(derivativeUrn)}`
+
+    return this.ajax(url)
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////
   getDownloadURI (urn, derivativeUrn, filename) {
 
     return `${this.apiUrl}/download?` +

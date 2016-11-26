@@ -261,12 +261,15 @@ export default class App {
 
                 if (parent) {
 
-                  this.dataPanel.onCreateItemNode (tree, {
+                  const itemNode = this.dataPanel.onCreateItemNode (
+                    tree, {
                     version: data.version,
                     item: data.item,
                     insert: true,
                     parent
                   })
+
+                  parent.children.push(itemNode)
                 }
               }
             })

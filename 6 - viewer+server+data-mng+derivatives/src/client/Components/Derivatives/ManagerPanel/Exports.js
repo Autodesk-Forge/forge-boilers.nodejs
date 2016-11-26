@@ -54,7 +54,44 @@ export class ExportsTreeDelegate
 
     const labelId = this.guid()
 
-    let label = `
+    if (node.tooltip) {
+
+      const html = `
+        <div class="label-container">
+            <label id="${labelId}"
+              class="tooltip-container ${node.type}"
+              ${options && options.localize?"data-i18n=" + text : ''}
+                data-placement="right"
+                data-toggle="tooltip"
+                data-delay='{"show":"800", "hide":"100"}'
+                title="loading item ...">
+                ${text}
+            </label>
+        </div>
+      `
+
+      $(parent).append(html)
+
+      const $tooltipTarget = $(parent).find(
+        '[data-toggle="tooltip"]')
+
+      $tooltipTarget.tooltip({
+        container: 'body',
+        animated: 'fade',
+        html: true
+      })
+
+      node.setTooltip = (title) => {
+
+        $(parent).find('.tooltip-container')
+          .attr('title', title)
+          .tooltip('fixTitle')
+          .tooltip('setContent')
+      }
+
+    } else {
+
+      const label = `
         <div class="label-container">
             <label class="${node.type}" id="${labelId}"
               ${options && options.localize?"data-i18n=" + text : ''}>
@@ -63,7 +100,8 @@ export class ExportsTreeDelegate
         </div>
       `
 
-    $(parent).append(label)
+      $(parent).append(label)
+    }
 
     node.createDownloader = (filename) => {
 
@@ -324,16 +362,58 @@ export class ExportsTreeDelegate
 
             const thumbnailNode = {
               type: 'formats.thumbnail-export',
-              query: {guid: thumbnail.guid},
+              query: { guid: thumbnail.guid },
               exportFilename: name + '.png',
               id: this.guid(),
               urn: this.urn,
+              tooltip:true,
               group: true,
               name: name
             }
 
             addChildCallback(thumbnailNode)
           })
+        }
+
+        break
+
+      case 'formats.thumbnail-export':
+
+        node.createDownloader(node.exportFilename)
+
+        node.setTooltip(
+          'loading thumbnail ...')
+
+        node.showLoader(true)
+
+        if (this.manifest) {
+
+          const derivatives =
+            this.derivativesAPI.findDerivatives(
+              this.manifest, node.query)
+
+          if(derivatives.length > 0) {
+
+            node.derivative = derivatives[0]
+
+            this.derivativesAPI.getDerivativeData(
+              this.urn, node.derivative.urn, { base64: true}).then(
+              (thumbnail) => {
+
+                const img = `<img width="150" height="150"
+                    src='data:image/png;base64,${thumbnail}'/>`
+
+                node.setTooltip(img)
+
+                node.showLoader(false)
+
+              }, () => {
+
+                node.setTooltip('failed to load thumbnail ...')
+
+                node.showLoader(false)
+              })
+          }
         }
 
         break
@@ -376,5 +456,34 @@ export class ExportsTreeDelegate
 
         break
     }
+  }
+
+  /////////////////////////////////////////////////////////////
+  //
+  //
+  /////////////////////////////////////////////////////////////
+  bufferToBase64 (buffer) {
+
+    var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+    var bytes = buffer, i, len = bytes.length, base64 = "";
+
+    for (i = 0; i < len; i+=3) {
+      base64 += chars[bytes[i] >> 2];
+      base64 += chars[((bytes[i] & 3) << 4) | (bytes[i + 1] >> 4)];
+      base64 += chars[((bytes[i + 1] & 15) << 2) | (bytes[i + 2] >> 6)];
+      base64 += chars[bytes[i + 2] & 63];
+    }
+
+    if ((len % 3) === 2) {
+
+      base64 = base64.substring(0, base64.length - 1) + "="
+
+    } else if (len % 3 === 1) {
+
+      base64 = base64.substring(0, base64.length - 2) + "=="
+    }
+
+    return base64
   }
 }

@@ -77,8 +77,6 @@ export default class DerivativesManagerPanel extends UIComponent {
 
     this.designName = designName
 
-    this.urn = urn
-
     this.properties = null
 
     this.hierarchy = null
@@ -86,6 +84,8 @@ export default class DerivativesManagerPanel extends UIComponent {
     this.modelGuid = null
 
     this.manifest = null
+
+    this.urn = urn
 
     try {
 
@@ -131,11 +131,17 @@ export default class DerivativesManagerPanel extends UIComponent {
           urn,
           this.hierarchy,
           this.properties)
+
+      } else {
+
+        this.loadExports(
+          this.urn,
+          this.designName,
+          this.manifest,
+          this.modelGuid)
       }
 
     } catch (ex) {
-
-      console.log(ex)
 
       this.loadManifest(
         this.manifest)
@@ -455,7 +461,7 @@ export default class DerivativesManagerPanel extends UIComponent {
             await this.derivativesAPI.postJobWithProgress(
               node.job, {
               panelContainer: this.viewerContainer,
-              designName: this.designName
+              designName: designName
             }, node.query)
 
           resolve(derivative)
@@ -463,20 +469,18 @@ export default class DerivativesManagerPanel extends UIComponent {
         } finally {
 
           this.manifest =
-            await this.derivativesAPI.getManifest(
-            this.urn)
+            await this.derivativesAPI.getManifest(urn)
 
           this.loadManifest (this.manifest)
 
           this.loadExports(
-            this.urn,
-            this.designName,
+            urn,
+            designName,
             this.manifest,
-            this.modelGuid,
+            modelGuid,
             false)
         }
       })
-
     })
 
     const domContainer = $('.exports-tree')[0]

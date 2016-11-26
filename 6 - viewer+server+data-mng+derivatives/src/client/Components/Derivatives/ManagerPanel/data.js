@@ -1,22 +1,28 @@
 
 const Formats = {
-  "stl": [
-    "f3d", "fbx", "iam", "ipt", "wire"
-  ],
-    "step": [
-    "f3d", "fbx", "iam", "ipt", "wire"
-  ],
-    "dwg": [
+  "dwg": [
     "f2d", "f3d", "rvt"
   ],
-    "iges": [
+  "fbx": [
+    "f3d"
+  ],
+  "ifc": [
+    "rvt"
+  ],
+  "iges": [
     "f3d", "fbx", "iam", "ipt", "wire"
   ],
-    "obj": [
+  "obj": [
     "f3d", "fbx", "iam", "ipt", "step", "stp",
     "stpz", "wire","rvt", "dwf", "dwfx", "nwc"
   ],
-    "svf": [
+  "step": [
+    "f3d", "fbx", "iam", "ipt", "wire"
+  ],
+  "stl": [
+    "f3d", "fbx", "iam", "ipt", "wire"
+  ],
+  "svf": [
     "3dm",
     "3ds",
     "asm",
@@ -79,12 +85,6 @@ const Formats = {
     "asm\\.\\d+$",
     "neu\\.\\d+$",
     "prt\\.\\d+$"
-  ],
-  "fbx": [
-    "f3d"
-  ],
-    "ifc": [
-    "rvt"
   ]
 }
 

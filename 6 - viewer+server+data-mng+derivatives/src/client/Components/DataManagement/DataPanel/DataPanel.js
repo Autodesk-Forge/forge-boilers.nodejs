@@ -400,7 +400,7 @@ export default class DataPanel extends UIComponent {
                 height: 200
               }).then((thumbnail) => {
 
-                let img = `<img width="150" height="150"
+                const img = `<img width="150" height="150"
                     src='data:image/png;base64,${thumbnail}'/>`
 
                 node.setTooltip(img)
@@ -499,19 +499,35 @@ export default class DataPanel extends UIComponent {
 
     hubs.data.forEach((hub) => {
 
-      let treeContainerId = this.guid()
+      const treeContainerId = this.guid()
+
+      const searchInputId = this.guid()
 
       this.TabManager.addTab({
         active: !Object.keys(this.treeMap).length,
         name: 'Hub: ' + hub.attributes.name,
         html: `
-          <div id=${treeContainerId}
-            class="tree-container">
+          <div id=${treeContainerId} class="tree-container">
+            <div class="search">
+              <input id="${searchInputId}" type="text"
+                placeholder=" Search ...">
+            </div>
           </div>
         `
       })
 
-      this.loadHub(treeContainerId, hub)
+      const tree = this.loadHub(treeContainerId, hub)
+
+      const rootNode = tree.nodeIdToNode[hub.id]
+
+      $('#' + searchInputId).on('input keyup', () => {
+
+        const search = $('#' + searchInputId).val()
+
+        this.filterNode(
+          rootNode,
+          search.toLowerCase())
+      })
     })
   }
 
@@ -550,7 +566,7 @@ export default class DataPanel extends UIComponent {
 
     delegate.on('createItemNode', (data) => {
 
-      this.onCreateItemNode(tree, data)
+      return this.onCreateItemNode(tree, data)
     })
 
     delegate.on('node.dblClick',
@@ -563,6 +579,70 @@ export default class DataPanel extends UIComponent {
       this.onNodeVersionsClickHandler)
 
     this.treeMap[hub.id] = tree
+
+    return tree
+  }
+
+  /////////////////////////////////////////////////////////////
+  //
+  //
+  /////////////////////////////////////////////////////////////
+  filterNode (node, filter) {
+
+    const name = node.name.toLowerCase()
+
+    let visibleItems = 0
+
+    if (node.children) {
+
+      node.children.forEach((child) => {
+
+        visibleItems += this.filterNode(child, filter)
+      })
+
+      if (visibleItems) {
+
+        $(node.parent).css({
+          display: 'block'
+        })
+
+      } else {
+
+        if (name.indexOf(filter) < 0) {
+
+          $(node.parent).css({
+            display: 'none'
+          })
+
+        } else {
+
+          $(node.parent).css({
+            display: 'block'
+          })
+        }
+      }
+
+      return visibleItems
+
+    } else {
+
+      if (name.indexOf(filter) < 0) {
+
+        $(node.parent).css({
+          display: 'none'
+        })
+
+      } else {
+
+        $(node.parent).css({
+          display: 'block'
+        })
+
+        ++visibleItems
+      }
+    }
+
+    return visibleItems
   }
 }
 
@@ -741,11 +821,13 @@ class DMTreeDelegate extends BaseTreeDelegate {
 
           node.showLoader(false)
 
-          this.createItemNode(
+          const itemNode = this.createItemNode(
             node,
             response.item,
             response.version,
             true)
+
+          node.children.push(itemNode)
         }
       })
 
@@ -850,7 +932,7 @@ class DMTreeDelegate extends BaseTreeDelegate {
 
       const $group = $(node.parent).parent()
 
-      let index = 0
+      let index = -1
 
       $group.find('> group').each(function(idx) {
 
@@ -1098,8 +1180,10 @@ class DMTreeDelegate extends BaseTreeDelegate {
 
                       return new Promise((resolve, reject) => {
 
-                        var itemNode = this.createItemNode(
+                        const itemNode = this.createItemNode(
                           node, item)
+
+                        node.children.push(itemNode)
 
                         resolve(itemNode)
                       })
@@ -1225,8 +1309,10 @@ class DMTreeDelegate extends BaseTreeDelegate {
 
                   return new Promise((resolve, reject) => {
 
-                    var itemNode = this.createItemNode(
+                    const itemNode = this.createItemNode(
                       node, item)
+
+                    node.children.push(itemNode)
 
                     resolve(itemNode)
                   })
@@ -1249,7 +1335,6 @@ class DMTreeDelegate extends BaseTreeDelegate {
               }, (error) => {
 
                 node.emit('childrenLoaded', null)
-
               })
           }
         }

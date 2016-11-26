@@ -149,18 +149,41 @@ export default class DerivativeSvc extends BaseSvc {
 
       request({
         url: url,
+        method: 'GET',
         headers: {
           'Authorization': 'Bearer ' + token
         },
         encoding: null
       }, function(err, response, body) {
 
-        if(err) {
+        try {
 
-          return reject(err)
+          if (err) {
+
+            return reject(err)
+          }
+
+          if (response && [200, 201, 202].indexOf(
+              response.statusCode) < 0) {
+
+            return reject(response.statusMessage)
+          }
+
+          if (opts.base64) {
+
+            resolve(bufferToBase64(body))
+
+          } else {
+
+            resolve(body)
+          }
+
+        } catch(ex) {
+
+          console.log(ex)
+
+          reject(ex)
         }
-
-        resolve(body)
       })
     })
   }
@@ -192,6 +215,7 @@ export default class DerivativeSvc extends BaseSvc {
         try {
 
           if (err) {
+
             return reject(err)
           }
 
@@ -201,29 +225,29 @@ export default class DerivativeSvc extends BaseSvc {
             return reject(response.statusMessage)
           }
 
-          return resolve(arrayToBase64(body))
-        }
-        catch(ex){
+          resolve(bufferToBase64(body))
 
-          console.log(params.url)
+        } catch(ex){
+
+          console.log(url)
           console.log(body)
 
-          return reject(ex)
+          reject(ex)
         }
       })
     })
   }
 }
 
-///////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
+// Utils
 //
-//
-///////////////////////////////////////////////////////////////////
-function arrayToBase64(arraybuffer) {
+/////////////////////////////////////////////////////////////////
+function bufferToBase64 (buffer) {
 
   var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-  var bytes = arraybuffer, i, len = bytes.length, base64 = "";
+  var bytes = buffer, i, len = bytes.length, base64 = "";
 
   for (i = 0; i < len; i+=3) {
     base64 += chars[bytes[i] >> 2];
@@ -238,13 +262,9 @@ function arrayToBase64(arraybuffer) {
     base64 = base64.substring(0, base64.length - 2) + "==";
   }
 
-  return base64;
+  return base64
 }
 
-/////////////////////////////////////////////////////////////////
-// Utils
-//
-/////////////////////////////////////////////////////////////////
 function requestAsync(params) {
 
   return new Promise((resolve, reject) => {

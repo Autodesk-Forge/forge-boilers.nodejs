@@ -147,10 +147,7 @@ export default class ItemPanel extends UIComponent {
 
     this.contextMenu.on('context.setActiveVersion', (data) => {
 
-      $('.versions.version.active-version').toggleClass(
-        'active-version')
-
-      data.node.parent.classList.add('active-version')
+      data.node.setActiveVersion()
 
       this.emit('setActiveVersion', data.node)
     })
@@ -594,6 +591,36 @@ class ItemVersionsTreeDelegate extends BaseTreeDelegate {
 
     switch (node.type) {
 
+      case 'versions.version':
+
+        const activeVersionId = this.guid()
+
+        $(parent).append(`
+          <div id="${activeVersionId}" class="active-version">
+              <span class="fa fa-check">
+              </span>
+            </button>
+          </div>
+        `)
+
+        node.setActiveVersion = () => {
+
+          $('.active-version').css({
+            display: 'none'
+          })
+
+          $('#' + activeVersionId).css({
+            display: 'block'
+          })
+        }
+
+        if(node.active) {
+
+          node.setActiveVersion()
+        }
+
+        break
+
       case 'versions.attachments':
       case 'item.attachments':
 
@@ -816,8 +843,7 @@ class ItemVersionsTreeDelegate extends BaseTreeDelegate {
       if(!$('#' + loadDivId).length) {
 
         $('#' + labelId).after(`
-          <div id=${loadDivId} class="label-loader"
-            style="display:none;">
+          <div id=${loadDivId} class="label-loader">
             <img> </img>
           </div>
         `)
@@ -855,6 +881,7 @@ class ItemVersionsTreeDelegate extends BaseTreeDelegate {
           const verNum = version.id.split('=')[1]
 
           const versionNode = {
+            active: verNum === activeVerNum,
             projectId: node.projectId,
             type: 'versions.version',
             folderId: node.folderId,

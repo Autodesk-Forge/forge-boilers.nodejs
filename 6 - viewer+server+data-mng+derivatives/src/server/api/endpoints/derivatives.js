@@ -244,12 +244,14 @@ module.exports = function() {
   router.get('/download', async (req, res) => {
 
     try {
-      
-      var urn = req.query.urn
 
-      var filename = req.query.filename
+      var filename = req.query.filename || 'download'
 
       var derivativeUrn = req.query.derivativeUrn
+
+      var base64 = req.query.base64
+
+      var urn = req.query.urn
 
       var forgeSvc = ServiceManager.getService(
         'ForgeSvc')
@@ -261,7 +263,9 @@ module.exports = function() {
         'DerivativesSvc')
 
       var response = await derivativesSvc.download(
-        token.access_token, urn, derivativeUrn)
+        token.access_token, urn, derivativeUrn, {
+          base64: base64
+        })
 
       res.set('Content-Type', 'application/octet-stream')
 

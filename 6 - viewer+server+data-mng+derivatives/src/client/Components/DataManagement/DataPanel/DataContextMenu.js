@@ -30,7 +30,7 @@ export default class DataContextMenu extends
 
         menu.push({
           title: 'Show hub details',
-          className: 'fa fa-share',
+          className: 'fa fa-cloud',
           target: () => {
             this.emit('context.details', {
               event, node, type: 'hubs'
@@ -47,7 +47,7 @@ export default class DataContextMenu extends
           className: 'fa fa-share',
           target: [{
               title: 'Project details',
-              className: 'fa fa-share',
+              className: 'fa fa-clone',
               target: () => {
                 this.emit('context.details', {
                   event, node, type: 'projects'
@@ -55,7 +55,7 @@ export default class DataContextMenu extends
               }
             }, {
               title: 'Root folder details',
-              className: 'fa fa-share',
+              className: 'fa fa-folder',
               target: () => {
                 this.emit('context.details', {
                   event, node, type: 'folders'
@@ -63,7 +63,7 @@ export default class DataContextMenu extends
               }
             }, {
               title: 'Root folder content',
-              className: 'fa fa-share',
+              className: 'fa fa-folder-open',
               target: () => {
                 this.emit('context.details', {
                   event, node, type: 'folders.content'
@@ -91,7 +91,7 @@ export default class DataContextMenu extends
           className: 'fa fa-share',
           target: [{
             title: 'Folder details',
-            className: 'fa fa-share',
+            className: 'fa fa-folder',
             target: () => {
               this.emit('context.details', {
                 event, node, type: 'folders'
@@ -99,7 +99,7 @@ export default class DataContextMenu extends
             }
           }, {
             title: 'Folder content',
-            className: 'fa fa-share',
+            className: 'fa fa-folder-open',
             target: () => {
               this.emit('context.details', {
                 event, node, type: 'folders.content'
@@ -124,7 +124,7 @@ export default class DataContextMenu extends
 
         menu.push({
           title: 'Show item details',
-          className: 'fa fa-share',
+          className: 'fa fa-file-text',
           target: () => {
             this.emit('context.details', {
               event, node, type: 'items'

@@ -64,6 +64,7 @@
 .item-versions .treeview .label-container {
   pointer-events: none;
   overflow: hidden;
+  float: left
 }
 
 .item-versions .treeview .file .label-container {
@@ -87,6 +88,8 @@
 
 .item-versions .treeview .label-loader {
   position: relative;
+  display: none;
+  float: left;
   top: 1px;
 }
 
@@ -132,6 +135,16 @@
   line-height: 1;
   padding: 3px;
   height: 25px;
+  top: -2px;
+}
+
+.item-versions .active-version {
+  position: relative;
+  margin-left: 7px;
+  font-size: 20px;
+  color: #0ecc1f;
+  display: none;
+  float: left;
   top: -2px;
 }
 

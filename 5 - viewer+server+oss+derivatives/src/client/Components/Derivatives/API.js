@@ -216,7 +216,7 @@ export default class DerivativesAPI extends ClientAPI {
   findDerivatives (parent, query) {
 
     if(!parent) {
-
+      
       return []
     }
 
@@ -374,6 +374,20 @@ export default class DerivativesAPI extends ClientAPI {
         return reject(ex)
       }
     })
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////
+  getDerivativeData (urn, derivativeUrn, opts = {}) {
+
+    const url = `${this.apiUrl}/download?` +
+      `urn=${urn}&` +
+      `base64=${opts.base64 ? true : false}&` +
+      `derivativeUrn=${encodeURIComponent(derivativeUrn)}`
+
+    return this.ajax(url)
   }
 
   ///////////////////////////////////////////////////////////////////

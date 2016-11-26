@@ -90,8 +90,20 @@
     height: 100%;
 }
 
-.storage .tabs-container {
-    height: 100%;
+.storage .tree-container .search {
+  position: absolute;
+  color: #474848;
+  width: 160px;
+  z-index: 10;
+  right: 10px;
+  top: 10px;
+}
+
+.storage .tree-container .search input {
+  border: 1px solid #aeaeae;
+  background-color: #f8f8f8;
+  border-radius: 4px;
+  width: 100%;
 }
 
 .storage .treeview header {
