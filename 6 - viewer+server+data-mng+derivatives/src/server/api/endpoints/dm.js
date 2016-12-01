@@ -191,7 +191,8 @@ module.exports = function() {
       var dmSvc = ServiceManager.getService('DMSvc')
 
       var response = await dmSvc.getFolderContent(
-        token.access_token, projectId, folderId)
+        token.access_token,
+        projectId, folderId)
 
       res.json(response)
 
@@ -203,18 +204,16 @@ module.exports = function() {
   })
 
   /////////////////////////////////////////////////////////////////////////////
-  // GET /projects/{projectId}/folders/{folderId}/items/{itemId}
+  // GET /projects/{projectId}/items/{itemId}
   // Get item details
   //
   /////////////////////////////////////////////////////////////////////////////
-  router.get('/projects/:projectId/folders/:folderId/items/:itemId',
+  router.get('/projects/:projectId/items/:itemId',
     async (req, res) => {
 
     try {
 
       var projectId = req.params.projectId
-
-      var folderId = req.params.folderId
 
       var itemId = req.params.itemId
 
@@ -226,19 +225,11 @@ module.exports = function() {
 
       var dmSvc = ServiceManager.getService('DMSvc')
 
-      var response = await dmSvc.getFolderContent(
-        token.access_token, projectId, folderId)
+      var response = await dmSvc.getItem(
+        token.access_token,
+        projectId, itemId)
 
-      const items = response.data.filter((folderItem) => {
-
-        return folderItem.id === itemId
-      })
-
-      const item = items.length ? items[0] : null
-
-      res.status(item ? 200 : 404)
-
-      res.json(item)
+      res.json(response)
 
     } catch (ex) {
 
@@ -270,11 +261,49 @@ module.exports = function() {
       var dmSvc = ServiceManager.getService('DMSvc')
 
       var response = await dmSvc.getItemVersions(
-        token.access_token, projectId, itemId)
+        token.access_token,
+        projectId, itemId)
 
       res.json(response)
 
     } catch (ex) {
+
+      res.status(ex.status || 500)
+      res.json(ex)
+    }
+  })
+
+  /////////////////////////////////////////////////////////////////////////////
+  // DELETE /project/{projectId}/items/{itemId}
+  // Delete item
+  //
+  /////////////////////////////////////////////////////////////////////////////
+  router.delete('/projects/:projectId/items/:itemId',
+    async (req, res) => {
+
+    try {
+
+      var projectId = req.params.projectId
+
+      var itemId = req.params.itemId
+
+      var forgeSvc = ServiceManager.getService(
+        'ForgeSvc')
+
+      var token = await forgeSvc.get3LeggedTokenMaster(
+        req.session)
+
+      var dmSvc = ServiceManager.getService('DMSvc')
+
+      var response = await dmSvc.deleteItem(
+        token.access_token,
+        projectId, itemId)
+
+      res.json(response)
+
+    } catch (ex) {
+
+      console.log(ex)
 
       res.status(ex.status || 500)
       res.json(ex)
@@ -303,7 +332,8 @@ module.exports = function() {
       var dmSvc = ServiceManager.getService('DMSvc')
 
       var response = await dmSvc.getVersion(
-        token.access_token, projectId, versionId)
+        token.access_token,
+        projectId, versionId)
 
       res.json(response)
 
@@ -337,7 +367,8 @@ module.exports = function() {
       var dmSvc = ServiceManager.getService('DMSvc')
 
       var response = await dmSvc.getItemRelationshipsRefs(
-        token.access_token, projectId, itemId)
+        token.access_token,
+        projectId, itemId)
 
       res.json(response)
 
@@ -371,7 +402,8 @@ module.exports = function() {
       var dmSvc = ServiceManager.getService('DMSvc')
 
       var response = await dmSvc.getVersionRelationshipsRefs(
-        token.access_token, projectId, versionId)
+        token.access_token,
+        projectId, versionId)
 
       res.json(response)
 
@@ -407,7 +439,8 @@ module.exports = function() {
       var dmSvc = ServiceManager.getService('DMSvc')
 
       var response = await dmSvc.createItemRelationshipRef(
-        token.access_token, projectId, itemId,
+        token.access_token,
+        projectId, itemId,
         payload.refVersionId)
 
       res.json(response)
@@ -444,7 +477,8 @@ module.exports = function() {
       var dmSvc = ServiceManager.getService('DMSvc')
 
       var response = await dmSvc.createVersionRelationshipRef(
-        token.access_token, projectId, versionId,
+        token.access_token,
+        projectId, versionId,
         payload.refVersionId)
 
       res.json(response)
@@ -516,8 +550,7 @@ module.exports = function() {
 
       var object = await ossSvc.getObject(
         token.access_token,
-        bucketKey,
-        objectKey)
+        bucketKey, objectKey)
 
       res.end(object)
 

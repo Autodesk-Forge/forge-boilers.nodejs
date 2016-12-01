@@ -120,21 +120,54 @@ export class ExportsTreeDelegate
           </div>
         `)
 
-      const download = (derivativeUrn) => {
+      const download = async(derivativeUrn) => {
 
         node.showLoader(true)
 
-        const uri = this.derivativesAPI.getDownloadURI(
-          node.urn,
-          derivativeUrn,
-          node.exportFilename)
+        if (node.urn === derivativeUrn) {
 
-        this.derivativesAPI.downloadURI(
-          uri, node.exportFilename)
+          try {
 
-        setTimeout(() => {
-          node.showLoader(false)
-        }, 2000)
+            await this.derivativesAPI.getStatusSVF(
+              this.designName)
+
+          } catch (ex) {
+
+            this.derivativesAPI.extractSVF({
+              urn: node.urn,
+              name: this.designName
+            })
+
+            await this.derivativesAPI.waitExtractSVF(
+              this.designName)
+
+          } finally {
+
+            setTimeout(() => {
+              node.showLoader(false)
+            }, 2000)
+
+            const uri = `${this.derivativesAPI.apiUrl}` +
+              `/svf/download/${this.designName}`
+
+            this.derivativesAPI.downloadURI(
+              uri, this.designName + '.zip')
+          }
+
+        } else {
+
+          const uri = this.derivativesAPI.getDownloadURI(
+            node.urn,
+            derivativeUrn,
+            node.exportFilename)
+
+          this.derivativesAPI.downloadURI(
+            uri, node.exportFilename)
+
+          setTimeout(() => {
+            node.showLoader(false)
+          }, 2000)
+        }
       }
 
       $(`#${downloadId}`).click(() => {
@@ -146,6 +179,8 @@ export class ExportsTreeDelegate
         } else {
 
           this.emit('postJob', node).then((derivative) => {
+
+            this.emit('manifest.reload', node)
 
             download(derivative.urn)
           })
@@ -208,6 +243,7 @@ export class ExportsTreeDelegate
               input: {urn: this.urn}
             },
             query: { role: format },
+            nodeId: node.nodeId,
             id: this.guid(),
             urn: this.urn,
             group: true,
@@ -221,6 +257,7 @@ export class ExportsTreeDelegate
 
         let thumbnailsNode = {
           type: 'formats.thumbnails-export',
+          nodeId: node.nodeId,
           name: 'thumbnails',
           id: this.guid(),
           group: true
@@ -257,6 +294,7 @@ export class ExportsTreeDelegate
                 _.isEqual(derivative.objectIds, [-1])
               )
             },
+            nodeId: node.nodeId,
             name: 'Full Model',
             id: this.guid(),
             urn: this.urn,
@@ -282,6 +320,7 @@ export class ExportsTreeDelegate
               name: `Components: [${obj.objectIds.join(', ')}]`,
               type: 'formats.obj-export-component',
               query: { guid: obj.guid },
+              nodeId: node.nodeId,
               id: this.guid(),
               urn: this.urn,
               group: true
@@ -309,6 +348,7 @@ export class ExportsTreeDelegate
               type: 'formats.dwg-export-sheet',
               query: { guid: dwg.guid },
               exportFilename: sheet,
+              nodeId: node.nodeId,
               id: this.guid(),
               urn: this.urn,
               group: true,
@@ -321,6 +361,7 @@ export class ExportsTreeDelegate
         } else {
 
           const dwgRequestNode = {
+            exportFilename: "2d dwg's",
             type: 'formats.dwg-export-sheet',
             job: {
               output: {
@@ -331,6 +372,7 @@ export class ExportsTreeDelegate
               },
               input: {urn: this.urn}
             },
+            nodeId: node.nodeId,
             id: this.guid(),
             group: true,
             name: 'Request dwg exports ... '
@@ -364,6 +406,7 @@ export class ExportsTreeDelegate
               type: 'formats.thumbnail-export',
               query: { guid: thumbnail.guid },
               exportFilename: name + '.png',
+              nodeId: node.nodeId,
               id: this.guid(),
               urn: this.urn,
               tooltip:true,
@@ -420,6 +463,23 @@ export class ExportsTreeDelegate
 
       case 'formats.svf-export':
 
+        node.createDownloader(node.exportFilename)
+
+        node.job = {
+          input: {
+            urn: this.urn
+          },
+          output: {
+            force: true,
+            formats:[{
+              type: 'svf',
+              views: ['2d', '3d']
+            }]
+          }
+        }
+
+        node.query = { type: 'geometry'}
+
         if (this.manifest) {
 
           const derivatives =
@@ -430,7 +490,9 @@ export class ExportsTreeDelegate
 
             node.parent.classList.add('derivated')
 
-            node.derivative = derivatives[0]
+            node.derivative = {
+              urn: node.urn
+            }
           }
         }
 
@@ -456,34 +518,5 @@ export class ExportsTreeDelegate
 
         break
     }
-  }
-
-  /////////////////////////////////////////////////////////////
-  //
-  //
-  /////////////////////////////////////////////////////////////
-  bufferToBase64 (buffer) {
-
-    var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
-    var bytes = buffer, i, len = bytes.length, base64 = "";
-
-    for (i = 0; i < len; i+=3) {
-      base64 += chars[bytes[i] >> 2];
-      base64 += chars[((bytes[i] & 3) << 4) | (bytes[i + 1] >> 4)];
-      base64 += chars[((bytes[i + 1] & 15) << 2) | (bytes[i + 2] >> 6)];
-      base64 += chars[bytes[i + 2] & 63];
-    }
-
-    if ((len % 3) === 2) {
-
-      base64 = base64.substring(0, base64.length - 1) + "="
-
-    } else if (len % 3 === 1) {
-
-      base64 = base64.substring(0, base64.length - 2) + "=="
-    }
-
-    return base64
   }
 }

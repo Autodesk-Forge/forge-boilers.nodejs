@@ -6,6 +6,7 @@
 import { BaseTreeDelegate, TreeNode } from 'TreeView'
 import CreateFolderPanel from './CreateFolderPanel'
 import {API as DerivativesAPI} from 'Derivatives'
+import ToolPanelModal from 'ToolPanelModal'
 import ContextMenu from './DataContextMenu'
 import UIComponent from 'UIComponent'
 import TabManager from 'TabManager'
@@ -103,8 +104,7 @@ export default class DataPanel extends UIComponent {
           case 'items':
             this.showPayload(
               `${this.dmAPI.apiUrl}/projects/` +
-              `${data.node.projectId}/folders/` +
-              `${data.node.folderId}/items/` +
+              `${data.node.projectId}/items/` +
               `${data.node.itemId}`)
             break
         }
@@ -232,6 +232,47 @@ export default class DataPanel extends UIComponent {
       }, (err) => {
 
         data.node.showLoader(false)
+      })
+    })
+
+    this.contextMenu.on('context.item.delete', (data) => {
+
+      const dlg = new ToolPanelModal(appContainer, {
+        title: 'Delete item ...'
+      })
+
+      dlg.bodyContent(
+        `<div class="confirm-delete">
+          <br>
+          Are you sure you want to delete
+          <b>
+            ${data.node.name}
+          </b>
+          ?
+        </div>
+        `)
+
+      dlg.setVisible(true)
+
+      dlg.on('close', async(event) => {
+
+        if (event.result === 'OK') {
+
+          console.log('Deleting item: ' + data.node.name)
+
+          data.node.showLoader(true)
+
+          this.dmAPI.deleteItem(
+            data.node.projectId,
+            data.node.itemId).then(() => {
+
+              data.node.remove()
+
+            }, (err) => {
+
+              data.node.showLoader(false)
+            })
+        }
       })
     })
   }
@@ -412,10 +453,14 @@ export default class DataPanel extends UIComponent {
 
             node.setTooltip('no SVF derivative on this item')
 
+            node.parent.classList.remove('derivated')
+
             node.showLoader(false)
           }
 
         } else {
+
+          node.parent.classList.remove('derivated')
 
           node.showLoader(false)
         }
@@ -423,6 +468,8 @@ export default class DataPanel extends UIComponent {
       }, (err) => {
 
         node.setTooltip('no derivative on this item')
+
+        node.parent.classList.remove('derivated')
 
         node.showLoader(false)
 
@@ -890,6 +937,10 @@ class DMTreeDelegate extends BaseTreeDelegate {
           this.emit('node.versionsClick', node)
         })
       }
+    }
+
+    node.remove = () => {
+      $(`group[lmv-nodeid='${node.id}']`).remove()
     }
 
     node.expand = () => {

@@ -263,11 +263,11 @@ export default class App {
 
                   const itemNode = this.dataPanel.onCreateItemNode (
                     tree, {
-                    version: data.version,
-                    item: data.item,
-                    insert: true,
-                    parent
-                  })
+                      version: data.version,
+                      item: data.item,
+                      insert: true,
+                      parent
+                    })
 
                   parent.children.push(itemNode)
                 }
@@ -413,12 +413,12 @@ export default class App {
 
       this.derivativesPanel.off()
 
-      this.derivativesPanel.on('manifest.delete', () => {
+      this.derivativesPanel.on('manifest.reload', () => {
 
-        node.parent.classList.remove('derivated')
+        this.dataPanel.onItemNodeAdded (node)
       })
 
-      this.derivativesPanel.load(urn, node.name).then(() => {
+      this.derivativesPanel.load(urn, node).then(() => {
 
         resolve()
       })

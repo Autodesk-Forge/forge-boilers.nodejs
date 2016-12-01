@@ -73,11 +73,13 @@ export default class DerivativesManagerPanel extends UIComponent {
   //
   //
   ///////////////////////////////////////////////////////////////////
-  async load (urn, designName) {
+  async load (urn, node) {
 
-    this.designName = designName
+    this.designName = node.name
 
     this.properties = null
+
+    this.nodeId = node.id
 
     this.hierarchy = null
 
@@ -209,9 +211,10 @@ export default class DerivativesManagerPanel extends UIComponent {
         display: 'none'
       })
 
-      this.emit('manifest.delete', this.urn)
+      this.derivativesAPI.deleteManifest(this.urn).then(() => {
 
-      this.derivativesAPI.deleteManifest(this.urn)
+        this.emit('manifest.reload')
+      })
     })
   }
 
@@ -483,11 +486,17 @@ export default class DerivativesManagerPanel extends UIComponent {
       })
     })
 
+    delegate.on('manifest.reload', () => {
+
+      this.emit('manifest.reload')
+    })
+
     const domContainer = $('.exports-tree')[0]
 
     const rootNode = {
       name: 'Available Exports',
       type: 'formats.root',
+      nodeId: this.nodeId,
       id: this.guid(),
       group: true
     }

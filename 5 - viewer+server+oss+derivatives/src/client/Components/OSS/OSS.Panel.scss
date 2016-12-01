@@ -58,11 +58,11 @@
 
 .storage .treeview header {
     width: calc(100% - 20px);
-    height: 35px;
+    height: 32px;
 }
 
 .storage .treeview header.drop-target {
-    background-color: #67a8fd;
+  background-color: rgba(114, 162, 255, 0.31);
     border-radius: 6px;
 }
 
@@ -115,9 +115,11 @@
 
 .storage .cloud-upload,
 .storage .cloud-download {
-    margin-right: 4px;
-    float: left;
-    left: -5px;
+  margin-right: 4px;
+  position: relative;
+  float: left;
+  left: -2px;
+  top: 1px;
 }
 
 .storage .cloud-upload .btn,

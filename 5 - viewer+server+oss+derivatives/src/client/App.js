@@ -155,18 +155,16 @@ export default class App {
       const urn = window.btoa(node.details.objectId).replace(
         new RegExp('=', 'g'), '')
 
-      const modelName = node.details.objectKey
-
-      $('#model-name').text(modelName)
+      $('#model-name').text(node.name)
 
       this.derivativesPanel.off()
 
-      this.derivativesPanel.on('manifest.delete', () => {
+      this.derivativesPanel.on('manifest.reload', () => {
 
-        node.parent.classList.remove('derivated')
+        this.ossPanel.onObjectNodeAdded (node)
       })
 
-      this.derivativesPanel.load(urn, modelName).then(() => {
+      this.derivativesPanel.load(urn, node).then(() => {
 
         resolve()
       })

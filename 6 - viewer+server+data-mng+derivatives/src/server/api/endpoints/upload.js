@@ -4,6 +4,7 @@ import { serverConfig as config } from 'c0nfig'
 import findRemoveSync from 'find-remove'
 import express from 'express'
 import multer from 'multer'
+import rimraf from 'rimraf'
 import crypto from 'crypto'
 import path from 'path'
 import fs from 'fs'
@@ -12,10 +13,10 @@ module.exports = function() {
 
   var router = express.Router()
 
-  //clean up TMP files at startup
-  findRemoveSync('TMP', {
-    age: { seconds: 0 }
-  })
+  const dir = path.resolve(__dirname,
+    `../../../../TMP`)
+
+  clean(dir)
 
   ///////////////////////////////////////////////////////////////////
   // start cleanup task to remove uploaded temp files
@@ -23,10 +24,9 @@ module.exports = function() {
   ///////////////////////////////////////////////////////////////////
   setInterval(() => {
 
-    findRemoveSync('TMP', {
-      age: { seconds: 3600 }
-    }), 60 * 60 * 1000
-  })
+    clean(dir, 60 * 60 * 1000)
+
+  }, 60 * 60 * 1000)
 
   //////////////////////////////////////////////////////////////////////////////
   // Initialization upload
@@ -123,4 +123,31 @@ module.exports = function() {
   })
 
   return router
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+//
+/////////////////////////////////////////////////////////////////////////////
+function clean(dir, age = 0) {
+  fs.readdir(dir, (err, files) => {
+    files.forEach((file) => {
+      const filePath = path.join(dir, file)
+      fs.stat(filePath, (err, stat) => {
+        if (err) {
+          return console.error(err);
+        }
+        const now = new Date().getTime();
+        const endTime = new Date(stat.ctime).getTime() + age
+        if (now > endTime) {
+          return rimraf(filePath, (err) => {
+            if (err) {
+              return console.error(err);
+            }
+            console.log(`${dir} cleaned`);
+          })
+        }
+      })
+    })
+  })
 }

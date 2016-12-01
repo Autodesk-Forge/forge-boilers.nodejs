@@ -39,6 +39,7 @@ import AppAPI from './api/endpoints/app'
 import DMAPI from './api/endpoints/dm'
 
 //Services
+import SVFDownloaderSvc from './api/services/SVFDownloaderSvc'
 import DerivativesSvc from './api/services/DerivativesSvc'
 import ServiceManager from './api/services/SvcManager'
 import SocketSvc from './api/services/SocketSvc'
@@ -110,15 +111,18 @@ function runServer() {
           ' reason: ', reason)
       })
 
-      var forgeSvc = new ForgeSvc(
+      const svfDownloaderSvc = new SVFDownloaderSvc()
+
+      const forgeSvc = new ForgeSvc(
         config.forge)
 
-      var derivativesSvc = new DerivativesSvc()
+      const derivativesSvc = new DerivativesSvc()
 
-      var ossSvc = new OssSvc()
+      const ossSvc = new OssSvc()
 
-      var dmSvc = new DMSvc()
+      const dmSvc = new DMSvc()
 
+      ServiceManager.registerService(svfDownloaderSvc)
       ServiceManager.registerService(derivativesSvc)
       ServiceManager.registerService(forgeSvc)
       ServiceManager.registerService(ossSvc)

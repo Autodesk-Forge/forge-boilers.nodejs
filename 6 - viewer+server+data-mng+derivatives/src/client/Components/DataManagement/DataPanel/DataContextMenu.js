@@ -170,6 +170,19 @@ export default class DataContextMenu extends
           }
         }
 
+        if(node.activeVersion.relationships.storage) {
+
+          menu.push({
+            title: 'Delete item',
+            className: 'fa fa-times-circle',
+            target: () => {
+              this.emit('context.item.delete', {
+                event, node
+              })
+            }
+          })
+        }
+
         break
     }
 

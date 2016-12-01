@@ -36,10 +36,11 @@ module.exports = {
 
         scope: [
           'data:read',
-          'data:create',
           'data:write',
+          'data:create',
           'bucket:read',
-          'bucket:create'
+          'bucket:create',
+          'bucket:delete'
         ]
       }
     }

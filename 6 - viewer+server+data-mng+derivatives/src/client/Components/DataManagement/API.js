@@ -70,15 +70,28 @@ export default class DataManagementAPI extends ClientAPI {
   }
 
   ///////////////////////////////////////////////////////////////////
-  // GET /projects/:projectId/folders/:folderId
+  // GET /projects/:projectId/items/:itemId
   //
   ///////////////////////////////////////////////////////////////////
-  getItem (projectId, folderId, itemId) {
+  getItem (projectId, itemId) {
     
-    const url = `${this.apiUrl}/projects/${projectId}/folders/` +
-      `${folderId}/items/${itemId}`
+    const url = `${this.apiUrl}/projects/${projectId}/items/${itemId}`
 
     return this.ajax(url)
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  // DELETE /projects/:projectId/items/:itemId
+  //
+  ///////////////////////////////////////////////////////////////////
+  deleteItem (projectId, itemId) {
+
+    const url = `${this.apiUrl}/projects/${projectId}/items/${itemId}`
+
+    return this.ajax({
+      type: 'DELETE',
+      url
+    })
   }
 
   ///////////////////////////////////////////////////////////////////

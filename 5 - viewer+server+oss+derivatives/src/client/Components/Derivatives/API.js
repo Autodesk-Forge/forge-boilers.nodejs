@@ -36,6 +36,10 @@ export default class DerivativesAPI extends ClientAPI {
 
     switch (job.output.formats[0].type) {
 
+      case 'svf':
+
+        return { type: 'geometry' }
+
       case 'obj':
 
         const objIds = job.output.formats[0].advanced.objectIds
@@ -93,7 +97,16 @@ export default class DerivativesAPI extends ClientAPI {
 
           jobPanel.done()
 
-          resolve(derivative)
+          if (job.output.formats[0].type === 'svf') {
+
+            resolve({
+              urn: job.input.urn
+            })
+
+          } else {
+
+            resolve(derivative)
+          }
 
         } else {
 
@@ -297,7 +310,7 @@ export default class DerivativesAPI extends ClientAPI {
             return reject(manifest)
           }
 
-          var derivatives = this.findDerivatives(
+          const derivatives = this.findDerivatives(
             manifest, query)
 
           if (derivatives.length) {
@@ -412,6 +425,62 @@ export default class DerivativesAPI extends ClientAPI {
     link.download = name
     link.href = uri
     link.click()
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////
+  extractSVF (payload) {
+
+    const url = `${this.apiUrl}/svf/extract`
+
+    const data = {
+      payload: JSON.stringify(payload)
+    }
+
+    return this.ajax({
+      type: 'POST',
+      data,
+      url
+    })
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////
+  getStatusSVF (name) {
+
+    const url = `${this.apiUrl}/svf/status/${name}`
+
+    return this.ajax(url)
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////
+  waitExtractSVF (name) {
+
+    const url = `${this.apiUrl}/svf/status/${name}`
+
+    return new Promise(async(resolve, reject) => {
+
+      while (true) {
+
+        try {
+
+          const res = await this.ajax(url)
+
+          return resolve(res)
+
+        } catch (ex) {
+
+          await sleep(2000)
+        }
+      }
+    })
   }
 }
 

@@ -167,7 +167,7 @@ export default class OSSPanel extends UIComponent {
 
       data.node.showLoader(true)
 
-      let response = await this.ossAPI.deleteObject(
+      const response = await this.ossAPI.deleteObject(
         data.node.bucketKey,
         data.node.objectKey)
 
@@ -276,6 +276,10 @@ export default class OSSPanel extends UIComponent {
     const urn = window.btoa(objectId).replace(
       new RegExp('=', 'g'), '')
 
+    node.manifest = null
+
+    node.showLoader(true)
+
     this.derivativesAPI.getManifest(
       urn).then((manifest) => {
 
@@ -307,10 +311,14 @@ export default class OSSPanel extends UIComponent {
 
             node.setTooltip('no SVF derivative on this item')
 
+            node.parent.classList.remove('derivated')
+
             node.showLoader(false)
           }
 
         } else {
+
+          node.parent.classList.remove('derivated')
 
           node.showLoader(false)
         }
@@ -318,6 +326,8 @@ export default class OSSPanel extends UIComponent {
       }, (err) => {
 
         node.setTooltip('no derivative on this item')
+
+        node.parent.classList.remove('derivated')
 
         node.showLoader(false)
 

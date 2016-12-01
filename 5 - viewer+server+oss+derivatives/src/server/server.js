@@ -37,6 +37,7 @@ import ForgeAPI from './api/endpoints/forge'
 import OssAPI from './api/endpoints/oss'
 
 //Services
+import SVFDownloaderSvc from './api/services/SVFDownloaderSvc'
 import DerivativesSvc from './api/services/DerivativesSvc'
 import ServiceManager from './api/services/SvcManager'
 import ForgeSvc from './api/services/ForgeSvc'
@@ -103,17 +104,20 @@ function runServer() {
         })
 
 
-      var forgeSvc = new ForgeSvc(config.forge)
+      const svfDownloaderSvc = new SVFDownloaderSvc()
 
-      var derivativesSvc = new DerivativesSvc()
+      const forgeSvc = new ForgeSvc(config.forge)
 
-      var ossSvc = new OssSvc()
+      const derivativesSvc = new DerivativesSvc()
 
+      const ossSvc = new OssSvc()
+
+      ServiceManager.registerService(svfDownloaderSvc)
       ServiceManager.registerService(derivativesSvc)
       ServiceManager.registerService(forgeSvc)
       ServiceManager.registerService(ossSvc)
 
-      var server = app.listen(
+      const server = app.listen(
         process.env.PORT || config.port || 3000, () => {
 
         console.log('Server listening on: ')

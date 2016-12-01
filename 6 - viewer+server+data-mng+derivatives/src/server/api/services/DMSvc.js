@@ -114,6 +114,18 @@ export default class DMSvc extends BaseSvc {
   }
 
   /////////////////////////////////////////////////////////////////
+  // Returns Item details
+  //
+  /////////////////////////////////////////////////////////////////
+  getItem (token, projectId, itemId) {
+
+    this._APIAuth.accessToken = token
+
+    return this._itemsAPI.getItem(
+      projectId, itemId)
+  }
+
+  /////////////////////////////////////////////////////////////////
   // Returns Versions for specific Item
   //
   /////////////////////////////////////////////////////////////////
@@ -126,6 +138,36 @@ export default class DMSvc extends BaseSvc {
   }
 
   /////////////////////////////////////////////////////////////////
+  // Delete Item
+  //
+  /////////////////////////////////////////////////////////////////
+  deleteItem (token, projectId, itemId) {
+
+    return new Promise(async(resolve, reject) => {
+
+      try {
+
+        this._APIAuth.accessToken = token
+
+        const versionsRes = await this._itemsAPI.getItemVersions(
+          projectId, itemId)
+
+        const deleteTasks = versionsRes.data.map((version) => {
+
+          return this.deleteVersion(
+            token, projectId, version.id)
+        })
+
+        return Promise.all(deleteTasks)
+
+      } catch (ex) {
+
+        reject (ex)
+      }
+    })
+  }
+
+  /////////////////////////////////////////////////////////////////
   // Returns Version for specific versionId
   //
   /////////////////////////////////////////////////////////////////
@@ -135,6 +177,45 @@ export default class DMSvc extends BaseSvc {
 
     return this._versionsAPI.getVersion(
       projectId, versionId)
+  }
+
+  /////////////////////////////////////////////////////////////////
+  // Delete Version
+  //
+  /////////////////////////////////////////////////////////////////
+  deleteVersion (token, projectId, versionId) {
+
+    return new Promise(async(resolve, reject) => {
+
+      try {
+
+        this._APIAuth.accessToken = token
+
+        const versionsRes = await this._versionsAPI.getVersion(
+          projectId, versionId)
+
+        const version = versionsRes.data
+
+        if(version.relationships.storage) {
+
+          const ossSvc = ServiceManager.getService('OssSvc')
+
+          const objectId = ossSvc.parseObjectId(
+            version.relationships.storage.data.id)
+
+          return ossSvc.deleteObject (
+            token,
+            objectId.bucketKey,
+            objectId.objectKey)
+        }
+
+        return reject('no storage')
+
+      } catch (ex) {
+
+        reject (ex)
+      }
+    })
   }
 
   /////////////////////////////////////////////////////////////////
