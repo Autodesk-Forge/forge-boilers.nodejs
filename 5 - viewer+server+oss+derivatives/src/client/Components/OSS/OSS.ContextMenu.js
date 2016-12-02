@@ -1,5 +1,5 @@
-
 import EventsEmitter from 'EventsEmitter'
+import ContextMenu from 'ContextMenu'
 
 export default class OSSContextMenu extends
   EventsEmitter.Composer (Autodesk.Viewing.UI.ObjectContextMenu) {
@@ -8,9 +8,11 @@ export default class OSSContextMenu extends
   // Class constructor
   //
   /////////////////////////////////////////////////////////////////
-  constructor (viewer) {
+  constructor (opts) {
 
-    super (viewer)
+    super (opts)
+
+    this.contextMenu = new ContextMenu(opts)
   }
 
   /////////////////////////////////////////////////////////////////
@@ -27,6 +29,7 @@ export default class OSSContextMenu extends
 
         menu.push({
           title: 'Create bucket',
+          className: 'fa fa-plus',
           target: () => {
             this.emit('context.oss.bucket.create', {
               event, node
@@ -40,6 +43,7 @@ export default class OSSContextMenu extends
 
         menu.push({
           title: 'Bucket details',
+          className: 'fa fa-folder-open',
           target: () => {
             this.emit('context.oss.details', {
               event, node
@@ -49,6 +53,7 @@ export default class OSSContextMenu extends
 
         menu.push({
           title: 'Delete bucket',
+          className: 'fa fa-times-circle',
           target: () => {
             this.emit('context.oss.bucket.delete', {
               event, node
@@ -62,6 +67,7 @@ export default class OSSContextMenu extends
 
         menu.push({
           title: 'Object details',
+          className: 'fa fa-file-text',
           target: () => {
             this.emit('context.oss.details', {
               event, node
@@ -71,6 +77,7 @@ export default class OSSContextMenu extends
 
         menu.push({
           title: 'Delete object',
+          className: 'fa fa-times-circle',
           target: () => {
             this.emit('context.oss.object.delete', {
               event, node
@@ -82,6 +89,7 @@ export default class OSSContextMenu extends
 
           menu.push({
             title: 'Re-generate viewable',
+            className: 'fa fa-refresh',
             target: () => {
               this.emit('context.viewable.create', {
                 event, node
@@ -91,6 +99,7 @@ export default class OSSContextMenu extends
 
           menu.push({
             title: 'Delete viewable',
+            className: 'fa fa-times',
             target: () => {
               this.emit('context.viewable.delete', {
                 event, node
@@ -102,6 +111,7 @@ export default class OSSContextMenu extends
 
           menu.push({
             title: 'Generate viewable',
+            className: 'fa fa-cog',
             target: () => {
               this.emit('context.viewable.create', {
                 event, node

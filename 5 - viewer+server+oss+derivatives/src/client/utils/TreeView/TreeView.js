@@ -149,3 +149,21 @@ export class TreeNode extends EventsEmitter {
     Object.assign(this, properties)
   }
 }
+/////////////////////////////////////////////////////////////////////
+//
+//
+/////////////////////////////////////////////////////////////////////
+jQuery.fn.insertAt = function(index, element) {
+
+  var lastIndex = this.children().size()
+
+  this.append(element)
+
+  if (index < lastIndex) {
+
+    this.children().eq(index).before(
+      this.children().last())
+  }
+
+  return this
+}

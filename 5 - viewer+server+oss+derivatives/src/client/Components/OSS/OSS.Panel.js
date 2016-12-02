@@ -154,8 +154,6 @@ export default class OSSPanel extends UIComponent {
           let response = await this.ossAPI.deleteBucket(
             data.node.bucketKey)
 
-          console.log(response)
-
           data.node.remove()
         }
       })
@@ -249,7 +247,7 @@ export default class OSSPanel extends UIComponent {
       this.onNodeIconClickHandler)
 
     let rootNode = {
-      id: guid(),
+      id: this.guid(),
       name: 'Root Storage',
       type: 'oss.root',
       group: true
@@ -402,7 +400,7 @@ class OSSTreeDelegate extends BaseTreeDelegate {
   /////////////////////////////////////////////////////////////
   createTreeNode (node, parent, options = {}) {
 
-    parent.id = guid()
+    parent.id = this.guid()
 
     node.parent = parent
 
@@ -418,7 +416,7 @@ class OSSTreeDelegate extends BaseTreeDelegate {
       text = Autodesk.Viewing.i18n.translate(text)
     }
 
-    const labelId = guid()
+    const labelId = this.guid()
 
     if (node.tooltip) {
 
@@ -533,7 +531,7 @@ class OSSTreeDelegate extends BaseTreeDelegate {
 
           console.log(response)
 
-          let id = response.bucketKey + '-' + response.objectKey
+          const id = response.bucketKey + '-' + response.objectKey
 
           if(!$(container).find(`leaf[lmv-nodeid='${id}']`).length) {
 
@@ -541,7 +539,7 @@ class OSSTreeDelegate extends BaseTreeDelegate {
               response.bucketKey,
               response.objectKey).then((objectDetails) => {
 
-                let objectNode = new TreeNode({
+                const objectNode = new TreeNode({
                   id: response.bucketKey + '-' + response.objectKey,
                   objectKey: response.objectKey,
                   bucketKey: response.bucketKey,
@@ -552,7 +550,7 @@ class OSSTreeDelegate extends BaseTreeDelegate {
                   group: true
                 })
 
-                node.addChild(objectNode)
+                node.insert(objectNode)
 
                 node.showLoader(false)
 
@@ -564,7 +562,7 @@ class OSSTreeDelegate extends BaseTreeDelegate {
 
     } else if (node.type === 'oss.object') {
 
-      let downloadId = guid()
+      let downloadId = this.guid()
 
       $(parent).find('icon').before(`
         <div class="cloud-download">
@@ -607,7 +605,40 @@ class OSSTreeDelegate extends BaseTreeDelegate {
       $(`group[lmv-nodeid='${node.id}']`).remove()
     }
 
-    const loadDivId = guid()
+    node.insert = (child) => {
+
+      const $group = $(node.parent).parent()
+
+      let index = -1
+
+      $group.find('> group').each(function(idx) {
+
+        if ($(this).find('header').hasClass('object')) {
+
+          const name =
+            $(this).find('.label-container').text().
+              replace(/^(?=\n)$|^\s*|\s*$|\n\n+/gm, '').
+              replace(/(\r\n|\n|\r)/gm, '')
+
+          if (child.name.localeCompare(name) > 0) {
+
+            index = idx
+          }
+
+        } else if (child.type === 'oss.object') {
+
+          index = idx
+        }
+      })
+
+      node.addChild(child)
+
+      const element = $(child.parent).parent().detach()
+
+      $group.insertAt(index + 2, element)
+    }
+
+    const loadDivId = this.guid()
 
     node.showLoader = (show) => {
 
@@ -725,19 +756,4 @@ class OSSTreeDelegate extends BaseTreeDelegate {
         break
     }
   }
-}
-
-function guid(format = 'xxxxxxxxxx') {
-
-  let d = new Date().getTime()
-
-  let guid = format.replace(
-    /[xy]/g,
-    function (c) {
-      let r = (d + Math.random() * 16) % 16 | 0
-      d = Math.floor(d / 16)
-      return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16)
-    })
-
-  return guid
 }
