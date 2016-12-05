@@ -187,10 +187,10 @@ module.exports = function() {
   ///////////////////////////////////////////////////////////////////////////
   router.get('/token/3legged', async (req, res) => {
 
-    try {
+    var forgeSvc = ServiceManager.getService(
+      'ForgeSvc')
 
-      var forgeSvc = ServiceManager.getService(
-        'ForgeSvc')
+    try {
 
       var token = await forgeSvc.get3LeggedTokenClient(
         req.session)
@@ -202,6 +202,8 @@ module.exports = function() {
       })
 
     } catch (error) {
+
+      forgeSvc.logout(req.session)
 
       res.status(error.statusCode || 404)
       res.json(error)

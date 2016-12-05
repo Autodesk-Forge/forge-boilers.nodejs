@@ -962,7 +962,7 @@ class DMTreeDelegate extends BaseTreeDelegate {
         $('#' + labelId).after(`
           <div id=${loadDivId} class="label-loader"
             style="display:none;">
-            <img> </img>
+            <span> </span>
           </div>
         `)
       }
@@ -1056,7 +1056,10 @@ class DMTreeDelegate extends BaseTreeDelegate {
 
               node.children.forEach((child) => {
 
-                child.loadChildren(loadingMode)
+                if(child.loadChildren) {
+
+                  child.loadChildren(loadingMode)
+                }
               })
 
             } else {
@@ -1110,7 +1113,10 @@ class DMTreeDelegate extends BaseTreeDelegate {
 
                     if (loadingMode !== 'firstLevel') {
 
-                      child.loadChildren(loadingMode)
+                      if(child.loadChildren) {
+
+                        child.loadChildren(loadingMode)
+                      }
                     }
                   })
                 })
@@ -1155,7 +1161,10 @@ class DMTreeDelegate extends BaseTreeDelegate {
 
               node.children.forEach((child) => {
 
-                child.loadChildren(loadingMode)
+                if(child.loadChildren) {
+
+                  child.loadChildren(loadingMode)
+                }
               })
 
             } else {
@@ -1222,7 +1231,10 @@ class DMTreeDelegate extends BaseTreeDelegate {
 
                         if (loadingMode !== 'firstLevel') {
 
-                          child.loadChildren(loadingMode)
+                          if(child.loadChildren) {
+
+                            child.loadChildren(loadingMode)
+                          }
                         }
                       })
                     })
@@ -1289,7 +1301,10 @@ class DMTreeDelegate extends BaseTreeDelegate {
 
               node.children.forEach((child) => {
 
-                child.loadChildren(loadingMode)
+                if(child.loadChildren) {
+
+                  child.loadChildren(loadingMode)
+                }
               })
 
             } else {
@@ -1351,7 +1366,10 @@ class DMTreeDelegate extends BaseTreeDelegate {
 
                     if (loadingMode !== 'firstLevel') {
 
-                      child.loadChildren(loadingMode)
+                      if(child.loadChildren) {
+
+                        child.loadChildren(loadingMode)
+                      }
                     }
                   })
                 })

@@ -257,6 +257,24 @@ export default class OSSPanel extends UIComponent {
       delegate, rootNode, domContainer, {
         excludeRoot: false
       })
+
+    const searchInputId = this.guid()
+
+    $(domContainer).append(`
+      <div class="search">
+        <input id="${searchInputId}" type="text"
+          placeholder=" Search ...">
+      </div>
+    `)
+
+    $('#' + searchInputId).on('input keyup', () => {
+
+      const search = $('#' + searchInputId).val()
+
+      this.filterNode(
+        rootNode,
+        search.toLowerCase())
+    })
   }
 
   ///////////////////////////////////////////////////////////////////
@@ -374,6 +392,68 @@ export default class OSSPanel extends UIComponent {
         node.showLoader(false)
       })
     }
+  }
+
+  /////////////////////////////////////////////////////////////
+  //
+  //
+  /////////////////////////////////////////////////////////////
+  filterNode (node, filter) {
+
+    const name = node.name.toLowerCase()
+
+    let visibleItems = 0
+
+    if (node.children) {
+
+      node.children.forEach((child) => {
+
+        visibleItems += this.filterNode(child, filter)
+      })
+
+      if (visibleItems) {
+
+        $(node.parent).css({
+          display: 'block'
+        })
+
+      } else {
+
+        if (name.indexOf(filter) < 0) {
+
+          $(node.parent).css({
+            display: 'none'
+          })
+
+        } else {
+
+          $(node.parent).css({
+            display: 'block'
+          })
+        }
+      }
+
+      return visibleItems
+
+    } else {
+
+      if (name.indexOf(filter) < 0) {
+
+        $(node.parent).css({
+          display: 'none'
+        })
+
+      } else {
+
+        $(node.parent).css({
+          display: 'block'
+        })
+
+        ++visibleItems
+      }
+    }
+
+    return visibleItems
   }
 }
 
@@ -533,11 +613,11 @@ class OSSTreeDelegate extends BaseTreeDelegate {
 
           const id = response.bucketKey + '-' + response.objectKey
 
-          if(!$(container).find(`leaf[lmv-nodeid='${id}']`).length) {
+          this.ossAPI.getObjectDetails(
+            response.bucketKey,
+            response.objectKey).then((objectDetails) => {
 
-            this.ossAPI.getObjectDetails(
-              response.bucketKey,
-              response.objectKey).then((objectDetails) => {
+              if(!$(container).find(`group[lmv-nodeid='${id}']`).length) {
 
                 const objectNode = new TreeNode({
                   id: response.bucketKey + '-' + response.objectKey,
@@ -552,12 +632,12 @@ class OSSTreeDelegate extends BaseTreeDelegate {
 
                 node.insert(objectNode)
 
-                node.showLoader(false)
-
                 this.emit('objectNodeAdded', objectNode)
-              })
+              }
+
+              node.showLoader(false)
+            })
           }
-        }
       })
 
     } else if (node.type === 'oss.object') {
@@ -647,7 +727,7 @@ class OSSTreeDelegate extends BaseTreeDelegate {
         $('#' + labelId).after(`
           <div id=${loadDivId} class="label-loader"
             style="display:none;">
-            <img> </img>
+            <span> </span>
           </div>
         `)
       }
@@ -672,6 +752,8 @@ class OSSTreeDelegate extends BaseTreeDelegate {
 
         this.ossAPI.getBuckets().then((response) => {
 
+          node.children = []
+
           const buckets = _.sortBy(response.items,
             (bucketDetails) => {
               return bucketDetails.bucketKey.toLowerCase()
@@ -691,6 +773,8 @@ class OSSTreeDelegate extends BaseTreeDelegate {
 
               bucketNode.showLoader(false)
             })
+
+            node.children.push(bucketNode)
 
             addChildCallback(bucketNode)
 
@@ -712,6 +796,8 @@ class OSSTreeDelegate extends BaseTreeDelegate {
 
         this.ossAPI.getObjects(node.bucketKey).then((response) => {
 
+          node.children = []
+
           const items = _.sortBy(response.items,
             (objectDetails) => {
               return objectDetails.objectKey.toLowerCase()
@@ -730,6 +816,8 @@ class OSSTreeDelegate extends BaseTreeDelegate {
                 tooltip: true,
                 group: true
               })
+
+              node.children.push(objectNode)
 
               addChildCallback(objectNode)
 

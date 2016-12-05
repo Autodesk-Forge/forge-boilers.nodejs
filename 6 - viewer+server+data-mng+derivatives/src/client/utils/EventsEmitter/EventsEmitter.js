@@ -110,9 +110,9 @@ export const EventsEmitterComposer =
   //
   //
   ///////////////////////////////////////////////////////////////////
-  constructor (args) {
+  constructor (arg1, arg2, arg3, arg4, arg5) {
 
-    super(args)
+    super (arg1, arg2, arg3, arg4, arg5)
 
     this._events = {};
   }
