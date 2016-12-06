@@ -575,9 +575,14 @@ export default class SVFDownloaderSvc extends BaseSvc {
 
     fs.readFile(item.path, (err, content) => {
 
-      zlib.unzip (content, (err, unzipedContent) => {
+      zlib.unzip (content, (err, data) => {
 
-        var manifest = JSON.parse(unzipedContent)
+        if(err || !data) {
+
+          callback(null, [])
+        }
+
+        var manifest = JSON.parse(data)
 
         var uris = this.getUriRec(manifest, path.dirname(item.urn));
 

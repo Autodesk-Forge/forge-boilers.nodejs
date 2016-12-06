@@ -21,6 +21,7 @@ import ViewerPanel from 'Components/Viewer/ViewerPanel'
 import OSSPanel from 'Components/OSS/OSS.Panel'
 import 'jquery-ui/themes/base/resizable.css'
 import ToolPanelModal from 'ToolPanelModal'
+import ViewerToolkit from 'Viewer.Toolkit'
 import 'jquery-ui/ui/widgets/resizable'
 import 'font-awesome-webpack'
 import 'bootstrap-webpack'
@@ -199,7 +200,7 @@ export default class App {
         showCancel: false
       })
 
-    aboutDlg.bodyContent (`
+    aboutDlg.bodyContent(`
       <div>
         <br>
         Written by <a href="https://twitter.com/F3lipek"

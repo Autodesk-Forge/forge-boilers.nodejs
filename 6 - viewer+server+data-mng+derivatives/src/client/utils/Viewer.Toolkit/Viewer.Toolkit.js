@@ -301,15 +301,17 @@ export default class ViewerToolkit {
 
       try{
 
-        model.getProperties(dbId, function(result){
+        model.getProperties(dbId, (result) => {
 
           if (result.properties) {
 
             result.properties.forEach((prop) => {
 
-              if(typeof displayName === 'function') {
+              prop.dbId = dbId
 
-                if(displayName(prop.displayName)){
+              if (typeof displayName === 'function') {
+
+                if (displayName(prop.displayName)){
 
                   resolve(prop)
                 }
@@ -318,13 +320,14 @@ export default class ViewerToolkit {
 
                 resolve(prop)
               }
-            });
+            })
 
             if (defaultValue) {
 
               return resolve({
                 displayValue: defaultValue,
-                displayName
+                displayName,
+                dbId
               })
             }
 
@@ -335,34 +338,33 @@ export default class ViewerToolkit {
             reject(new Error('Error getting properties'));
           }
         })
-      }
-      catch(ex){
 
-        return reject(ex);
+      } catch(ex){
+
+        return reject(ex)
       }
-    });
+    })
   }
 
   /////////////////////////////////////////////////////////////////
   // Gets all existing properties from component  dbIds
   //
   /////////////////////////////////////////////////////////////////
-  static getPropertyList(model, dbIds) {
+  static getPropertyList (model, dbIds) {
 
-    return new Promise(async(resolve, reject)=>{
+    return new Promise(async(resolve, reject) => {
 
       try{
 
-        var propertyTasks = dbIds.map((dbId)=>{
+        var propertyTasks = dbIds.map((dbId) => {
 
-          return ViewerToolkit.getProperties(model, dbId);
-        });
+          return ViewerToolkit.getProperties(model, dbId)
+        })
 
         var propertyResults = await Promise.all(
-          propertyTasks
-        );
+          propertyTasks)
 
-        var properties = [];
+        var properties = []
 
         propertyResults.forEach((propertyResult)=>{
 
@@ -370,18 +372,18 @@ export default class ViewerToolkit {
 
             if(properties.indexOf(prop.displayName) < 0){
 
-              properties.push(prop.displayName);
+              properties.push(prop.displayName)
             }
-          });
-        });
+          })
+        })
 
-        return resolve(properties.sort());
-      }
-      catch(ex){
+        return resolve(properties.sort())
 
-        return reject(ex);
+      } catch(ex){
+
+        return reject(ex)
       }
-    });
+    })
   }
 
   /////////////////////////////////////////////////////////////////
@@ -390,16 +392,42 @@ export default class ViewerToolkit {
   /////////////////////////////////////////////////////////////////
   static getBulkPropertiesAsync (model, dbIds, propFilter) {
 
-    return new Promise((resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
 
-      model.getBulkProperties(dbIds, propFilter, (result) => {
+      if (typeof propFilter === 'function') {
 
-        resolve (result)
+        const propTasks = dbIds.map((dbId) => {
 
-      }, (error) => {
+          return this.getProperty(
+            model, dbId, propFilter, 'Not Found')
+        })
 
-        reject(error)
-      })
+        const propRes = await Promise.all(propTasks)
+
+        const filteredRes = propRes.filter((res) => {
+
+          return res.displayValue !== 'Not Found'
+        })
+
+        resolve(filteredRes.map((res) => {
+
+          return {
+            properties: [res],
+            dbId: res.dbId
+          }
+        }))
+
+      } else {
+
+        model.getBulkProperties(dbIds, propFilter, (result) => {
+
+          resolve (result)
+
+        }, (error) => {
+
+          reject(error)
+        })
+      }
     })
   }
 
@@ -407,14 +435,14 @@ export default class ViewerToolkit {
   // Maps components by property
   //
   /////////////////////////////////////////////////////////////////
-  static mapComponentsByProp (model, propName, components, defaultProp) {
+  static mapComponentsByProp (model, propFilter, components, defaultProp) {
 
-    return new Promise(async(resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
 
       try {
 
         const results = await ViewerToolkit.getBulkPropertiesAsync(
-          model, components, [propName])
+          model, components, propFilter)
 
         const propertyResults = results.map((result) => {
 
@@ -429,7 +457,7 @@ export default class ViewerToolkit {
 
           var value = result.displayValue;
 
-          if(typeof value == 'string'){
+          if (typeof value == 'string') {
 
             value = value.split(':')[0]
           }

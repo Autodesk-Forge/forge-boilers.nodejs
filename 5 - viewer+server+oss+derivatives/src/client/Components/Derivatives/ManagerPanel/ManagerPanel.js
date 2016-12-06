@@ -252,7 +252,9 @@ export default class DerivativesManagerPanel extends UIComponent {
   ///////////////////////////////////////////////////////////////////
   createHierarchyTab () {
 
-    const btnShowInTabId = this.guid()
+    const btnShowHierarchyInTabId = this.guid()
+
+    const btnShowPropsInTabId = this.guid()
 
     this.TabManager.addTab({
       name: 'Hierarchy',
@@ -261,18 +263,32 @@ export default class DerivativesManagerPanel extends UIComponent {
           <div class="hierarchy-tree">
           </div>
           <div class="controls">
-            <button id="${btnShowInTabId}" class="btn">
+            <button id="${btnShowHierarchyInTabId}" class="btn">
               <span class="glyphicon glyphicon-share-alt">
               </span>
-              Show in new tab ...
+              Show hierarchy ...
+            </button>
+            <br>
+            <button id="${btnShowPropsInTabId}" class="btn">
+              <span class="glyphicon glyphicon-share-alt">
+              </span>
+              Show properties ...
             </button>
           </div>
         </div>`
     })
 
-    $('#' + btnShowInTabId).click(() => {
+    $('#' + btnShowHierarchyInTabId).click(() => {
 
       const uri = `${this.apiUrl}/hierarchy/` +
+        `${this.urn}/${this.modelGuid}`
+
+      this.showPayload(uri)
+    })
+
+    $('#' + btnShowPropsInTabId).click(() => {
+
+      const uri = `${this.apiUrl}/properties/` +
         `${this.urn}/${this.modelGuid}`
 
       this.showPayload(uri)
