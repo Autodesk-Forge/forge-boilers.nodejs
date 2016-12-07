@@ -1,7 +1,6 @@
 
 import ServiceManager from '../services/SvcManager'
 import { serverConfig as config } from 'c0nfig'
-import findRemoveSync from 'find-remove'
 import express from 'express'
 import multer from 'multer'
 import rimraf from 'rimraf'
