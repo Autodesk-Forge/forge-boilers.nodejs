@@ -1,0 +1,40 @@
+
+.create-bucket {
+    height: 135px;
+    width: 300px;
+}
+
+.create-bucket .bucket-key {
+    border: 1px solid #a7a7a7;
+    background-color: #f8f8f8;
+    border-radius: 4px;
+    margin-bottom: 4px;
+    margin-top: 4px;
+    color: #363939;
+    width: 100%;
+}
+
+.create-bucket .lmv-dropdown .btn {
+  background-color: #f8f8f8;
+  vertical-align: top;
+  line-height: 0;
+  height: 28px;
+  border: 1px solid #a5a5a5;
+}
+
+.create-bucket .lmv-dropdown .caret {
+  border-top: 4px solid #a5a5a5;
+}
+
+.create-bucket .lmv-dropdown .label {
+  font: normal 14px Times New Roman;
+  color: #323535;
+}
+
+.create-bucket .open>.dropdown-menu {
+  background-color: #f8f8f8;
+}
+
+.create-bucket .dropdown-menu>li>a {
+  color: #040707;
+}

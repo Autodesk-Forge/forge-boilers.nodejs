@@ -1,0 +1,143 @@
+<!--/////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) Autodesk, Inc. All rights reserved
+// Written by Philippe Leefsma 2016 - ADN/Developer Technical Services
+//
+// Permission to use, copy, modify, and distribute this software in
+// object code form for any purpose and without fee is hereby granted,
+// provided that the above copyright notice appears in all copies and
+// that both that copyright notice and the limited warranty and
+// restricted rights notice below appear in all supporting
+// documentation.
+//
+// AUTODESK PROVIDES THIS PROGRAM "AS IS" AND WITH ALL FAULTS.
+// AUTODESK SPECIFICALLY DISCLAIMS ANY IMPLIED WARRANTY OF
+// MERCHANTABILITY OR FITNESS FOR A PARTICULAR USE.  AUTODESK, INC.
+// DOES NOT WARRANT THAT THE OPERATION OF THE PROGRAM WILL BE
+// UNINTERRUPTED OR ERROR FREE.
+////////////////////////////////////////////////////////////////////////////////-->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, height=device-height, minimal-ui, minimum-scale=1.0, initial-scale=1, user-scalable=no"/>
+  <link rel="stylesheet" href="https://autodeskviewer.com/viewers/2.9/style.min.css" type="text/css"/>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Viewer</title>
+
+  <style>
+
+    body{
+      margin:0
+    }
+
+    .viewer {
+      position: relative
+      height: 100vh
+      width: 100vw
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <script src="https://autodeskviewer.com/viewers/2.10/three.min.js"></script>
+  <script src="https://autodeskviewer.com/viewers/2.10/viewer3D.min.js"></script>
+
+  <div id="viewer" class="viewer"></div>
+
+  <script>
+
+    var token = '<Place your token here>'
+
+    // replace URN with one generated
+    // from corresponding credentials to the token above
+    var urn = 'urn:dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bGVlZnNtcC1mb3JnZS1wZXJzL3Rlc3QuZHdm'
+
+    /////////////////////////////////////////////////////////////////
+    // Initialization Options
+    //
+    /////////////////////////////////////////////////////////////////
+    var initOptions = {
+      documentId: urn,
+      env: 'AutodeskProduction',
+      getAccessToken: function( onGetAccessToken) {
+        return token;
+      }
+    }
+
+    /////////////////////////////////////////////////////////////////
+    // Document Loaded Handler
+    //
+    /////////////////////////////////////////////////////////////////
+    function onDocumentLoaded (doc) {
+
+      var rootItem = doc.getRootItem()
+
+      // Grab all 3D items
+      var geometryItems3d =
+        Autodesk.Viewing.Document.getSubItemsWithProperties(
+          rootItem, { 'type': 'geometry', 'role': '3d' }, true)
+
+      // Grab all 2D items
+      var geometryItems2d =
+          Autodesk.Viewing.Document.getSubItemsWithProperties(
+          rootItem, { 'type': 'geometry', 'role': '2d' }, true)
+
+      // Pick the first 3D item otherwise first 2D item
+      var selectedItem = (geometryItems3d.length ?
+              geometryItems3d[0] :
+              geometryItems2d[0])
+
+      var domContainer = document.getElementById('viewer')
+
+      // UI-less Version: viewer without controls and commands
+      //viewer = new Autodesk.Viewing.Viewer3D(domContainer)
+
+      // GUI Version: viewer with controls
+      var viewer = new Autodesk.Viewing.Private.GuiViewer3D(domContainer)
+
+      viewer.initialize()
+
+      viewer.loadModel(doc.getViewablePath(selectedItem))
+    }
+
+    /////////////////////////////////////////////////////////////////
+    // Environment Initialized Handler
+    //
+    /////////////////////////////////////////////////////////////////
+    function onEnvInitialized () {
+
+      Autodesk.Viewing.Document.load(
+        initOptions.documentId,
+        function(doc) {
+          onDocumentLoaded (doc)
+        },
+        function (errCode){
+          onLoadError (errCode)
+        })
+    }
+
+    /////////////////////////////////////////////////////////////////
+    // Error Handler
+    //
+    /////////////////////////////////////////////////////////////////
+    function onLoadError (errCode) {
+
+      console.log('Error loading document: ' + errCode)
+    }
+
+    /////////////////////////////////////////////////////////////////
+    // Bootstraping
+    //
+    /////////////////////////////////////////////////////////////////
+    Autodesk.Viewing.Initializer(
+      initOptions,
+      function() {
+        onEnvInitialized ()
+      })
+
+  </script>
+
+</body>
+</html>

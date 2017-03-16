@@ -1,0 +1,59 @@
+ <!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>A360 Viewer</title>
+
+		<link rel="stylesheet" href="https://developer.api.autodesk.com/viewingservice/v1/viewers/style.min.css" type="text/css">
+        <link rel="stylesheet" href="https://developer.api.autodesk.com/viewingservice/v1/viewers/A360.css" type="text/css">
+    
+		<style type='text/css'>
+
+      body{
+        margin:0
+      }
+
+			.viewer {
+				width: 100vw
+				height: 100vh
+			}
+
+		</style>
+	</head>
+  
+	<body>
+  
+    <script src="https://developer.api.autodesk.com/viewingservice/v1/viewers/three.min.js"></script>
+    <script src="https://developer.api.autodesk.com/viewingservice/v1/viewers/viewer3D.min.js"></script>
+    <script src="https://developer.api.autodesk.com/viewingservice/v1/viewers/Autodesk360App.js"></script>
+
+    <div id="viewer" class="viewer"></div>
+
+    <script type="text/javascript">
+
+      var token = 'mnmOrH85HjjE0HyivblQ4J5ynQKT'
+
+      // replace URN with one generated
+      // from corresponding credentials to the token above
+      var urn = 'urn:dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bGVlZnNtcC1mb3JnZS1wZXJzL1VyYmFuSG91c2UucnZ0'
+
+      var initOptions = {
+        documentId: urn,
+        env: 'AutodeskProduction',
+        getAccessToken: function(onGetAccessToken) {
+          return token
+        }
+      }
+
+      Autodesk.Viewing.Initializer(initOptions, function () {
+
+        var viewerApp = new Autodesk.A360ViewingApplication('viewer')
+
+        viewerApp.registerViewer(viewerApp.k3D, Autodesk.Viewing.Private.GuiViewer3D)
+
+        viewerApp.loadDocumentWithItemAndObject(initOptions.documentId)
+      })
+
+    </script>
+	</body>
+</html>

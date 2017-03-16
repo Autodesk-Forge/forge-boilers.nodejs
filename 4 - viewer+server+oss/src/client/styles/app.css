@@ -1,0 +1,61 @@
+
+body{
+    margin:0;
+}
+
+.viewer {
+    position: relative;
+    height: calc(100vh - 69px);
+    width: 100%;
+}
+
+.background {
+    position: relative;
+    height: calc(100vh - 69px);
+    background-color: #B3B3B3;
+}
+
+.navbar {
+    margin-bottom: 0px;
+}
+
+.navbar-brand-forge {
+    float: left;
+    font-size: 18px;
+    line-height: 20px;
+    height: 50px;
+    padding: 13px 0 0 0;
+    width: 200px;
+    margin: 0;
+}
+
+.navbar-nav li a {
+    line-height: 60px;
+    height: 65px;
+    padding-top: 0;
+}
+
+.dropdown-menu>li>a {
+    height: 30px;
+    line-height: 23px;
+    padding: 3px 20px;
+}
+
+.navbar-default {
+    border-color: #F5C70A;
+    border-bottom-width: 4px;
+}
+
+.navbar .container {
+    width: calc(100% - 50px);
+    margin-left: 15px;
+}
+
+.app-logo {
+    position: relative;
+    top: 2px;
+}
+
+.menuItem {
+    border-radius: 4px;
+}

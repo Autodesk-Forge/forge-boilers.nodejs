@@ -1,0 +1,10 @@
+{
+  "name": "forge-boiler.nodejs",
+  "description": "Forge boiler: viewer-barebone",
+  "repository": "https://github.com/Autodesk-Forge/forge-boilers.nodejs",
+  "logo": "https://autodesk-forge.github.io/forge-boilers.nodejs/img/forge.png",
+  "keywords": ["autodesk", "forge", "node", "express"],
+  "env": {
+
+  }
+}
