@@ -183,30 +183,30 @@ module.exports = function() {
   // 3-legged client token: exposes a 'data:read' only token to client App
   //
   ///////////////////////////////////////////////////////////////////////////
-  router.get('/token/3legged', async (req, res) => {
-
-    var forgeSvc = ServiceManager.getService(
-      'ForgeSvc')
-
-    try {
-
-      var token = await forgeSvc.get3LeggedTokenClient(
-        req.session)
-
-      res.json({
-        expires_in: forgeSvc.getExpiry(token),
-        access_token: token.access_token,
-        scope: token.scope
-      })
-
-    } catch (error) {
-
-      forgeSvc.logout(req.session)
-
-      res.status(error.statusCode || 404)
-      res.json(error)
-    }
-  })
+  //router.get('/token/3legged', async (req, res) => {
+  //
+  //  var forgeSvc = ServiceManager.getService(
+  //    'ForgeSvc')
+  //
+  //  try {
+  //
+  //    var token = await forgeSvc.get3LeggedTokenClient(
+  //      req.session)
+  //
+  //    res.json({
+  //      expires_in: forgeSvc.getExpiry(token),
+  //      access_token: token.access_token,
+  //      scope: token.scope
+  //    })
+  //
+  //  } catch (error) {
+  //
+  //    forgeSvc.logout(req.session)
+  //
+  //    res.status(error.statusCode || 404)
+  //    res.json(error)
+  //  }
+  //})
 
   return router
 }

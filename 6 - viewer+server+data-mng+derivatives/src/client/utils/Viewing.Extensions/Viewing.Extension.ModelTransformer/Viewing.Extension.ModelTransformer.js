@@ -231,7 +231,7 @@ class ModelTransformerExtension extends ExtensionBase {
 
       data.model.transform = data.transform
 
-      this.applyTransform(data.model)
+      this.applyModelTransform(data.model)
 
       this._viewer.impl.sceneUpdated(true)
 
@@ -355,10 +355,43 @@ class ModelTransformerExtension extends ExtensionBase {
   }
 
   /////////////////////////////////////////////////////////////////
+  //
+  //
+  /////////////////////////////////////////////////////////////////
+  transformFragProxy (viewer, model, fragId, transform) {
+
+    var fragProxy = viewer.impl.getFragmentProxy(
+      model, fragId)
+
+    fragProxy.getAnimTransform()
+
+    if (transform.translation) {
+
+      fragProxy.position = transform.translation
+    }
+
+    if (transform.scale) {
+
+      fragProxy.scale = transform.scale
+    }
+
+    if (transform.quaternion) {
+
+      //Not a standard three.js quaternion
+      fragProxy.quaternion._x = transform.quaternion.x
+      fragProxy.quaternion._y = transform.quaternion.y
+      fragProxy.quaternion._z = transform.quaternion.z
+      fragProxy.quaternion._w = transform.quaternion.w
+    }
+
+    fragProxy.updateAnimTransform()
+  }
+
+  /////////////////////////////////////////////////////////////////
   // Applies transform to specific model
   //
   /////////////////////////////////////////////////////////////////
-  applyTransform (model) {
+  applyModelTransform (model) {
 
     var viewer = this._viewer
 
@@ -372,26 +405,31 @@ class ModelTransformerExtension extends ExtensionBase {
 
     quaternion.setFromEuler(euler)
 
-    function _transformFragProxy (fragId) {
+    var fragCount = model.getFragmentList().
+      fragments.fragId2dbId.length
 
-      var fragProxy = viewer.impl.getFragmentProxy(
-        model,
-        fragId)
+    //fragIds range from 0 to fragCount-1
+    for (var fragId = 0; fragId < fragCount; ++fragId) {
 
-      fragProxy.getAnimTransform()
-
-      fragProxy.position = model.transform.translation
-
-      fragProxy.scale = model.transform.scale
-
-      //Not a standard three.js quaternion
-      fragProxy.quaternion._x = quaternion.x
-      fragProxy.quaternion._y = quaternion.y
-      fragProxy.quaternion._z = quaternion.z
-      fragProxy.quaternion._w = quaternion.w
-
-      fragProxy.updateAnimTransform()
+      this.transformFragProxy(viewer, model, fragId, {
+        translation: model.transform.translation,
+        scale: model.transform.scale,
+        quaternion
+      })
     }
+  }
+
+  /////////////////////////////////////////////////////////////////
+  // Applies transform to specific model
+  //
+  /////////////////////////////////////////////////////////////////
+  applyTransform (model, matrix) {
+
+    var quaternion = new THREE.Quaternion()
+
+    quaternion.setFromRotationMatrix (matrix)
+
+    var viewer = this._viewer
 
     var fragCount = model.getFragmentList().
       fragments.fragId2dbId.length
@@ -399,7 +437,11 @@ class ModelTransformerExtension extends ExtensionBase {
     //fragIds range from 0 to fragCount-1
     for (var fragId = 0; fragId < fragCount; ++fragId) {
 
-      _transformFragProxy(fragId)
+      this.transformFragProxy(viewer, model, fragId, {
+        translation: null,
+        scale: null,
+        quaternion
+      })
     }
   }
 

@@ -8,12 +8,6 @@ const HOST_URL = 'http://localhost'
 module.exports = {
 
   clientConfig: {
-
-    forge: {
-      token3LeggedUrl: '/api/forge/token/3legged',
-      token2LeggedUrl: '/api/forge/token/2legged'
-    },
-
     host: `${HOST_URL}`,
     port: 3000
   },

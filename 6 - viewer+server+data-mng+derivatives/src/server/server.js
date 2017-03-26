@@ -33,6 +33,7 @@ import path from 'path'
 
 //Endpoints
 import DerivativesAPI from './api/endpoints/derivatives'
+import LMVProxy from './api/endpoints/lmv-proxy'
 import UploadAPI from './api/endpoints/upload'
 import SocketAPI from './api/endpoints/socket'
 import ForgeAPI from './api/endpoints/forge'
@@ -83,6 +84,12 @@ app.use('/api/upload', UploadAPI())
 app.use('/api/forge', ForgeAPI())
 app.use('/api/app', AppAPI())
 app.use('/api/dm', DMAPI())
+
+/////////////////////////////////////////////////////////////////////
+// Viewer GET Proxy
+//
+/////////////////////////////////////////////////////////////////////
+app.get('/lmv-proxy/*', LMVProxy.get)
 
 /////////////////////////////////////////////////////////////////////
 // Static server setup with hot reloading for DEV

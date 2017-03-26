@@ -37,8 +37,7 @@ export default class App {
 
     this.derivativesPanel = new DerivativesManagerPanel()
 
-    this.viewerPanel = new ViewerPanel(
-      config.forge.token3LeggedUrl)
+    this.viewerPanel = new ViewerPanel()
 
     this.dataPanel = new DataPanel()
 
@@ -354,9 +353,6 @@ export default class App {
 
       urn = 'urn:' + urn.replace(new RegExp('=', 'g'), '')
 
-      this.viewerPanel.setTokenUrl(
-        config.forge.token3LeggedUrl)
-
       const doc = await this.viewerPanel.loadDocument(urn)
 
       const viewer = this.viewerPanel.viewer
@@ -372,14 +368,29 @@ export default class App {
       const extInstance = viewer.getExtension(
         ModelTransformerExtension)
 
-      const placementTransform = extInstance.buildPlacementTransform(
-        name)
+      const placementTransform =
+        extInstance.buildPlacementTransform(name)
 
       const loadOptions = {
-        placementTransform
+        //broken v 2.13
+        //placementTransform
       }
 
       viewer.loadModel(path, loadOptions, (model) => {
+
+        const onGeometryLoaded = () => {
+
+          viewer.removeEventListener(
+            Autodesk.Viewing.GEOMETRY_LOADED_EVENT,
+            onGeometryLoaded)
+
+          extInstance.applyTransform (
+            model, placementTransform)
+        }
+
+        viewer.addEventListener(
+          Autodesk.Viewing.GEOMETRY_LOADED_EVENT,
+          onGeometryLoaded)
 
         model.name = name
 

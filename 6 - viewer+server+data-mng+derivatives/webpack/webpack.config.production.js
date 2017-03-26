@@ -58,9 +58,10 @@ module.exports = {
     }),
 
     new html({
-      threeJS: 'https://autodeskviewer.com/viewers/2.11/three.min.js',
-      viewer3D: 'https://autodeskviewer.com/viewers/2.11/viewer3D.min.js',
-      viewerCSS: 'https://autodeskviewer.com/viewers/2.11/style.min.css',
+      viewer3D: 'https://developer.api.autodesk.com/viewingservice/v1/viewers/viewer3D.min.js?v=2.13',
+      threeJS:  'https://developer.api.autodesk.com/viewingservice/v1/viewers/three.min.js?v=2.13',
+      style:    'https://developer.api.autodesk.com/viewingservice/v1/viewers/style.min.css?v=2.13',
+
       template: './layout/index.ejs',
       bundle: 'bundle.min.js',
       title: 'Autodesk Forge',

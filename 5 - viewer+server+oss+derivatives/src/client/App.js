@@ -148,14 +148,29 @@ export default class App {
       const extInstance = viewer.getExtension(
         ModelTransformerExtension)
 
-      const placementTransform = extInstance.buildPlacementTransform(
-        item.objectKey)
+      const placementTransform =
+        extInstance.buildPlacementTransform(item.objectKey)
 
       const loadOptions = {
-        placementTransform
+        //broken v 2.13
+        //placementTransform
       }
 
       viewer.loadModel(path, loadOptions, (model) => {
+
+        const onGeometryLoaded = () => {
+
+          viewer.removeEventListener(
+            Autodesk.Viewing.GEOMETRY_LOADED_EVENT,
+            onGeometryLoaded)
+
+          extInstance.applyTransform (
+            model, placementTransform)
+        }
+
+        viewer.addEventListener(
+          Autodesk.Viewing.GEOMETRY_LOADED_EVENT,
+          onGeometryLoaded)
 
         model.name = item.objectKey
 

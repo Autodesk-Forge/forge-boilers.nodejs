@@ -7,12 +7,6 @@
 module.exports = {
 
   clientConfig: {
-
-    forge: {
-      token3LeggedUrl: '/api/forge/token/3legged',
-      token2LeggedUrl: '/api/forge/token/2legged'
-    },
-
     host: process.env.HOST_URL || 'https://dm.autodesk.io',
     port: 443
   },
