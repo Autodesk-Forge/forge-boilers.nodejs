@@ -479,6 +479,72 @@ export default class ViewerToolkit {
     })
   }
 
+  /////////////////////////////////////////////////////////////////
+  //
+  //
+  /////////////////////////////////////////////////////////////////
+  static hide (viewer, dbIds = [], model = null) {
+
+    try {
+
+      model = model || viewer.model
+
+      viewer.hide (dbIds)
+
+      const targetIds = Array.isArray(dbIds) ? dbIds : [dbIds]
+
+      const tasks = targetIds.map((dbId) => {
+
+        return new Promise((resolve) => {
+
+          viewer.impl.visibilityManager.setNodeOff(
+            dbId, true)
+
+          resolve()
+        })
+      })
+
+      return Promise.all(tasks)
+
+    } catch (ex) {
+
+      return Promise.reject(ex)
+    }
+  }
+
+  /////////////////////////////////////////////////////////////////
+  //
+  //
+  /////////////////////////////////////////////////////////////////
+  static show (viewer, dbIds = [], model = null) {
+
+    try {
+
+      model = model || viewer.model
+
+      viewer.show (dbIds)
+
+      const targetIds = Array.isArray(dbIds) ? dbIds : [dbIds]
+
+      const tasks = targetIds.map((dbId) => {
+
+        return new Promise((resolve) => {
+
+          viewer.impl.visibilityManager.setNodeOff(
+            dbId, false)
+
+          resolve()
+        })
+      })
+
+      return Promise.all(tasks)
+
+    } catch (ex) {
+
+      return Promise.reject(ex)
+    }
+  }
+
   /////////////////////////////////////////////////////////////
   // Runs recursively the argument task on each node
   // of the data tree

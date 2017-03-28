@@ -231,7 +231,10 @@ class ModelTransformerExtension extends ExtensionBase {
 
       data.model.transform = data.transform
 
-      this.applyModelTransform(data.model)
+      this.applyTransform(
+        data.model,
+        data.model.transform,
+        data.model.placementOffset)
 
       this._viewer.impl.sceneUpdated(true)
 
@@ -391,14 +394,24 @@ class ModelTransformerExtension extends ExtensionBase {
   // Applies transform to specific model
   //
   /////////////////////////////////////////////////////////////////
-  applyModelTransform (model) {
+  applyTransform (model, transform, offset = {
+    scale: {
+      x: 0.0, y: 0.0, z: 0.0
+    },
+    translation: {
+      x: 0.0, y: 0.0, z: 0.0
+    },
+    rotation: {
+      x: 0.0, y: 0.0, z: 0.0
+    }
+  }) {
 
     var viewer = this._viewer
 
     var euler = new THREE.Euler(
-      model.transform.rotation.x * Math.PI/180,
-      model.transform.rotation.y * Math.PI/180,
-      model.transform.rotation.z * Math.PI/180,
+      (transform.rotation.x + offset.rotation.x) * Math.PI/180,
+      (transform.rotation.y + offset.rotation.y) * Math.PI/180,
+      (transform.rotation.z + offset.rotation.z) * Math.PI/180,
       'XYZ')
 
     var quaternion = new THREE.Quaternion()
@@ -412,8 +425,8 @@ class ModelTransformerExtension extends ExtensionBase {
     for (var fragId = 0; fragId < fragCount; ++fragId) {
 
       this.transformFragProxy(viewer, model, fragId, {
-        translation: model.transform.translation,
-        scale: model.transform.scale,
+        translation: transform.translation,
+        scale: transform.scale,
         quaternion
       })
     }
@@ -423,7 +436,7 @@ class ModelTransformerExtension extends ExtensionBase {
   // Applies transform to specific model
   //
   /////////////////////////////////////////////////////////////////
-  applyTransform (model, matrix) {
+  applyTransformMatrix (model, matrix) {
 
     var quaternion = new THREE.Quaternion()
 
@@ -578,6 +591,92 @@ class ModelTransformerExtension extends ExtensionBase {
     }
 
     return placementTransform
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //
+  //////////////////////////////////////////////////////////////////////////
+  buildModelOffset (modelName) {
+
+    if (!this.firstModelLoaded) {
+
+      this.firstModelLoaded = modelName
+    }
+
+    // those file type have different orientation
+    // than other, so need to correct it
+    // upon insertion
+    const zOriented = ['rvt', 'nwc']
+
+    var firstExt = this.firstModelLoaded.split('.').pop(-1)
+
+    var modelExt = modelName.split(".").pop(-1)
+
+    if (zOriented.indexOf(firstExt) > -1) {
+
+      if (zOriented.indexOf(modelExt) < 0) {
+
+        return {
+          translation: {
+            x: 0,
+            y: 0,
+            z: 0
+          },
+          rotation: {
+            x: 90,
+            y: 0,
+            z: 0
+          },
+          scale: {
+            x: 1.0,
+            y: 1.0,
+            z: 1.0
+          }
+        }
+      }
+
+    } else {
+
+      if(zOriented.indexOf(modelExt) > -1) {
+
+        return {
+          translation: {
+            x: 0,
+            y: 0,
+            z: 0
+          },
+          rotation: {
+            x: -90,
+            y: 0,
+            z: 0
+          },
+          scale: {
+            x: 1.0,
+            y: 1.0,
+            z: 1.0
+          }
+        }
+      }
+    }
+
+    return {
+      translation: {
+        x: 0,
+        y: 0,
+        z: 0
+      },
+      rotation: {
+        x: 0,
+        y: 0,
+        z: 0
+      },
+      scale: {
+        x: 1.0,
+        y: 1.0,
+        z: 1.0
+      }
+    }
   }
 
   /////////////////////////////////////////////////////////////////

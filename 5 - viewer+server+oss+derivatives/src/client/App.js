@@ -20,9 +20,9 @@ import {ManagerPanel as DerivativesManagerPanel} from 'Derivatives'
 import ViewerPanel from 'Viewer/ViewerPanel'
 import 'jquery-ui/themes/base/resizable.css'
 import ToolPanelModal from 'ToolPanelModal'
-import ViewerToolkit from 'Viewer.Toolkit'
 import 'jquery-ui/ui/widgets/resizable'
 import OSSPanel from 'OSS/OSS.Panel'
+import Toolkit from 'Viewer.Toolkit'
 import 'font-awesome-webpack'
 import 'bootstrap-webpack'
 import 'jquery-ui'
@@ -127,6 +127,18 @@ export default class App {
   //
   //
   ///////////////////////////////////////////////////////////////////
+  sleep (ms) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve()
+      }, ms)
+    })
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////
   onLoadItem (item) {
 
     return new Promise(async(resolve, reject) => {
@@ -139,7 +151,7 @@ export default class App {
 
       viewer.loadExtension(ModelTransformerExtension, {
         parentControl: 'modelTools',
-        autoLoad: true
+        autoLoad: false
       })
 
       const path = this.viewerPanel.getDefaultViewablePath(doc)
@@ -148,29 +160,58 @@ export default class App {
       const extInstance = viewer.getExtension(
         ModelTransformerExtension)
 
-      const placementTransform =
-        extInstance.buildPlacementTransform(item.objectKey)
-
       const loadOptions = {
         //broken v 2.13
-        //placementTransform
+        //placementTransform:
+        // extInstance.buildPlacementTransform(item.objectKey)
       }
 
-      viewer.loadModel(path, loadOptions, (model) => {
+      const offset =
+        extInstance.buildModelOffset(item.objectKey)
 
-        const onGeometryLoaded = () => {
+      const onRootNodeLoaded = async(args) => {
 
-          viewer.removeEventListener(
-            Autodesk.Viewing.GEOMETRY_LOADED_EVENT,
-            onGeometryLoaded)
+        args.model.placementOffset = offset
 
-          extInstance.applyTransform (
-            model, placementTransform)
+        viewer.removeEventListener(
+          Autodesk.Viewing.MODEL_ROOT_LOADED_EVENT,
+          onRootNodeLoaded)
+
+        while (!args.model.getData().instanceTree) {
+
+          await this.sleep(100)
         }
 
-        viewer.addEventListener(
+        const instanceTree = args.model.getData().instanceTree
+
+        Toolkit.hide(viewer, instanceTree.getRootId())
+      }
+
+      viewer.addEventListener(
+        Autodesk.Viewing.MODEL_ROOT_LOADED_EVENT,
+        onRootNodeLoaded)
+
+      const onGeometryLoaded = (args) => {
+
+        viewer.removeEventListener(
           Autodesk.Viewing.GEOMETRY_LOADED_EVENT,
           onGeometryLoaded)
+
+        extInstance.applyTransform (
+          args.model, offset)
+
+        const instanceTree = args.model.getData().instanceTree
+
+        Toolkit.show(viewer, instanceTree.getRootId())
+
+        extInstance.addModel(args.model)
+      }
+
+      viewer.addEventListener(
+        Autodesk.Viewing.GEOMETRY_LOADED_EVENT,
+        onGeometryLoaded)
+
+      viewer.loadModel(path, loadOptions, (model) => {
 
         model.name = item.objectKey
 
