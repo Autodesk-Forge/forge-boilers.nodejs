@@ -83,6 +83,7 @@ module.exports = {
       path.resolve('./src/client/utils/Viewing.Extensions'),
       path.resolve('./src/client/Components'),
       path.resolve('./src/client/components'),
+      path.resolve('./src/client/services'),
       path.resolve('./src/client/styles'),
       path.resolve('./src/client/utils'),
       path.resolve('./src/client')
