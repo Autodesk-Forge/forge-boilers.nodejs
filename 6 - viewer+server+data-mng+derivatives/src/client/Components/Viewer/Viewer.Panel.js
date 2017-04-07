@@ -26,31 +26,17 @@ export default class ViewerPanel {
   initializeViewingEnv () {
 
     var options = {
-
       env: 'AutodeskProduction'
-
-      //getAccessToken: (callback) => {
-      //
-      //  $.get(this._tokenURL, (tokenResponse) => {
-      //
-      //    callback(
-      //      tokenResponse.access_token,
-      //      tokenResponse.expires_in)
-      //  })
-      //}
     }
 
     return new Promise((resolve, reject) => {
 
       Autodesk.Viewing.Initializer(options, () => {
 
-        //2.13
-        Autodesk.Viewing.setApiEndpoint(
-          window.location.origin + '/lmv-proxy')
-
         //2.14
-        //Autodesk.Viewing.setEndpointAndApi(
-        //  window.location.origin + '/lmv-proxy', 'modelDerivativeV2')
+        Autodesk.Viewing.setEndpointAndApi(
+          window.location.origin + '/lmv-proxy',
+          'modelDerivativeV2')
 
         Autodesk.Viewing.Private.memoryOptimizedSvfLoading = true
 

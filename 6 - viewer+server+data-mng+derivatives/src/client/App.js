@@ -19,7 +19,7 @@ import ModelTransformerExtension from 'Viewing.Extension.ModelTransformer'
 import {ManagerPanel as DerivativesManagerPanel} from 'Derivatives'
 import ViewerPanel from 'Components/Viewer/Viewer.Panel'
 import ServiceManager from 'Services/SvcManager'
-import {clientConfig as config} from 'c0nfig'
+import {client as config} from 'c0nfig'
 import 'jquery-ui/themes/base/resizable.css'
 import ToolPanelModal from 'ToolPanelModal'
 import SocketSvc from 'Services/SocketSvc'
@@ -369,55 +369,9 @@ export default class App {
         ModelTransformerExtension)
 
       const loadOptions = {
-        //broken v 2.13
-        //placementTransform:
-        // extInstance.buildPlacementTransform(item.objectKey)
+        placementTransform:
+        extInstance.buildPlacementTransform(name)
       }
-
-      const offset =
-        extInstance.buildModelOffset(item.objectKey)
-
-      const onRootNodeLoaded = async(args) => {
-
-        args.model.placementOffset = offset
-
-        viewer.removeEventListener(
-          Autodesk.Viewing.MODEL_ROOT_LOADED_EVENT,
-          onRootNodeLoaded)
-
-        while (!args.model.getData().instanceTree) {
-
-        await this.sleep(100)
-        }
-
-        const instanceTree = args.model.getData().instanceTree
-
-        Toolkit.hide(viewer, instanceTree.getRootId())
-      }
-
-      viewer.addEventListener(
-        Autodesk.Viewing.MODEL_ROOT_LOADED_EVENT,
-        onRootNodeLoaded)
-
-      const onGeometryLoaded = (args) => {
-
-        viewer.removeEventListener(
-          Autodesk.Viewing.GEOMETRY_LOADED_EVENT,
-          onGeometryLoaded)
-
-        extInstance.applyTransform (
-          args.model, offset)
-
-        const instanceTree = args.model.getData().instanceTree
-
-        Toolkit.show(viewer, instanceTree.getRootId())
-
-        extInstance.addModel(args.model)
-      }
-
-      viewer.addEventListener(
-        Autodesk.Viewing.GEOMETRY_LOADED_EVENT,
-        onGeometryLoaded)
 
       viewer.loadModel(path, loadOptions, (model) => {
 
@@ -429,6 +383,8 @@ export default class App {
 
           model.name += ' ' + verNum
         }
+
+        extInstance.addModel(args.model)
 
         resolve(model)
       })

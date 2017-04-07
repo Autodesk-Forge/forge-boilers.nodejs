@@ -83,6 +83,21 @@ export default class DMSvc extends BaseSvc {
   }
 
   /////////////////////////////////////////////////////////////////
+  // Returns Project Top Folders
+  // If the user has access to the project’s root folder,
+  // it only returns details of the root folder.
+  // If the user does not have access to the root folder,
+  // it returns details of all the highest level folders in
+  // the folder hierarchy the user has access to.
+  //
+  /////////////////////////////////////////////////////////////////
+  getProjectTopFolders (token, hubId, projectId) {
+
+    return this._projectsAPI.getProjectTopFolders(
+      hubId, projectId, {autoRefresh:false}, token)
+  }
+
+  /////////////////////////////////////////////////////////////////
   // Returns Folder
   //
   /////////////////////////////////////////////////////////////////

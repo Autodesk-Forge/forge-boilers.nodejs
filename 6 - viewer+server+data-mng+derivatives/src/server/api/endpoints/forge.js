@@ -16,9 +16,9 @@
 // UNINTERRUPTED OR ERROR FREE.
 ///////////////////////////////////////////////////////////////////////
 import ServiceManager from '../services/SvcManager'
-import { serverConfig as config } from 'c0nfig'
 import { OAuth2 } from 'oauth'
 import express from 'express'
+import config from 'c0nfig'
 
 module.exports = function() {
 

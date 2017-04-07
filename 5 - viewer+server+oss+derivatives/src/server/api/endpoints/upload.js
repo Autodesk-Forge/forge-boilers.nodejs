@@ -1,7 +1,7 @@
 
 import ServiceManager from '../services/SvcManager'
-import { serverConfig as config } from 'c0nfig'
 import express from 'express'
+import config from 'c0nfig'
 import multer from 'multer'
 import crypto from 'crypto'
 import rimraf from 'rimraf'

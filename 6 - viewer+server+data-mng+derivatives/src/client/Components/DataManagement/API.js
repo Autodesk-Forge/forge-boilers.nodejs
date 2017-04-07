@@ -46,7 +46,23 @@ export default class DataManagementAPI extends ClientAPI {
   ///////////////////////////////////////////////////////////////////
   getProject (hubId, projectId) {
 
-    const url = `${this.apiUrl}/hubs/${hubId}/projects/${projectId}`
+    const url = `${this.apiUrl}` +
+      `/hubs/${hubId}/projects/${projectId}`
+
+    return this.ajax ({
+      rawBody: true,
+      url
+    })
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  // GET /hubs/:hubId/projects/:projectId/topFolders
+  //
+  ///////////////////////////////////////////////////////////////////
+  getProjectTopFolders (hubId, projectId) {
+
+    const url = `${this.apiUrl}` +
+      `/hubs/${hubId}/projects/${projectId}/topFolders`
 
     return this.ajax ({
       rawBody: true,
@@ -60,8 +76,8 @@ export default class DataManagementAPI extends ClientAPI {
   ///////////////////////////////////////////////////////////////////
   getFolder (projectId, folderId) {
 
-    const url = `${this.apiUrl}/projects/${projectId}` +
-      `/folders/${folderId}`
+    const url = `${this.apiUrl}` +
+      `/projects/${projectId}/folders/${folderId}`
 
     return this.ajax ({
       rawBody: true,
@@ -75,8 +91,8 @@ export default class DataManagementAPI extends ClientAPI {
   ///////////////////////////////////////////////////////////////////
   getFolderContent (projectId, folderId) {
 
-    const url = `${this.apiUrl}/projects/${projectId}` +
-      `/folders/${folderId}/content`
+    const url = `${this.apiUrl}` +
+      `/projects/${projectId}/folders/${folderId}/content`
 
     return this.ajax ({
       rawBody: true,
@@ -90,7 +106,8 @@ export default class DataManagementAPI extends ClientAPI {
   ///////////////////////////////////////////////////////////////////
   getItem (projectId, itemId) {
     
-    const url = `${this.apiUrl}/projects/${projectId}/items/${itemId}`
+    const url = `${this.apiUrl}` +
+      `/projects/${projectId}/items/${itemId}`
 
     return this.ajax ({
       rawBody: true,
@@ -104,7 +121,8 @@ export default class DataManagementAPI extends ClientAPI {
   ///////////////////////////////////////////////////////////////////
   deleteItem (projectId, itemId) {
 
-    const url = `${this.apiUrl}/projects/${projectId}/items/${itemId}`
+    const url = `${this.apiUrl}` +
+      `/projects/${projectId}/items/${itemId}`
 
     return this.ajax({
       type: 'DELETE',
@@ -118,8 +136,8 @@ export default class DataManagementAPI extends ClientAPI {
   ///////////////////////////////////////////////////////////////////
   getItemVersions (projectId, itemId) {
 
-    const url = `${this.apiUrl}/projects/${projectId}/items/` +
-      `${itemId}/versions`
+    const url = `${this.apiUrl}` +
+      `/projects/${projectId}/items/${itemId}/versions`
 
     return this.ajax ({
       rawBody: true,
@@ -133,8 +151,8 @@ export default class DataManagementAPI extends ClientAPI {
   ///////////////////////////////////////////////////////////////////
   getItemTip (projectId, itemId) {
 
-    const url = `${this.apiUrl}/projects/${projectId}/items/` +
-      `${itemId}/tip`
+    const url = `${this.apiUrl}` +
+      `/projects/${projectId}/items/${itemId}/tip`
 
     return this.ajax ({
       rawBody: true,
@@ -148,8 +166,8 @@ export default class DataManagementAPI extends ClientAPI {
   ///////////////////////////////////////////////////////////////////
   getVersion (projectId, versionId) {
 
-    const url = `${this.apiUrl}/projects/${projectId}/versions/` +
-      `${encodeURIComponent(versionId)}`
+    const url = `${this.apiUrl}` +
+      `/projects/${projectId}/versions/${encodeURIComponent(versionId)}`
 
     return this.ajax ({
       rawBody: true,
@@ -163,8 +181,8 @@ export default class DataManagementAPI extends ClientAPI {
   ///////////////////////////////////////////////////////////////////
   getItemRelationshipsRefs (projectId, itemId) {
 
-    const url = `${this.apiUrl}/projects/${projectId}/items/` +
-      `${itemId}/relationships/refs`
+    const url = `${this.apiUrl}` +
+      `/projects/${projectId}/items/${itemId}/relationships/refs`
 
     return this.ajax ({
       rawBody: true,
@@ -178,7 +196,8 @@ export default class DataManagementAPI extends ClientAPI {
   ///////////////////////////////////////////////////////////////////
   getVersionRelationshipsRefs (projectId, versionId) {
 
-    const url = `${this.apiUrl}/projects/${projectId}/versions/` +
+    const url = `${this.apiUrl}` +
+      `/projects/${projectId}/versions/` +
       `${encodeURIComponent(versionId)}/relationships/refs`
 
     return this.ajax ({
@@ -193,8 +212,8 @@ export default class DataManagementAPI extends ClientAPI {
   ///////////////////////////////////////////////////////////////////
   postItemRelationshipRef (projectId, itemId, refVersionId) {
 
-    const url = `${this.apiUrl}/projects/${projectId}/items/` +
-      `${itemId}/relationships/refs`
+    const url = `${this.apiUrl}` +
+      `/projects/${projectId}/items/${itemId}/relationships/refs`
 
     const data = {
       payload: JSON.stringify({
@@ -216,7 +235,8 @@ export default class DataManagementAPI extends ClientAPI {
   ///////////////////////////////////////////////////////////////////
   postVersionRelationshipRef (projectId, versionId, refVersionId) {
 
-    const url = `${this.apiUrl}/projects/${projectId}/versions/` +
+    const url = `${this.apiUrl}` +
+      `/projects/${projectId}/versions/` +
       `${encodeURIComponent(versionId)}/relationships/refs`
 
     const data = {

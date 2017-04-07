@@ -79,7 +79,15 @@ export default class DataContextMenu extends
                   event, node, type: 'folders.content'
                 })
               }
-            }]
+            },{
+              title: 'Top folder content',
+              className: 'fa fa-folder-open',
+              target: () => {
+                this.emit('context.details', {
+                  event, node, type: 'top.folders.content'
+                })
+              }
+          }]
         })
 
         menu.push({

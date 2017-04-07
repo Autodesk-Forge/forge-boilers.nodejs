@@ -161,59 +161,15 @@ export default class App {
         ModelTransformerExtension)
 
       const loadOptions = {
-        //broken v 2.13
-        //placementTransform:
-        // extInstance.buildPlacementTransform(item.objectKey)
+        placementTransform:
+         extInstance.buildPlacementTransform(item.objectKey)
       }
-
-      const offset =
-        extInstance.buildModelOffset(item.objectKey)
-
-      const onRootNodeLoaded = async(args) => {
-
-        args.model.placementOffset = offset
-
-        viewer.removeEventListener(
-          Autodesk.Viewing.MODEL_ROOT_LOADED_EVENT,
-          onRootNodeLoaded)
-
-        while (!args.model.getData().instanceTree) {
-
-          await this.sleep(100)
-        }
-
-        const instanceTree = args.model.getData().instanceTree
-
-        Toolkit.hide(viewer, instanceTree.getRootId())
-      }
-
-      viewer.addEventListener(
-        Autodesk.Viewing.MODEL_ROOT_LOADED_EVENT,
-        onRootNodeLoaded)
-
-      const onGeometryLoaded = (args) => {
-
-        viewer.removeEventListener(
-          Autodesk.Viewing.GEOMETRY_LOADED_EVENT,
-          onGeometryLoaded)
-
-        extInstance.applyTransform (
-          args.model, offset)
-
-        const instanceTree = args.model.getData().instanceTree
-
-        Toolkit.show(viewer, instanceTree.getRootId())
-
-        extInstance.addModel(args.model)
-      }
-
-      viewer.addEventListener(
-        Autodesk.Viewing.GEOMETRY_LOADED_EVENT,
-        onGeometryLoaded)
 
       viewer.loadModel(path, loadOptions, (model) => {
 
         model.name = item.objectKey
+
+        extInstance.addModel(args.model)
 
         resolve(model)
       })

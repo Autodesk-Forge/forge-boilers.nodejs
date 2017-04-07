@@ -94,27 +94,23 @@ Mac OSX/Linux (Terminal)
     > npm install
     > export FORGE_CLIENT_ID=<<YOUR CLIENT ID FROM DEVELOPER PORTAL>
     > export FORGE_CLIENT_SECRET=<<YOUR CLIENT SECRET>
-    > npm run build-dev (this runs a dev build and webpack in --watch mode)
-    > npm run dev (runs the node server, do in another terminal if you want to keep the webpack watcher running)
+    > npm start (builds the client dynamically in memory using webpack dev server)
 
 Windows (use <b>Node.js command line</b> from Start menu)
 
     > npm install
     > set FORGE_CLIENT_ID=<<YOUR CLIENT ID FROM DEVELOPER PORTAL>
     > set FORGE_CLIENT_SECRET=<<YOUR CLIENT SECRET>
-    > npm run build-dev
-    > npm run dev
+    > npm start (builds the client dynamically in memory using webpack dev server)
 
 Open your browser at:
 [http://localhost:3000](http://localhost:3000)
 
-<b>Important:</b> the <b>npm start</b> command, this is intended for <b>PRODUCTION</b> with HTTPS (SSL) secure cookies.
+To run a production build you can use build command:
 
-To run a production build you can use start command:
+    > npm run build
 
-    > npm start
-
-Which will run a production build and start the server. A production build code is minified and function names are mangled which make it much smaller and impractical for debugging or reverse engineering.
+A production build code is minified and function names are mangled which make it much smaller and impractical for debugging or reverse engineering.
 
 
 ### Deploy Project #5 on Heroku
@@ -152,8 +148,7 @@ Run the following commands (mind the DEV!):
     > npm install
     > set FORGE_DEV_CLIENT_ID=<<YOUR DEV CLIENT ID FROM DEVELOPER PORTAL>
     > set FORGE_DEV_CLIENT_SECRET=<<YOUR DEV CLIENT SECRET>
-    > npm run build-dev
-    > npm run dev
+    > npm start (builds the client dynamically in memory using webpack dev server)
 
 
 To run in production, the callback url defined in your Forge App needs to match the host url, so if you run your app from <b>https://mydomain.com</b>:
@@ -162,7 +157,7 @@ To run in production, the callback url defined in your Forge App needs to match 
     > set HOST_URL=https://mydomain.com
     > set FORGE_CLIENT_ID=<<YOUR CLIENT ID FROM DEVELOPER PORTAL>
     > set FORGE_CLIENT_SECRET=<<YOUR CLIENT SECRET>
-    > npm start
+    > npm start (builds the client dynamically on disk or use npm run build before)
 
 ### Deploy Project #6 on Heroku
 
@@ -186,19 +181,6 @@ To load a design in the viewer:
 
  ![Project6](resources/img/Project6.png)
 
-
-# Tips & tricks
-
-For local development/testing, consider use [nodemon](https://www.npmjs.com/package/nodemon) package, which auto restarts your node application after any modification on your code. To install it, use:
-
-    sudo npm install -g nodemon
-
-Then, instead of <b>npm run dev</b>, use the following:
-
-    npm run nodemon
-
-Which executes <b>nodemon bin/run.js --config nodemon.js</b>, where the <b>nodemon.js</b> is the nodemon config file where you can define which directories and file types are being watched, along with other configuration options.
-See [nodemon](https://github.com/remy/nodemon) for more details.
 
 ## License
 

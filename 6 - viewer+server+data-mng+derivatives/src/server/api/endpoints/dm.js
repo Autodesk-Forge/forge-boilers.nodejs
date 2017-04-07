@@ -1,7 +1,7 @@
 
 import ServiceManager from '../services/SvcManager'
-import { serverConfig as config } from 'c0nfig'
 import express from 'express'
+import config from 'c0nfig'
 import fs from 'fs'
 
 module.exports = function() {
@@ -110,6 +110,37 @@ module.exports = function() {
       const dmSvc = ServiceManager.getService('DMSvc')
 
       const response = await dmSvc.getProject(
+        token, hubId, projectId)
+
+      res.json(response)
+
+    } catch (ex) {
+
+      res.status(ex.status || 500)
+      res.json(ex)
+    }
+  })
+
+  /////////////////////////////////////////////////////////////////////////////
+  //  GET /hubds/{hubId}/projects/{projectId}
+  //  Get project top folders
+  //
+  /////////////////////////////////////////////////////////////////////////////
+  router.get('/hubs/:hubId/projects/:projectId/topFolders', async (req, res) => {
+
+    try {
+
+      const hubId = req.params.hubId
+
+      const projectId = req.params.projectId
+
+      const forgeSvc = ServiceManager.getService('ForgeSvc')
+
+      const token = await forgeSvc.get3LeggedTokenMaster(req.session)
+
+      const dmSvc = ServiceManager.getService('DMSvc')
+
+      const response = await dmSvc.getProjectTopFolders(
         token, hubId, projectId)
 
       res.json(response)
