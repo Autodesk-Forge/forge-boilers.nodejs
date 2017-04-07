@@ -182,7 +182,6 @@ module.exports = {
       template: path.resolve(__dirname, '../src/client/layouts/index.ejs'),
       title: 'Forge | Boiler',
       filename: 'index.html',
-      bundle: 'bundle.min.js',
       minify: {
         removeStyleLinkTypeAttributes: true,
         removeAttributeQuotes: true,
@@ -190,7 +189,7 @@ module.exports = {
         removeComments: true,
         minifyCSS: true
       },
-      inject: false
+      inject: 'head'
     }),
 
     // just a progress bar to make compilation less boring

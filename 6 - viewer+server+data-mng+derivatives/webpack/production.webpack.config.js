@@ -190,7 +190,7 @@ module.exports = {
         removeComments: true,
         minifyCSS: true
       },
-      inject: false
+      inject: 'head'
     }),
 
     // just a progress bar to make compilation less boring

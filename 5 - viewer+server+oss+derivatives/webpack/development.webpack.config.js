@@ -108,9 +108,8 @@ module.exports = {
       template: path.resolve(__dirname, '../src/client/layouts/index.ejs'),
       title: 'Forge | Boiler | DEV',
       filename: 'index.html',
-      bundle: 'bundle.js',
       minify: false,
-      inject: false
+      inject: 'head'
     }),
 
     new ProgressBarPlugin({
