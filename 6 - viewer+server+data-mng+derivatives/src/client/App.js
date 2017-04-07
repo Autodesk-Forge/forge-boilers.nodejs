@@ -361,7 +361,7 @@ export default class App {
 
       viewer.loadExtension(ModelTransformerExtension, {
         parentControl: 'modelTools',
-        autoLoad: true
+        autoLoad: false
       })
 
       //  builds placementTransform based on model extension
@@ -384,7 +384,7 @@ export default class App {
           model.name += ' ' + verNum
         }
 
-        extInstance.addModel(args.model)
+        extInstance.addModel(model)
 
         resolve(model)
       })

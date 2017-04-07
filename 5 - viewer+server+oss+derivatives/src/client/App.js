@@ -169,7 +169,7 @@ export default class App {
 
         model.name = item.objectKey
 
-        extInstance.addModel(args.model)
+        extInstance.addModel(model)
 
         resolve(model)
       })
