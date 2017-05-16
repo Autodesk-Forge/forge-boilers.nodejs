@@ -29,24 +29,36 @@ export default class DataContextMenu extends
       case 'hubs':
 
         menu.push({
-          title: 'Show hub details',
-          className: 'fa fa-cloud',
-          target: () => {
-            this.emit('context.details', {
-              event, node, type: 'hubs'
-            })
-          }
+          title: 'Show details',
+          className: 'fa fa-share',
+          target: [{
+            title: 'Hub details',
+            className: 'fa fa-cloud',
+            target: () => {
+              this.emit('context.details', {
+                event, node, type: 'hubs'
+              })
+            }
+          }, {
+            title: 'Projects details',
+            className: 'fa fa-folder',
+            target: () => {
+              this.emit('context.details', {
+                event, node, type: 'hubs.projects'
+              })
+            }
+          }]
         })
 
-        menu.push({
-          title: 'Refresh',
-          className: 'fa fa-refresh',
-          target: () => {
-            this.emit('context.refresh', {
-              event, node
-            })
-          }
-        })
+        //menu.push({
+        //  title: 'Refresh',
+        //  className: 'fa fa-refresh',
+        //  target: () => {
+        //    this.emit('context.refresh', {
+        //      event, node
+        //    })
+        //  }
+        //})
 
         break
 
@@ -100,15 +112,15 @@ export default class DataContextMenu extends
           }
         })
 
-        menu.push({
-          title: 'Refresh',
-          className: 'fa fa-refresh',
-          target: () => {
-            this.emit('context.refresh', {
-              event, node
-            })
-          }
-        })
+        //menu.push({
+        //  title: 'Refresh',
+        //  className: 'fa fa-refresh',
+        //  target: () => {
+        //    this.emit('context.refresh', {
+        //      event, node
+        //    })
+        //  }
+        //})
 
         break
 
@@ -156,15 +168,15 @@ export default class DataContextMenu extends
           }
         })
 
-        menu.push({
-          title: 'Refresh',
-          className: 'fa fa-refresh',
-          target: () => {
-            this.emit('context.refresh', {
-              event, node
-            })
-          }
-        })
+        //menu.push({
+        //  title: 'Refresh',
+        //  className: 'fa fa-refresh',
+        //  target: () => {
+        //    this.emit('context.refresh', {
+        //      event, node
+        //    })
+        //  }
+        //})
 
         break
 
@@ -218,15 +230,15 @@ export default class DataContextMenu extends
           }
         }
 
-        menu.push({
-          title: 'Refresh',
-          className: 'fa fa-refresh',
-          target: () => {
-            this.emit('context.refresh', {
-              event, node
-            })
-          }
-        })
+        //menu.push({
+        //  title: 'Refresh',
+        //  className: 'fa fa-refresh',
+        //  target: () => {
+        //    this.emit('context.refresh', {
+        //      event, node
+        //    })
+        //  }
+        //})
 
         if(node.activeVersion.relationships.storage) {
 

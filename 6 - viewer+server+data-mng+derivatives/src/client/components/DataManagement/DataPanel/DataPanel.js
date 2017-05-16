@@ -77,6 +77,12 @@ export default class DataPanel extends UIComponent {
           case 'hubs':
             this.showPayload(
               `${this.dmAPI.apiUrl}/hubs/` +
+              `${data.node.hubId}`)
+            break
+
+          case 'hubs.projects':
+            this.showPayload(
+              `${this.dmAPI.apiUrl}/hubs/` +
               `${data.node.hubId}/projects`)
             break
 
@@ -834,7 +840,7 @@ class DMTreeDelegate extends BaseTreeDelegate {
       $(parent).append(label)
     }
 
-    if (['projects', 'folders'].indexOf(node.type) > -1) {
+    if (['folders'].indexOf(node.type) > -1) {
 
       $(parent).find('icon').before(`
         <div class="cloud-upload">
@@ -1291,15 +1297,6 @@ class DMTreeDelegate extends BaseTreeDelegate {
 
         node.children = []
 
-        //this.dmAPI.getProject(
-        //  node.hubId, node.projectId).then((project) => {
-        //
-        //const rootId = project.data.relationships.rootFolder.data.id
-        //
-        //this.dmAPI.getFolderContent(
-        //  node.projectId, rootId).then((folderItemsRes) => {
-        //
-
         this.dmAPI.getProjectTopFolders(
           node.hubId, node.projectId).then((folderItemsRes) => {
 
@@ -1540,7 +1537,13 @@ class DMTreeDelegate extends BaseTreeDelegate {
         return this.onFolderNode (node)
 
       case 'hubs':
-        return this.onHubNode (node)
+
+        const hubType = node.details.attributes.extension.type
+
+        const showProjects =
+          (hubType === 'hubs:autodesk.bim360:Account')
+
+        return this.onHubNode (node, showProjects)
     }
   }
 

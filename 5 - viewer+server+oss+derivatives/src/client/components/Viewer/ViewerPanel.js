@@ -15,7 +15,6 @@
 // DOES NOT WARRANT THAT THE OPERATION OF THE PROGRAM WILL BE
 // UNINTERRUPTED OR ERROR FREE.
 /////////////////////////////////////////////////////////////////////
-import {client as config} from 'c0nfig'
 
 export default class ViewerPanel {
 

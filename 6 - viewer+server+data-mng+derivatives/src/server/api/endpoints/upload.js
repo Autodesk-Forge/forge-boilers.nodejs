@@ -37,9 +37,7 @@ module.exports = function() {
     `../../../../TMP`)
 
   setInterval(() => {
-
     clean(dir, 60 * 60 * 1000)
-
   }, 60 * 60 * 1000)
 
   setTimeout(() => {
