@@ -45,11 +45,8 @@ module.exports = function() {
 
     try {
 
-<<<<<<< HEAD
       const hubId = req.params.hubId
 
-=======
->>>>>>> 92284fc7a048628072394b4af365ac6998de36cc
       const forgeSvc = ServiceManager.getService('ForgeSvc')
 
       const token = await forgeSvc.get3LeggedTokenMaster(req.session)
