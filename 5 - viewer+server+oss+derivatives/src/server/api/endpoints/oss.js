@@ -1,7 +1,7 @@
 
 import ServiceManager from '../services/SvcManager'
-import { serverConfig as config } from 'c0nfig'
 import express from 'express'
+import config from 'c0nfig'
 import fs from 'fs'
 
 module.exports = function() {
@@ -89,13 +89,13 @@ module.exports = function() {
       const token = await forgeSvc.get2LeggedToken()
 
       const ossSvc = ServiceManager.getService('OssSvc')
-  
+
       const options = {
         region: req.query.region || 'US',
         startAt: req.query.startAt || 0,
         limit: req.query.limit || 100
       }
-      
+
       const response = await ossSvc.getObjects(
         token, bucketKey, options)
 

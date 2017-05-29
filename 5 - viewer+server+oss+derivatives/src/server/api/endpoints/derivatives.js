@@ -1,7 +1,7 @@
 
 import ServiceManager from '../services/SvcManager'
-import { serverConfig as config } from 'c0nfig'
 import express from 'express'
+import config from 'c0nfig'
 import rmdir from 'rmdir'
 import mzfs from 'mz/fs'
 import path from 'path'
@@ -20,14 +20,14 @@ module.exports = function() {
   router.post('/job', async (req, res) => {
 
     try {
-      
+
       var payload = JSON.parse(req.body.payload)
 
       var forgeSvc = ServiceManager.getService(
         'ForgeSvc')
 
       var token = await forgeSvc.get2LeggedToken()
-      
+
       var derivativesSvc = ServiceManager.getService(
         'DerivativesSvc')
 
@@ -77,7 +77,7 @@ module.exports = function() {
   router.get('/metadata/:urn', async (req, res) => {
 
     try {
-      
+
       var urn = req.params.urn
 
       var forgeSvc = ServiceManager.getService('ForgeSvc')
@@ -133,7 +133,7 @@ module.exports = function() {
   router.get('/hierarchy/:urn/:guid', async (req, res) => {
 
     try {
-      
+
       var urn = req.params.urn
 
       var guid = req.params.guid
@@ -266,7 +266,7 @@ module.exports = function() {
   router.get('/thumbnails/:urn', async (req, res) => {
 
     try {
-      
+
       var urn = req.params.urn
 
       var options = {

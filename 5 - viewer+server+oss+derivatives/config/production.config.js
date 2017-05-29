@@ -3,33 +3,30 @@
 // PRODUCTION configuration
 //
 /////////////////////////////////////////////////////////////////////
-
 module.exports = {
 
-  clientConfig: {
-    forge: {
-      token2LeggedUrl: '/api/forge/token/2legged'
-    }
-  },
+  port: 3000,
 
-  serverConfig: {
+  forge: {
 
-    port: 3000,
+    viewer: {
+      viewer3D: 'https://developer.api.autodesk.com/viewingservice/v1/viewers/viewer3D.min.js?v=2.14',
+      threeJS:  'https://developer.api.autodesk.com/viewingservice/v1/viewers/three.min.js?v=2.14',
+      style:    'https://developer.api.autodesk.com/viewingservice/v1/viewers/style.min.css?v=2.14'
+    },
 
-    forge: {
-      oauth: {
-        clientSecret: process.env.FORGE_CLIENT_SECRET,
-        clientId: process.env.FORGE_CLIENT_ID,
+    oauth: {
+      clientSecret: process.env.FORGE_CLIENT_SECRET,
+      clientId: process.env.FORGE_CLIENT_ID,
 
-        scope: [
-          'data:read',
-          'data:write',
-          'data:create',
-          'bucket:read',
-          'bucket:create',
-          'bucket:delete'
-        ]
-      }
+      scope: [
+        'data:read',
+        'data:write',
+        'data:create',
+        'bucket:read',
+        'bucket:create',
+        'bucket:delete'
+      ]
     }
   }
 }

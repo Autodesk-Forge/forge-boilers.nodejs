@@ -9,6 +9,10 @@
       "description": "Environment, defaulted to production",
       "value": "production"
     },
+    "NPM_CONFIG_PRODUCTION": {
+      "description": "This forces Heroku to install devDependencies, needed to build the App. Must be false!",
+      "value": "false"
+    },
     "FORGE_CLIENT_ID": {
       "description": "Your Forge Client ID API Key"
     },

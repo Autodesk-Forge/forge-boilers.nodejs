@@ -17,15 +17,15 @@
 /////////////////////////////////////////////////////////////////////
 import ModelTransformerExtension from 'Viewing.Extension.ModelTransformer'
 import {ManagerPanel as DerivativesManagerPanel} from 'Derivatives'
-import ViewerPanel from 'Components/Viewer/Viewer.Panel'
-import ServiceManager from 'Services/SvcManager'
-import {clientConfig as config} from 'c0nfig'
+import ViewerPanel from 'components/Viewer/Viewer.Panel'
+import ServiceManager from 'services/SvcManager'
+import {client as config} from 'c0nfig'
 import 'jquery-ui/themes/base/resizable.css'
 import ToolPanelModal from 'ToolPanelModal'
-import SocketSvc from 'Services/SocketSvc'
 import {DataPanel} from 'DataManagement'
 import {ItemPanel} from 'DataManagement'
 import 'jquery-ui/ui/widgets/resizable'
+import UserSvc from 'services/UserSvc'
 import 'font-awesome-webpack'
 import 'bootstrap-webpack'
 import 'jquery-ui'
@@ -54,100 +54,9 @@ export default class App {
 
       this.onAbout(e)
     })
-  }
 
-  //////////////////////////////////////////////////////////////////////////
-  // register app with socket service
-  //
-  //////////////////////////////////////////////////////////////////////////
-  register (socketId) {
-
-    return new Promise((resolve, reject) => {
-
-      $.ajax({
-        url: '/api/app/register',
-        type: 'POST',
-        contentType: 'application/json',
-        dataType: 'json',
-        data: JSON.stringify({
-          socketId: socketId
-        }),
-        success: (response) => {
-
-          return resolve(response)
-        },
-        error: (err) => {
-
-          console.log(err)
-          return reject(err)
-        }
-      })
-    })
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  // perform login
-  //
-  //////////////////////////////////////////////////////////////////////////
-  login() {
-
-    return new Promise((resolve, reject) => {
-
-      $.ajax({
-        url: '/api/forge/login',
-        type: 'POST',
-        contentType: 'application/json',
-        dataType: 'json',
-        data: null,
-        success: (url) => {
-
-          // iframes are not allowed
-
-          this.popup = this.PopupCenter(
-            url, "Autodesk Login", 800, 400)
-
-          if (this.popup) {
-
-            this.popup.focus()
-          }
-
-          resolve()
-        },
-        error: (err) => {
-
-          console.log(err)
-
-          reject(err)
-        }
-      })
-    })
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  // perform logout
-  //
-  //////////////////////////////////////////////////////////////////////////
-  logout() {
-
-    return new Promise((resolve, reject) => {
-
-      $.ajax({
-        url: '/api/forge/logout',
-        type: 'POST',
-        contentType: 'application/json',
-        dataType: 'json',
-        data: null,
-        success: (res) => {
-
-          resolve()
-        },
-        error: (err) => {
-
-         console.log(err)
-
-         reject(err)
-        }
-      })
+    this.userSvc = new UserSvc({
+        apiUrl: '/api/forge' 
     })
   }
 
@@ -293,44 +202,12 @@ export default class App {
               return this.onLoadItemDetails (node)
             })
 
-            let socketSvc = new SocketSvc({
-              host: config.host,
-              port: config.port
-            })
+            this.userSvc.getUser().then((user) => {
 
-            socketSvc.connect().then(()=> {
+              if (user) {
 
-              ServiceManager.registerService(socketSvc)
-
-              socketSvc.on('connection.data', (data)=> {
-
-                this.register(data.socketId)
-              })
-
-              socketSvc.on('callback', (msg)=> {
-
-                if (this.popup) {
-
-                  this.loggedIn = true
-                  this.popup.close()
-                  this.popup = null
-                }
-
-                if (msg === 'success') {
-
-                  $.get('/api/dm/user', (user) => {
-
-                    this.onUserLoggedIn(user)
-                  })
-                }
-              })
-
-              socketSvc.emit('request.connection.data')
-            })
-
-            $.get('/api/dm/user', (user) => {
-
-              this.onUserLoggedIn(user)
+                this.onUserLoggedIn(user)
+              }
             })
           }
         })
@@ -361,7 +238,7 @@ export default class App {
 
       viewer.loadExtension(ModelTransformerExtension, {
         parentControl: 'modelTools',
-        autoLoad: true
+        autoLoad: false
       })
 
       //  builds placementTransform based on model extension
@@ -369,55 +246,9 @@ export default class App {
         ModelTransformerExtension)
 
       const loadOptions = {
-        //broken v 2.13
-        //placementTransform:
-        // extInstance.buildPlacementTransform(item.objectKey)
+        placementTransform:
+        extInstance.buildPlacementTransform(name)
       }
-
-      const offset =
-        extInstance.buildModelOffset(item.objectKey)
-
-      const onRootNodeLoaded = async(args) => {
-
-        args.model.placementOffset = offset
-
-        viewer.removeEventListener(
-          Autodesk.Viewing.MODEL_ROOT_LOADED_EVENT,
-          onRootNodeLoaded)
-
-        while (!args.model.getData().instanceTree) {
-
-        await this.sleep(100)
-        }
-
-        const instanceTree = args.model.getData().instanceTree
-
-        Toolkit.hide(viewer, instanceTree.getRootId())
-      }
-
-      viewer.addEventListener(
-        Autodesk.Viewing.MODEL_ROOT_LOADED_EVENT,
-        onRootNodeLoaded)
-
-      const onGeometryLoaded = (args) => {
-
-        viewer.removeEventListener(
-          Autodesk.Viewing.GEOMETRY_LOADED_EVENT,
-          onGeometryLoaded)
-
-        extInstance.applyTransform (
-          args.model, offset)
-
-        const instanceTree = args.model.getData().instanceTree
-
-        Toolkit.show(viewer, instanceTree.getRootId())
-
-        extInstance.addModel(args.model)
-      }
-
-      viewer.addEventListener(
-        Autodesk.Viewing.GEOMETRY_LOADED_EVENT,
-        onGeometryLoaded)
 
       viewer.loadModel(path, loadOptions, (model) => {
 
@@ -429,6 +260,8 @@ export default class App {
 
           model.name += ' ' + verNum
         }
+
+        extInstance.addModel(model)
 
         resolve(model)
       })
@@ -536,14 +369,19 @@ export default class App {
 
       this.viewerPanel.onResize()
 
-      this.logout().then(() => {
+      this.userSvc.logout()
 
-        this.user = null
-      })
+      this.user = null
 
     } else {
 
-      this.login()
+      this.userSvc.login().then((user) => {
+
+        if (user) {
+
+          this.onUserLoggedIn(user)
+        }
+      })
     }
   }
 

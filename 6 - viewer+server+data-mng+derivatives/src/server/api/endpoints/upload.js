@@ -1,7 +1,7 @@
 
 import ServiceManager from '../services/SvcManager'
-import { serverConfig as config } from 'c0nfig'
 import express from 'express'
+import config from 'c0nfig'
 import multer from 'multer'
 import rimraf from 'rimraf'
 import crypto from 'crypto'
@@ -37,9 +37,7 @@ module.exports = function() {
     `../../../../TMP`)
 
   setInterval(() => {
-
     clean(dir, 60 * 60 * 1000)
-
   }, 60 * 60 * 1000)
 
   setTimeout(() => {

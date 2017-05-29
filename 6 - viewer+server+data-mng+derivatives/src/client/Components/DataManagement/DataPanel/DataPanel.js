@@ -77,6 +77,12 @@ export default class DataPanel extends UIComponent {
           case 'hubs':
             this.showPayload(
               `${this.dmAPI.apiUrl}/hubs/` +
+              `${data.node.hubId}`)
+            break
+
+          case 'hubs.projects':
+            this.showPayload(
+              `${this.dmAPI.apiUrl}/hubs/` +
               `${data.node.hubId}/projects`)
             break
 
@@ -85,6 +91,13 @@ export default class DataPanel extends UIComponent {
               `${this.dmAPI.apiUrl}/hubs/` +
               `${data.node.hubId}/projects/` +
               `${data.node.projectId}`)
+            break
+
+          case 'top.folders.content':
+            this.showPayload(
+              `${this.dmAPI.apiUrl}/hubs/` +
+              `${data.node.hubId}/projects/` +
+              `${data.node.projectId}/topFolders`)
             break
 
           case 'folders':
@@ -827,7 +840,7 @@ class DMTreeDelegate extends BaseTreeDelegate {
       $(parent).append(label)
     }
 
-    if (['projects', 'folders'].indexOf(node.type) > -1) {
+    if (['folders'].indexOf(node.type) > -1) {
 
       $(parent).find('icon').before(`
         <div class="cloud-upload">
@@ -1049,395 +1062,488 @@ class DMTreeDelegate extends BaseTreeDelegate {
   //
   //
   /////////////////////////////////////////////////////////////
+  onHubNode (node, showProjects = false) {
+
+    node.on('childrenLoaded', (children) => {
+
+      node.loadStatus = 'loaded'
+
+      node.showLoader(false)
+    })
+
+    node.loadChildren = async(loadingMode) => {
+
+      if (['pending', 'loaded'].indexOf(node.loadStatus) > -1) {
+
+        return
+      }
+
+      node.loadStatus = 'pending'
+
+      node.showLoader(true)
+
+      // if node has children -> run loadChildren
+      // on each child if loadMode is not 'firstLevel'
+      // otherwise request children from API
+
+      if (node.children) {
+
+        if (loadingMode !== 'firstLevel') {
+
+          node.children.forEach((child) => {
+
+            if(child.loadChildren) {
+
+              child.loadChildren(loadingMode)
+            }
+          })
+
+        } else {
+
+          node.loadStatus = 'idle'
+
+          node.showLoader(false)
+        }
+
+      } else {
+
+        try {
+
+          node.children = []
+
+          const projectsRes = await this.dmAPI.getProjects(node.id)
+
+          const projects = _.sortBy(projectsRes.data,
+            (project) => {
+              return project.attributes.name.toLowerCase()
+            })
+
+          if (showProjects) {
+
+            const projectTasks = projects.map((project) => {
+
+              return new Promise((resolve) => {
+
+                let rootId = project.relationships.rootFolder.data.id
+
+                let child = new TreeNode({
+                  name: project.attributes.name,
+                  projectId: project.id,
+                  type: project.type,
+                  details: project,
+                  folderId: rootId,
+                  hubId: node.id,
+                  id: project.id,
+                  group: true
+                })
+
+                child.on('childrenLoaded', () => {
+
+                  child.loadStatus = 'loaded'
+
+                  child.showLoader(false)
+
+                  resolve(child)
+                })
+
+                node.addChild(child)
+
+                node.children.push(child)
+
+                if (loadingMode !== 'firstLevel') {
+
+                  if (child.loadChildren) {
+
+                    child.loadChildren(loadingMode)
+                  }
+                }
+              })
+            })
+
+            if (loadingMode === 'firstLevel') {
+
+              node.loadStatus = 'idle'
+
+              node.showLoader(false)
+            }
+
+            Promise.all(projectTasks).then(
+              (children) => {
+                node.emit('childrenLoaded', children)
+              })
+
+          } else {
+
+            const projectTasks = projects.map((project) => {
+
+              return new Promise(async(resolve) => {
+
+                const folderItemsRes =
+                  await this.dmAPI.getProjectTopFolders(
+                    node.id, project.id)
+
+                folderItemsRes.data.forEach((folder) => {
+                  folder.projectId = project.id
+                })
+
+                return resolve(folderItemsRes.data)
+              })
+            })
+
+            Promise.all(projectTasks).then((folderArrays) => {
+
+              if (loadingMode === 'firstLevel') {
+
+                node.loadStatus = 'idle'
+
+                node.showLoader(false)
+              }
+
+              const folders = _.sortBy(_.flatten(folderArrays),
+                (folderItem) => {
+                  return folderItem.attributes.displayName.toLowerCase()
+                })
+
+              const foldersTasks = folders.map((folder) => {
+
+                return new Promise((resolve) => {
+
+                  let child = new TreeNode({
+                    name: folder.attributes.displayName,
+                    projectId: folder.projectId,
+                    folderId: folder.id,
+                    type: folder.type,
+                    details: folder,
+                    hubId: node.id,
+                    id: folder.id,
+                    group: true
+                  })
+
+                  child.on('childrenLoaded', () => {
+
+                    child.loadStatus = 'loaded'
+
+                    child.showLoader(false)
+
+                    resolve(child)
+                  })
+
+                  node.addChild(child)
+
+                  node.children.push(child)
+
+                  if (loadingMode !== 'firstLevel') {
+
+                    if (child.loadChildren) {
+
+                      child.loadChildren(loadingMode)
+                    }
+                  }
+                })
+              })
+
+              Promise.all(foldersTasks).then(
+                (children) => {
+                  node.emit('childrenLoaded', children)
+                })
+            })
+          }
+
+        } catch(ex) {
+
+          node.emit('childrenLoaded', null)
+        }
+      }
+    }
+  }
+
+  /////////////////////////////////////////////////////////////
+  //
+  //
+  /////////////////////////////////////////////////////////////
+  onProjectNode (node) {
+
+    node.loadChildren = (loadingMode) => {
+
+      if (['pending', 'loaded'].indexOf(node.loadStatus) > -1) {
+
+        return
+      }
+
+      node.loadStatus = 'pending'
+
+      node.showLoader(true)
+
+      if (node.children) {
+
+        if (loadingMode !== 'firstLevel') {
+
+          node.children.forEach((child) => {
+
+            if(child.loadChildren) {
+
+              child.loadChildren(loadingMode)
+            }
+          })
+
+        } else {
+
+          node.loadStatus = 'idle'
+
+          node.showLoader(false)
+        }
+
+      } else {
+
+        node.children = []
+
+        this.dmAPI.getProjectTopFolders(
+          node.hubId, node.projectId).then((folderItemsRes) => {
+
+            const folderItems = _.sortBy(folderItemsRes.data,
+              (folderItem) => {
+                return folderItem.attributes.displayName.toLowerCase()
+              })
+
+            const folders = folderItems.filter((folderItem) => {
+
+              return (folderItem.type === 'folders')
+            })
+
+            const items = folderItems.filter((folderItem) => {
+
+              return (folderItem.type === 'items')
+            })
+
+            const folderTasks = folders.map((folder) => {
+
+              return new Promise((resolve) => {
+
+                let child = new TreeNode({
+                  name: folder.attributes.displayName,
+                  projectId: node.projectId,
+                  folderId: folder.id,
+                  type: folder.type,
+                  hubId: node.hubId,
+                  details: folder,
+                  id: folder.id,
+                  group: true
+                })
+
+                child.on('childrenLoaded', () => {
+
+                  child.loadStatus = 'loaded'
+
+                  child.showLoader(false)
+
+                  resolve(child)
+                })
+
+                node.addChild(child)
+
+                node.children.push(child)
+
+                if (loadingMode !== 'firstLevel') {
+
+                  if(child.loadChildren) {
+
+                    child.loadChildren(loadingMode)
+                  }
+                }
+              })
+            })
+
+            const itemTasks = items.map((item) => {
+
+              return new Promise((resolve, reject) => {
+
+                const itemNode = this.createItemNode(
+                  node, item)
+
+                node.children.push(itemNode)
+
+                resolve(itemNode)
+              })
+            })
+
+            if (loadingMode === 'firstLevel') {
+
+              node.loadStatus = 'idle'
+
+              node.showLoader(false)
+            }
+
+            const tasks = [...folderTasks, ...itemTasks]
+
+            Promise.all(tasks).then((children) => {
+
+              node.emit('childrenLoaded', children)
+            })
+
+          }, (error) => {
+
+            node.emit('childrenLoaded', null)
+
+          })
+      }
+    }
+  }
+
+  /////////////////////////////////////////////////////////////
+  //
+  //
+  /////////////////////////////////////////////////////////////
+  onFolderNode (node) {
+
+    node.loadChildren = (loadingMode) => {
+
+      if (['pending', 'loaded'].indexOf(node.loadStatus) > -1) {
+
+        return
+      }
+
+      node.loadStatus = 'pending'
+
+      node.showLoader(true)
+
+      if (node.children) {
+
+        if (loadingMode !== 'firstLevel') {
+
+          node.children.forEach((child) => {
+
+            if(child.loadChildren) {
+
+              child.loadChildren(loadingMode)
+            }
+          })
+
+        } else {
+
+          node.loadStatus = 'idle'
+
+          node.showLoader(false)
+        }
+
+      } else {
+
+        node.children = []
+
+        this.dmAPI.getFolderContent(
+          node.projectId, node.folderId).then((folderItemsRes) => {
+
+            const folderItems = _.sortBy(folderItemsRes.data,
+              (folderItem) => {
+                return folderItem.attributes.displayName.toLowerCase()
+              })
+
+            const folders = folderItems.filter((folderItem) => {
+
+              return (folderItem.type === 'folders')
+            })
+
+            const items = folderItems.filter((folderItem) => {
+
+              return (folderItem.type === 'items')
+            })
+
+            const folderTasks = folders.map((folder) => {
+
+              return new Promise((resolve) => {
+
+                let child = new TreeNode({
+                  name: folder.attributes.displayName,
+                  projectId: node.projectId,
+                  folderId: folder.id,
+                  type: folder.type,
+                  hubId: node.hubId,
+                  details: folder,
+                  id: folder.id,
+                  group: true
+                })
+
+                child.on('childrenLoaded', () => {
+
+                  child.loadStatus = 'loaded'
+
+                  child.showLoader(false)
+
+                  resolve(child)
+                })
+
+                node.addChild(child)
+
+                node.children.push(child)
+
+                if (loadingMode !== 'firstLevel') {
+
+                  if(child.loadChildren) {
+
+                    child.loadChildren(loadingMode)
+                  }
+                }
+              })
+            })
+
+            const itemTasks = items.map((item) => {
+
+              return new Promise((resolve, reject) => {
+
+                const itemNode = this.createItemNode(
+                  node, item)
+
+                node.children.push(itemNode)
+
+                resolve(itemNode)
+              })
+            })
+
+            if (loadingMode === 'firstLevel') {
+
+              node.loadStatus = 'idle'
+
+              node.showLoader(false)
+            }
+
+            const tasks = [...folderTasks, ...itemTasks]
+
+            Promise.all(tasks).then((children) => {
+
+              node.emit('childrenLoaded', children)
+            })
+
+          }, (error) => {
+
+            node.emit('childrenLoaded', null)
+          })
+      }
+    }
+  }
+
+  /////////////////////////////////////////////////////////////
+  //
+  //
+  /////////////////////////////////////////////////////////////
   forEachChild (node, addChildCallback) {
 
     node.addChild = addChildCallback
 
-    switch(node.type) {
+    switch (node.type) {
+
+      case 'projects':
+        return this.onProjectNode (node)
+
+      case 'folders':
+        return this.onFolderNode (node)
 
       case 'hubs':
 
-        node.on('childrenLoaded', (children) => {
+        const hubType = node.details.attributes.extension.type
 
-          node.loadStatus = 'loaded'
+        const showProjects =
+          (hubType === 'hubs:autodesk.bim360:Account')
 
-          node.showLoader(false)
-        })
-
-        node.loadChildren = (loadingMode) => {
-
-          if (['pending', 'loaded'].indexOf(node.loadStatus) > -1) {
-
-            return
-          }
-
-          node.loadStatus = 'pending'
-
-          node.showLoader(true)
-
-          // if node has children -> run loadChildren
-          // on each child if loadMode is not 'firstLevel'
-          // otherwise request children from API
-
-          if (node.children) {
-
-            if (loadingMode !== 'firstLevel') {
-
-              node.children.forEach((child) => {
-
-                if(child.loadChildren) {
-
-                  child.loadChildren(loadingMode)
-                }
-              })
-
-            } else {
-
-              node.loadStatus = 'idle'
-
-              node.showLoader(false)
-            }
-
-          } else {
-
-            node.children = []
-
-            this.dmAPI.getProjects(
-              node.id).then((projectsRes) => {
-
-                const projects = _.sortBy(projectsRes.data,
-                  (project) => {
-                    return project.attributes.name.toLowerCase()
-                  })
-
-                let projectTasks = projects.map((project) => {
-
-                  return new Promise((resolve, reject) => {
-
-                    let rootId = project.relationships.rootFolder.data.id
-
-                    let child = new TreeNode({
-                      name: project.attributes.name,
-                      projectId: project.id,
-                      type: project.type,
-                      details: project,
-                      folderId: rootId,
-                      hubId: node.id,
-                      id: project.id,
-                      group: true
-                    })
-
-                    child.on('childrenLoaded', (children) => {
-
-                      child.loadStatus = 'loaded'
-
-                      child.showLoader(false)
-
-                      resolve(child)
-                    })
-
-                    addChildCallback(child)
-
-                    node.children.push(child)
-
-                    if (loadingMode !== 'firstLevel') {
-
-                      if(child.loadChildren) {
-
-                        child.loadChildren(loadingMode)
-                      }
-                    }
-                  })
-                })
-
-                if (loadingMode === 'firstLevel') {
-
-                  node.loadStatus = 'idle'
-
-                  node.showLoader(false)
-                }
-
-                Promise.all(projectTasks).then((children) => {
-
-                  node.emit('childrenLoaded', children)
-                })
-
-              }, (error) => {
-
-                node.emit('childrenLoaded', null)
-              })
-          }
-        }
-
-        break
-
-      case 'projects':
-
-        node.loadChildren = (loadingMode) => {
-
-          if (['pending', 'loaded'].indexOf(node.loadStatus) > -1) {
-
-            return
-          }
-
-          node.loadStatus = 'pending'
-
-          node.showLoader(true)
-
-          if (node.children) {
-
-            if (loadingMode !== 'firstLevel') {
-
-              node.children.forEach((child) => {
-
-                if(child.loadChildren) {
-
-                  child.loadChildren(loadingMode)
-                }
-              })
-
-            } else {
-
-              node.loadStatus = 'idle'
-
-              node.showLoader(false)
-            }
-
-          } else {
-
-            node.children = []
-
-            this.dmAPI.getProject(
-              node.hubId, node.projectId).then((project) => {
-
-                const rootId = project.data.relationships.rootFolder.data.id
-
-                this.dmAPI.getFolderContent(
-                  node.projectId, rootId).then((folderItemsRes) => {
-
-                    const folderItems = _.sortBy(folderItemsRes.data,
-                      (folderItem) => {
-                        return folderItem.attributes.displayName.toLowerCase()
-                      })
-
-                    const folders = folderItems.filter((folderItem) => {
-
-                      return (folderItem.type === 'folders')
-                    })
-
-                    const items = folderItems.filter((folderItem) => {
-
-                      return (folderItem.type === 'items')
-                    })
-
-                    const folderTasks = folders.map((folder) => {
-
-                      return new Promise((resolve, reject) => {
-
-                        let child = new TreeNode({
-                          name: folder.attributes.displayName,
-                          projectId: node.projectId,
-                          folderId: folder.id,
-                          type: folder.type,
-                          hubId: node.hubId,
-                          details: folder,
-                          id: folder.id,
-                          group: true
-                        })
-
-                        child.on('childrenLoaded', (children) => {
-
-                          child.loadStatus = 'loaded'
-
-                          child.showLoader(false)
-
-                          resolve(child)
-                        })
-
-                        addChildCallback(child)
-
-                        node.children.push(child)
-
-                        if (loadingMode !== 'firstLevel') {
-
-                          if(child.loadChildren) {
-
-                            child.loadChildren(loadingMode)
-                          }
-                        }
-                      })
-                    })
-
-                    const itemTasks = items.map((item) => {
-
-                      return new Promise((resolve, reject) => {
-
-                        const itemNode = this.createItemNode(
-                          node, item)
-
-                        node.children.push(itemNode)
-
-                        resolve(itemNode)
-                      })
-                    })
-
-                    if (loadingMode === 'firstLevel') {
-
-                      node.loadStatus = 'idle'
-
-                      node.showLoader(false)
-                    }
-
-                    const tasks = [...folderTasks, ...itemTasks]
-
-                    Promise.all(tasks).then((children) => {
-
-                      node.emit('childrenLoaded', children)
-                    })
-
-                  }, (error) => {
-
-                    node.emit('childrenLoaded', null)
-
-                  })
-
-              }, (error) => {
-
-                node.emit('childrenLoaded', null)
-
-              })
-          }
-        }
-
-        break
-
-      case 'folders':
-
-        node.loadChildren = (loadingMode) => {
-
-          if (['pending', 'loaded'].indexOf(node.loadStatus) > -1) {
-
-            return
-          }
-
-          node.loadStatus = 'pending'
-
-          node.showLoader(true)
-
-          if (node.children) {
-
-            if (loadingMode !== 'firstLevel') {
-
-              node.children.forEach((child) => {
-
-                if(child.loadChildren) {
-
-                  child.loadChildren(loadingMode)
-                }
-              })
-
-            } else {
-
-              node.loadStatus = 'idle'
-
-              node.showLoader(false)
-            }
-
-          } else {
-
-            node.children = []
-
-            this.dmAPI.getFolderContent(
-              node.projectId, node.folderId).then((folderItemsRes) => {
-
-                const folderItems = _.sortBy(folderItemsRes.data,
-                  (folderItem) => {
-                    return folderItem.attributes.displayName.toLowerCase()
-                  })
-
-                const folders = folderItems.filter((folderItem) => {
-
-                  return (folderItem.type === 'folders')
-                })
-
-                const items = folderItems.filter((folderItem) => {
-
-                  return (folderItem.type === 'items')
-                })
-
-                const folderTasks = folders.map((folder) => {
-
-                  return new Promise((resolve, reject) => {
-
-                    let child = new TreeNode({
-                      name: folder.attributes.displayName,
-                      projectId: node.projectId,
-                      folderId: folder.id,
-                      type: folder.type,
-                      hubId: node.hubId,
-                      details: folder,
-                      id: folder.id,
-                      group: true
-                    })
-
-                    child.on('childrenLoaded', (children) => {
-
-                      child.loadStatus = 'loaded'
-
-                      child.showLoader(false)
-
-                      resolve(child)
-                    })
-
-                    addChildCallback(child)
-
-                    node.children.push(child)
-
-                    if (loadingMode !== 'firstLevel') {
-
-                      if(child.loadChildren) {
-
-                        child.loadChildren(loadingMode)
-                      }
-                    }
-                  })
-                })
-
-                const itemTasks = items.map((item) => {
-
-                  return new Promise((resolve, reject) => {
-
-                    const itemNode = this.createItemNode(
-                      node, item)
-
-                    node.children.push(itemNode)
-
-                    resolve(itemNode)
-                  })
-                })
-
-                if (loadingMode === 'firstLevel') {
-
-                  node.loadStatus = 'idle'
-
-                  node.showLoader(false)
-                }
-
-                const tasks = [...folderTasks, ...itemTasks]
-
-                Promise.all(tasks).then((children) => {
-
-                  node.emit('childrenLoaded', children)
-                })
-
-              }, (error) => {
-
-                node.emit('childrenLoaded', null)
-              })
-          }
-        }
-
-        break
+        return this.onHubNode (node, showProjects)
     }
   }
 

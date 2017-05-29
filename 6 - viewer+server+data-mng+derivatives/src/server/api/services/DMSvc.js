@@ -53,13 +53,23 @@ export default class DMSvc extends BaseSvc {
   }
 
   /////////////////////////////////////////////////////////////////
-  // Returns list of Hubs
+  // Returns hub info
   //
   /////////////////////////////////////////////////////////////////
   getHubs (token, opts = {}) {
 
     return this._hubsAPI.getHubs (
       opts, {autoRefresh:false}, token)
+  }
+
+  /////////////////////////////////////////////////////////////////
+  // Returns list of Hubs
+  //
+  /////////////////////////////////////////////////////////////////
+  getHub (token, hubId) {
+
+    return this._hubsAPI.getHub (
+      hubId, {autoRefresh:false}, token)
   }
 
   /////////////////////////////////////////////////////////////////
@@ -79,6 +89,21 @@ export default class DMSvc extends BaseSvc {
   getProject (token, hubId, projectId) {
 
     return this._projectsAPI.getProject(
+      hubId, projectId, {autoRefresh:false}, token)
+  }
+
+  /////////////////////////////////////////////////////////////////
+  // Returns Project Top Folders
+  // If the user has access to the project’s root folder,
+  // it only returns details of the root folder.
+  // If the user does not have access to the root folder,
+  // it returns details of all the highest level folders in
+  // the folder hierarchy the user has access to.
+  //
+  /////////////////////////////////////////////////////////////////
+  getProjectTopFolders (token, hubId, projectId) {
+
+    return this._projectsAPI.getProjectTopFolders(
       hubId, projectId, {autoRefresh:false}, token)
   }
 

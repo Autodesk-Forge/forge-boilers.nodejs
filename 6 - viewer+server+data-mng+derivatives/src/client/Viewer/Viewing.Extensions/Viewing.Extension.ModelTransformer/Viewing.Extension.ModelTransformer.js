@@ -395,16 +395,16 @@ class ModelTransformerExtension extends ExtensionBase {
   //
   /////////////////////////////////////////////////////////////////
   applyTransform (model, transform, offset = {
-    scale: {
-      x: 0.0, y: 0.0, z: 0.0
-    },
-    translation: {
-      x: 0.0, y: 0.0, z: 0.0
-    },
-    rotation: {
-      x: 0.0, y: 0.0, z: 0.0
-    }
-  }) {
+      scale: {
+        x: 0.0, y: 0.0, z: 0.0
+      },
+      translation: {
+        x: 0.0, y: 0.0, z: 0.0
+      },
+      rotation: {
+        x: 0.0, y: 0.0, z: 0.0
+      }
+    }) {
 
     var viewer = this._viewer
 
@@ -559,10 +559,8 @@ class ModelTransformerExtension extends ExtensionBase {
 
     var placementTransform = new THREE.Matrix4()
 
-    if (!this.firstModelLoaded) {
-
-      this.firstModelLoaded = modelName
-    }
+    this.firstModelLoaded =
+      this.firstModelLoaded || modelName
 
     // those file type have different orientation
     // than other, so need to correct it

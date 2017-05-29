@@ -155,7 +155,7 @@ export class TreeNode extends EventsEmitter {
 /////////////////////////////////////////////////////////////////////
 jQuery.fn.insertAt = function(index, element) {
 
-  var lastIndex = this.children().size()
+  const lastIndex = this.children().length
 
   this.append(element)
 

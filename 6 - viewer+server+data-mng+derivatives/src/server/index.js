@@ -16,17 +16,13 @@
 // UNINTERRUPTED OR ERROR FREE.
 ///////////////////////////////////////////////////////////////////////
 
-// async support
-import 'babel-polyfill'
-
-import {serverConfig as config} from 'c0nfig'
+//full config
+import config from 'c0nfig'
 
 //Server stuff
 import cookieParser from 'cookie-parser'
 import session from 'express-session'
 import bodyParser from 'body-parser'
-import favicon from 'serve-favicon'
-import webpack from 'webpack'
 import express from 'express'
 import helmet from 'helmet'
 import path from 'path'
@@ -35,15 +31,19 @@ import path from 'path'
 import DerivativesAPI from './api/endpoints/derivatives'
 import LMVProxy from './api/endpoints/lmv-proxy'
 import UploadAPI from './api/endpoints/upload'
+import SocketAPI from './api/endpoints/socket'
 import ForgeAPI from './api/endpoints/forge'
-import OssAPI from './api/endpoints/oss'
+import AppAPI from './api/endpoints/app'
+import DMAPI from './api/endpoints/dm'
 
 //Services
 import SVFDownloaderSvc from './api/services/SVFDownloaderSvc'
 import DerivativesSvc from './api/services/DerivativesSvc'
 import ServiceManager from './api/services/SvcManager'
+import SocketSvc from './api/services/SocketSvc'
 import ForgeSvc from './api/services/ForgeSvc'
 import OssSvc from './api/services/OssSvc'
+import DMSvc from './api/services/DMSvc'
 
 /////////////////////////////////////////////////////////////////////
 // App initialization
@@ -64,7 +64,6 @@ app.use(session({
 }))
 
 app.use('/resources', express.static(__dirname + '/../../resources'))
-app.use(favicon(__dirname + '/../../resources/img/forge.png'))
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(cookieParser())
@@ -75,9 +74,11 @@ app.use(helmet())
 //
 /////////////////////////////////////////////////////////////////////
 app.use('/api/derivatives', DerivativesAPI())
+app.use('/api/socket', SocketAPI())
 app.use('/api/upload', UploadAPI())
 app.use('/api/forge', ForgeAPI())
-app.use('/api/oss', OssAPI())
+app.use('/api/app', AppAPI())
+app.use('/api/dm', DMAPI())
 
 /////////////////////////////////////////////////////////////////////
 // Viewer GET Proxy
@@ -91,24 +92,20 @@ app.get('/lmv-proxy/*', LMVProxy.get)
 /////////////////////////////////////////////////////////////////////
 if (process.env.NODE_ENV === 'development') {
 
-  const webpackConfig = require('../../webpack/webpack.config.development')
+  // dynamically require webpack dependencies
+  // to keep them in devDependencies (package.json)
+  const webpackConfig = require('../../webpack/development.webpack.config')
   const webpackDevMiddleware = require('webpack-dev-middleware')
   const webpackHotMiddleware = require('webpack-hot-middleware')
+  const webpack = require('webpack')
+
   const compiler = webpack(webpackConfig)
 
   app.use(webpackDevMiddleware(compiler, {
     publicPath: webpackConfig.output.publicPath,
+    stats: webpackConfig.stats,
     progress: true,
-    hot: true,
-    stats: {
-      assets: false,
-      colors: true,
-      version: false,
-      hash: false,
-      timings: false,
-      chunks: false,
-      chunkModules: false
-    }
+    hot: true
   }))
 
   app.use(webpackHotMiddleware(compiler))
@@ -124,52 +121,68 @@ if (process.env.NODE_ENV === 'development') {
 /////////////////////////////////////////////////////////////////////
 function runServer() {
 
+  return new Promise((resolve, reject) => {
+
     try {
 
-        process.on('exit', () => {
+      process.on('exit', () => {
 
-        })
+      })
 
-        process.on('uncaughtException', (err) => {
+      process.on('uncaughtException', (err) => {
 
-            console.log('uncaughtException')
-            console.log(err)
-            console.error(err.stack)
-        })
+        console.log('uncaughtException')
+        console.log(err)
+        console.error(err.stack)
+      })
 
-        process.on('unhandledRejection', (reason, p) => {
+      process.on('unhandledRejection', (reason, p) => {
 
-            console.log('Unhandled Rejection at: Promise ', p,
-              ' reason: ', reason)
-        })
-
+        console.log('Unhandled Rejection at: Promise ', p,
+          ' reason: ', reason)
+      })
 
       const svfDownloaderSvc = new SVFDownloaderSvc()
 
-      const forgeSvc = new ForgeSvc(config.forge)
+      const forgeSvc = new ForgeSvc(
+        config.forge)
 
       const derivativesSvc = new DerivativesSvc()
 
       const ossSvc = new OssSvc()
 
+      const dmSvc = new DMSvc()
+
       ServiceManager.registerService(svfDownloaderSvc)
       ServiceManager.registerService(derivativesSvc)
       ServiceManager.registerService(forgeSvc)
       ServiceManager.registerService(ossSvc)
+      ServiceManager.registerService(dmSvc)
 
-      const server = app.listen(
+      var server = app.listen(
         process.env.PORT || config.port || 3000, () => {
 
-        console.log('Server listening on: ')
-        console.log(server.address())
-        console.log('ENV: ' + process.env.NODE_ENV)
-      })
+          var socketSvc = new SocketSvc({
+            session,
+            server
+          })
+
+          ServiceManager.registerService(socketSvc)
+
+          resolve(server)
+
+          console.log('Server listening on: ')
+          console.log(server.address())
+          console.log('ENV: ' + process.env.NODE_ENV)
+        })
 
     } catch (ex) {
 
-        console.log('Failed to run server... ')
-        console.log(ex)
+      console.log('Failed to run server... ')
+      console.log(ex)
+      reject(ex)
     }
+  })
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -177,3 +190,4 @@ function runServer() {
 //
 /////////////////////////////////////////////////////////////////////
 runServer()
+
