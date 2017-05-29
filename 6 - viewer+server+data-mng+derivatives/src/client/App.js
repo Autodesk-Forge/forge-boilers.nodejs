@@ -22,6 +22,10 @@ import ServiceManager from 'services/SvcManager'
 import {client as config} from 'c0nfig'
 import 'jquery-ui/themes/base/resizable.css'
 import ToolPanelModal from 'ToolPanelModal'
+<<<<<<< HEAD
+=======
+import SocketSvc from 'services/SocketSvc'
+>>>>>>> 92284fc7a048628072394b4af365ac6998de36cc
 import {DataPanel} from 'DataManagement'
 import {ItemPanel} from 'DataManagement'
 import 'jquery-ui/ui/widgets/resizable'

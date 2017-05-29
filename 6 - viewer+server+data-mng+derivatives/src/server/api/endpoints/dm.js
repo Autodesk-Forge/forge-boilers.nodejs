@@ -45,6 +45,39 @@ module.exports = function() {
 
     try {
 
+<<<<<<< HEAD
+      const hubId = req.params.hubId
+
+=======
+>>>>>>> 92284fc7a048628072394b4af365ac6998de36cc
+      const forgeSvc = ServiceManager.getService('ForgeSvc')
+
+      const token = await forgeSvc.get3LeggedTokenMaster(req.session)
+
+      const dmSvc = ServiceManager.getService('DMSvc')
+
+      const response = await dmSvc.getHub(token, hubId)
+
+      res.json(response)
+
+    } catch (ex) {
+
+      console.log(ex)
+
+      res.status(ex.status || 500)
+      res.json(ex)
+    }
+  })
+
+  /////////////////////////////////////////////////////////////////////////////
+  // GET /hubs/{hubId}
+  // Get hub by id
+  //
+  /////////////////////////////////////////////////////////////////////////////
+  router.get('/hubs/:hubId', async (req, res) => {
+
+    try {
+
       const hubId = req.params.hubId
 
       const forgeSvc = ServiceManager.getService('ForgeSvc')
