@@ -9,6 +9,7 @@ export default class MaterialSvc extends BaseSvc {
   //
   /////////////////////////////////////////////////////////////////
   constructor (config) {
+    
 
     super (config)
 
