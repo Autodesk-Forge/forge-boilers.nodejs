@@ -30,7 +30,6 @@ import path from 'path'
 //Endpoints
 import DerivativesAPI from './api/endpoints/derivatives'
 import LMVProxy from './api/endpoints/lmv-proxy'
-import UploadAPI from './api/endpoints/upload'
 import SocketAPI from './api/endpoints/socket'
 import ForgeAPI from './api/endpoints/forge'
 import AppAPI from './api/endpoints/app'
@@ -41,6 +40,7 @@ import SVFDownloaderSvc from './api/services/SVFDownloaderSvc'
 import DerivativesSvc from './api/services/DerivativesSvc'
 import ServiceManager from './api/services/SvcManager'
 import SocketSvc from './api/services/SocketSvc'
+import UploadSvc from './api/services/UploadSvc'
 import ForgeSvc from './api/services/ForgeSvc'
 import OssSvc from './api/services/OssSvc'
 import DMSvc from './api/services/DMSvc'
@@ -70,12 +70,36 @@ app.use(cookieParser())
 app.use(helmet())
 
 /////////////////////////////////////////////////////////////////////
+// Services setup
+//
+/////////////////////////////////////////////////////////////////////
+const uploadSvc = new UploadSvc({
+  tempStorage: path.join(__dirname, '/../../TMP')
+})
+
+const svfDownloaderSvc = new SVFDownloaderSvc()
+
+const forgeSvc = new ForgeSvc(config.forge)
+
+const derivativesSvc = new DerivativesSvc()
+
+const ossSvc = new OssSvc()
+
+const dmSvc = new DMSvc()
+
+ServiceManager.registerService(svfDownloaderSvc)
+ServiceManager.registerService(derivativesSvc)
+ServiceManager.registerService(uploadSvc)
+ServiceManager.registerService(forgeSvc)
+ServiceManager.registerService(ossSvc)
+ServiceManager.registerService(dmSvc)
+
+/////////////////////////////////////////////////////////////////////
 // Routes setup
 //
 /////////////////////////////////////////////////////////////////////
 app.use('/api/derivatives', DerivativesAPI())
 app.use('/api/socket', SocketAPI())
-app.use('/api/upload', UploadAPI())
 app.use('/api/forge', ForgeAPI())
 app.use('/api/app', AppAPI())
 app.use('/api/dm', DMAPI())
@@ -141,23 +165,6 @@ function runServer() {
         console.log('Unhandled Rejection at: Promise ', p,
           ' reason: ', reason)
       })
-
-      const svfDownloaderSvc = new SVFDownloaderSvc()
-
-      const forgeSvc = new ForgeSvc(
-        config.forge)
-
-      const derivativesSvc = new DerivativesSvc()
-
-      const ossSvc = new OssSvc()
-
-      const dmSvc = new DMSvc()
-
-      ServiceManager.registerService(svfDownloaderSvc)
-      ServiceManager.registerService(derivativesSvc)
-      ServiceManager.registerService(forgeSvc)
-      ServiceManager.registerService(ossSvc)
-      ServiceManager.registerService(dmSvc)
 
       var server = app.listen(
         process.env.PORT || config.port || 3000, () => {

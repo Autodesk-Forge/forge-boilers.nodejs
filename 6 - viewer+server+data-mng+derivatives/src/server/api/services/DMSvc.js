@@ -417,7 +417,7 @@ export default class DMSvc extends BaseSvc {
             displayName
           })
 
-        if(items.length > 0) {
+        if (items.length > 0) {
 
           const item = items[0]
 
@@ -448,7 +448,7 @@ export default class DMSvc extends BaseSvc {
             token, projectId, itemRes.body.data.id)
 
           const response = {
-            version: versions.data[0],
+            version: versions.body.data[0],
             storage: storageRes.body.data,
             item: itemRes.body.data,
             object
@@ -459,7 +459,6 @@ export default class DMSvc extends BaseSvc {
 
       } catch (ex) {
 
-        console.log(ex)
         reject(ex)
       }
     })

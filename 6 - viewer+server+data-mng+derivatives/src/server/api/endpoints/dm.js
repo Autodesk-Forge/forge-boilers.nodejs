@@ -6,6 +6,8 @@ import fs from 'fs'
 
 module.exports = function() {
 
+  const uploadSvc = ServiceManager.getService('UploadSvc')
+
   var router = express.Router()
 
   /////////////////////////////////////////////////////////////////////////////
@@ -336,6 +338,40 @@ module.exports = function() {
 
       const response = await dmSvc.getItemTip(
         token, projectId, itemId)
+
+      res.json(response)
+
+    } catch (ex) {
+
+      res.status(ex.status || 500)
+      res.json(ex)
+    }
+  })
+
+  /////////////////////////////////////////////////////////////////////////////
+  // POST /dm/projects/:projectId/folders/:folderId
+  // Upload file to DataManagement
+  //
+  /////////////////////////////////////////////////////////////////////////////
+  router.post('/projects/:projectId/folders/:folderId',
+    uploadSvc.uploader.any(), async (req, res) => {
+
+    try {
+
+      var projectId = req.params.projectId
+
+      var folderId = req.params.folderId
+
+      var file = req.files[0]
+
+      var forgeSvc = ServiceManager.getService('ForgeSvc')
+
+      var token = await forgeSvc.get3LeggedTokenMaster(req.session)
+
+      var dmSvc = ServiceManager.getService('DMSvc')
+
+      var response = await dmSvc.upload(
+        token, projectId, folderId, file)
 
       res.json(response)
 
