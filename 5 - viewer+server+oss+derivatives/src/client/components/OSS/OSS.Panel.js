@@ -632,7 +632,7 @@ class OSSTreeDelegate extends BaseTreeDelegate {
 
       $(parent).dropzone({
         clickable: `.btn.c${parent.id}`,
-        url: `/api/upload/oss/${node.name}`,
+        url: `/api/oss/buckets/${node.name}`,
         dictDefaultMessage: ' - upload',
         previewTemplate: '<div></div>',
         parallelUploads: 20,
@@ -699,7 +699,12 @@ class OSSTreeDelegate extends BaseTreeDelegate {
 
               node.showLoader(false)
             })
-          }
+        },
+        error: (err) => {
+
+          node.showLoader(false)
+          console.log(err)
+        }
       })
 
     } else if (node.type === 'oss.object') {

@@ -164,7 +164,7 @@ export default class App {
         placementTransform:
          extInstance.buildPlacementTransform(item.objectKey)
       }
-
+      
       viewer.loadModel(path, loadOptions, (model) => {
 
         model.name = item.objectKey
