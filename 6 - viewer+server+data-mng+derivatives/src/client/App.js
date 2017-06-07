@@ -19,13 +19,14 @@ import ModelTransformerExtension from 'Viewing.Extension.ModelTransformer'
 import {ManagerPanel as DerivativesManagerPanel} from 'Derivatives'
 import ViewerPanel from 'components/Viewer/Viewer.Panel'
 import ServiceManager from 'Services/SvcManager'
-import {client as config} from 'c0nfig'
 import 'jquery-ui/themes/base/resizable.css'
 import ToolPanelModal from 'ToolPanelModal'
 import {DataPanel} from 'DataManagement'
 import {ItemPanel} from 'DataManagement'
 import 'jquery-ui/ui/widgets/resizable'
-import UserSvc from 'Services/UserSvc'
+import {client as config} from 'c0nfig'
+import SocketSvc from 'SocketSvc'
+import UserSvc from 'UserSvc'
 import 'font-awesome-webpack'
 import 'bootstrap-webpack'
 import 'jquery-ui'
@@ -53,6 +54,21 @@ export default class App {
     $('#about').click((e) => {
 
       this.onAbout(e)
+    })
+
+    const socketSvc = new SocketSvc({
+      host: config.host,
+      port: config.port
+    })
+
+    socketSvc.connect().then((socket) => {
+      console.log(`${config.host}:${config.port}`)
+      console.log('Client socket connected: ' + socket.id)
+    })
+
+    socketSvc.on('progress', (info) => {
+      console.log('upload server -> forge: ')
+      console.log(info)
     })
 
     this.userSvc = new UserSvc({
@@ -406,7 +422,7 @@ export default class App {
         </a>, November 2016
         <hr class="about"/>
         Source on
-        <a href="https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/project6"
+        <a href="https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/master/6%20-%20viewer%2Bserver%2Bdata-mng%2Bderivatives"
           target="_blank">
           Github
         </a>

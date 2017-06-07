@@ -358,20 +358,47 @@ module.exports = function() {
 
     try {
 
-      var projectId = req.params.projectId
+      const forgeSvc = ServiceManager.getService('ForgeSvc')
 
-      var folderId = req.params.folderId
+      const dmSvc = ServiceManager.getService('DMSvc')
 
-      var file = req.files[0]
+      const projectId = req.params.projectId
 
-      var forgeSvc = ServiceManager.getService('ForgeSvc')
+      const folderId = req.params.folderId
 
-      var token = await forgeSvc.get3LeggedTokenMaster(req.session)
+      const file = req.files[0]
 
-      var dmSvc = ServiceManager.getService('DMSvc')
+      const opts = {
+        chunkSize: 5 * 1024 * 1024,
+        concurrentUploads: 3,
+        onProgress: (info) => {
 
-      var response = await dmSvc.upload(
-        token, projectId, folderId, file)
+          const socketId = req.body.socketId
+
+          if (socketId) {
+
+            const socketSvc = ServiceManager.getService(
+              'SocketSvc')
+
+            const msg = Object.assign({}, info, {
+              filename: file.originalname,
+              projectId,
+              folderId
+            })
+
+            socketSvc.broadcast (
+              'progress', msg, socketId)
+          }
+        }
+      }
+
+      const getToken =
+        () => forgeSvc.get3LeggedTokenMaster(
+          req.session)
+
+      const response = await dmSvc.upload(
+        getToken,
+        projectId, folderId, file, opts)
 
       res.json(response)
 

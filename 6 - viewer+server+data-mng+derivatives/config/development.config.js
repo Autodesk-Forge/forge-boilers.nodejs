@@ -1,18 +1,21 @@
-
 /////////////////////////////////////////////////////////////////////
 // DEVELOPMENT configuration
 //
 /////////////////////////////////////////////////////////////////////
 const HOST_URL = 'http://localhost'
+const PORT = 3000
 
 module.exports = {
 
+  env: 'development',
+
+  port: PORT,
+
   client: {
     host: `${HOST_URL}`,
-    port: 3000
+    env: 'development',
+    port: PORT
   },
-
-  port: 3000,
 
   forge: {
 

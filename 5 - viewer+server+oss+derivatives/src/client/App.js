@@ -21,8 +21,10 @@ import ViewerPanel from 'Viewer/ViewerPanel'
 import 'jquery-ui/themes/base/resizable.css'
 import ToolPanelModal from 'ToolPanelModal'
 import 'jquery-ui/ui/widgets/resizable'
+import {client as config} from 'c0nfig'
 import OSSPanel from 'OSS/OSS.Panel'
 import Toolkit from 'Viewer.Toolkit'
+import SocketSvc from 'SocketSvc'
 import 'font-awesome-webpack'
 import 'bootstrap-webpack'
 import 'jquery-ui'
@@ -35,6 +37,21 @@ import StorageSvc from 'StorageSvc'
 // ========================================================
 // Services Initialization
 // ========================================================
+const socketSvc = new SocketSvc({
+  host: config.host,
+  port: config.port
+})
+
+socketSvc.connect().then((socket) => {
+  console.log(`${config.host}:${config.port}`)
+  console.log('Client socket connected: ' + socket.id)
+})
+
+socketSvc.on('progress', (info) => {
+  console.log('upload server -> forge: ')
+  console.log(info)
+})
+
 const storageSvc = new StorageSvc({
   storageKey: 'forge.oss.settings'
 })
@@ -43,6 +60,7 @@ const storageSvc = new StorageSvc({
 // Services Registration
 // ========================================================
 ServiceManager.registerService(storageSvc)
+ServiceManager.registerService(socketSvc)
 
 // ========================================================
 // App
@@ -240,7 +258,7 @@ export default class App {
         </a>, November 2016
         <hr class="about"/>
         Source on
-        <a href="https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/project5"
+        <a href="https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/master/5%20-%20viewer%2Bserver%2Boss%2Bderivatives"
           target="_blank">
           Github
         </a>

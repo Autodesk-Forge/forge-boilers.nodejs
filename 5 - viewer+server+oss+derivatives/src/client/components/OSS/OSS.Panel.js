@@ -661,16 +661,23 @@ class OSSTreeDelegate extends BaseTreeDelegate {
           })
 
           dropzone.on('addedfile', (file) => {
+            console.log('Initialize upload client -> server: ')
             console.log(file)
             node.showLoader(true)
           })
 
           dropzone.on('uploadprogress', (file, progress) => {
-
+            console.log('upload client -> server: ')
+            console.log('progress: ' + progress)
           })
+        },
+        sending: (file, xhr, formData) => {
+          const socketSvc = ServiceManager.getService('SocketSvc')
+          formData.append('socketId', socketSvc.socketId)
         },
         success: (file, response) => {
 
+          console.log('upload complete: ')
           console.log(response)
 
           const id = response.bucketKey + '-' + response.objectKey

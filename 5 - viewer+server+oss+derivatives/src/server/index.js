@@ -29,6 +29,7 @@ import path from 'path'
 //Endpoints
 import DerivativesAPI from './api/endpoints/derivatives'
 import LMVProxy from './api/endpoints/lmv-proxy'
+import SocketSvc from './api/services/SocketSvc'
 import ForgeAPI from './api/endpoints/forge'
 import OssAPI from './api/endpoints/oss'
 
@@ -49,7 +50,7 @@ var app = express()
 app.set('trust proxy', 1)
 
 app.use(session({
-  secret: 'autodeskforge',
+  secret: 'forge-oss',
   cookie: {
     secure: (process.env.NODE_ENV === 'production'), //requires https
     maxAge: 1000 * 60 * 60 * 24 // 24h session
@@ -157,9 +158,16 @@ function runServer() {
       const server = app.listen(
         process.env.PORT || config.port || 3000, () => {
 
-        console.log('Server listening on: ')
-        console.log(server.address())
-        console.log('ENV: ' + process.env.NODE_ENV)
+          const socketSvc = new SocketSvc({
+            session,
+            server
+          })
+
+          ServiceManager.registerService(socketSvc)
+
+          console.log('Server listening on: ')
+          console.log(server.address())
+          console.log('ENV: ' + process.env.NODE_ENV)
       })
 
     } catch (ex) {

@@ -40,7 +40,11 @@ export default class DMSvc extends BaseSvc {
   // Returns current user profile
   //
   /////////////////////////////////////////////////////////////////
-  getUser (token) {
+  async getUser (getToken) {
+
+    const token = ((typeof getToken == 'function')
+      ? await getToken()
+      : getToken)
 
     const url = 'https://developer.api.autodesk.com' +
       '/userprofile/v1/users/@me'
@@ -56,7 +60,11 @@ export default class DMSvc extends BaseSvc {
   // Returns hub info
   //
   /////////////////////////////////////////////////////////////////
-  getHubs (token, opts = {}) {
+  async getHubs (getToken, opts = {}) {
+
+    const token = (typeof getToken == 'function')
+      ? await getToken()
+      : getToken
 
     return this._hubsAPI.getHubs (
       opts, {autoRefresh:false}, token)
@@ -66,7 +74,11 @@ export default class DMSvc extends BaseSvc {
   // Returns list of Hubs
   //
   /////////////////////////////////////////////////////////////////
-  getHub (token, hubId) {
+  async getHub (getToken, hubId) {
+
+    const token = (typeof getToken == 'function')
+      ? await getToken()
+      : getToken
 
     return this._hubsAPI.getHub (
       hubId, {autoRefresh:false}, token)
@@ -76,7 +88,11 @@ export default class DMSvc extends BaseSvc {
   // Returns list of Projects for specific Hub
   //
   /////////////////////////////////////////////////////////////////
-  getProjects (token, hubId, opts = {}) {
+  async getProjects (getToken, hubId, opts = {}) {
+
+    const token = (typeof getToken == 'function')
+      ? await getToken()
+      : getToken
 
     return this._projectsAPI.getHubProjects (
       hubId, opts, {autoRefresh:false}, token)
@@ -86,7 +102,11 @@ export default class DMSvc extends BaseSvc {
   // Returns Project content
   //
   /////////////////////////////////////////////////////////////////
-  getProject (token, hubId, projectId) {
+  async getProject (getToken, hubId, projectId) {
+
+    const token = (typeof getToken == 'function')
+      ? await getToken()
+      : getToken
 
     return this._projectsAPI.getProject(
       hubId, projectId, {autoRefresh:false}, token)
@@ -101,7 +121,11 @@ export default class DMSvc extends BaseSvc {
   // the folder hierarchy the user has access to.
   //
   /////////////////////////////////////////////////////////////////
-  getProjectTopFolders (token, hubId, projectId) {
+  async getProjectTopFolders (getToken, hubId, projectId) {
+
+    const token = (typeof getToken == 'function')
+      ? await getToken()
+      : getToken
 
     return this._projectsAPI.getProjectTopFolders(
       hubId, projectId, {autoRefresh:false}, token)
@@ -111,7 +135,11 @@ export default class DMSvc extends BaseSvc {
   // Returns Folder
   //
   /////////////////////////////////////////////////////////////////
-  getFolder (token, projectId, folderId) {
+  async getFolder (getToken, projectId, folderId) {
+
+    const token = (typeof getToken == 'function')
+      ? await getToken()
+      : getToken
 
     return this._foldersAPI.getFolder(
       projectId, folderId, {autoRefresh:false}, token)
@@ -121,7 +149,11 @@ export default class DMSvc extends BaseSvc {
   // Returns Folder content
   //
   /////////////////////////////////////////////////////////////////
-  getFolderContent (token, projectId, folderId, opts = {}) {
+  async getFolderContent (getToken, projectId, folderId, opts = {}) {
+
+    const token = (typeof getToken == 'function')
+      ? await getToken()
+      : getToken
 
     return this._foldersAPI.getFolderContents(
       projectId, folderId, opts, {autoRefresh:false}, token)
@@ -131,7 +163,11 @@ export default class DMSvc extends BaseSvc {
   // Returns Item details
   //
   /////////////////////////////////////////////////////////////////
-  getItem (token, projectId, itemId) {
+  async getItem (getToken, projectId, itemId) {
+
+    const token = (typeof getToken == 'function')
+      ? await getToken()
+      : getToken
 
     return this._itemsAPI.getItem(
       projectId, itemId, {autoRefresh:false}, token)
@@ -141,7 +177,11 @@ export default class DMSvc extends BaseSvc {
   // Returns Item tip version (most recent)
   //
   /////////////////////////////////////////////////////////////////
-  getItemTip (token, projectId, itemId) {
+  async getItemTip (getToken, projectId, itemId) {
+
+    const token = (typeof getToken == 'function')
+      ? await getToken()
+      : getToken
 
     return this._itemsAPI.getItemTip(
       projectId, itemId, {autoRefresh:false}, token)
@@ -151,7 +191,11 @@ export default class DMSvc extends BaseSvc {
   // Returns Versions for specific Item
   //
   /////////////////////////////////////////////////////////////////
-  getItemVersions (token, projectId, itemId, opts = {}) {
+  async getItemVersions (getToken, projectId, itemId, opts = {}) {
+
+    const token = (typeof getToken == 'function')
+      ? await getToken()
+      : getToken
 
     return this._itemsAPI.getItemVersions(
       projectId, itemId, opts, {autoRefresh:false}, token)
@@ -161,11 +205,15 @@ export default class DMSvc extends BaseSvc {
   // Delete Item
   //
   /////////////////////////////////////////////////////////////////
-  deleteItem (token, projectId, itemId) {
+  async deleteItem (getToken, projectId, itemId) {
 
     return new Promise(async(resolve, reject) => {
 
       try {
+
+        const token = (typeof getToken == 'function')
+          ? await getToken()
+          : getToken
 
         const versionsRes = await this._itemsAPI.getItemVersions(
           projectId, itemId, {autoRefresh:false}, token)
@@ -189,7 +237,11 @@ export default class DMSvc extends BaseSvc {
   // Returns Version for specific versionId
   //
   /////////////////////////////////////////////////////////////////
-  getVersion (token, projectId, versionId) {
+  async getVersion (getToken, projectId, versionId) {
+
+    const token = (typeof getToken == 'function')
+      ? await getToken()
+      : getToken
 
     return this._versionsAPI.getVersion(
       projectId, versionId, {autoRefresh:false}, token)
@@ -199,11 +251,15 @@ export default class DMSvc extends BaseSvc {
   // Delete Version
   //
   /////////////////////////////////////////////////////////////////
-  deleteVersion (token, projectId, versionId) {
+  deleteVersion (getToken, projectId, versionId) {
 
     return new Promise(async(resolve, reject) => {
 
       try {
+
+        const token = (typeof getToken == 'function')
+          ? await getToken()
+          : getToken
 
         const versionsRes = await this._versionsAPI.getVersion(
           projectId, versionId, {autoRefresh:false}, token)
@@ -238,7 +294,11 @@ export default class DMSvc extends BaseSvc {
   // Creates new Storage location on OSS for DM
   //
   /////////////////////////////////////////////////////////////////
-  createStorage (token, projectId, folderId, filename) {
+  async createStorage (getToken, projectId, folderId, filename) {
+
+    const token = (typeof getToken == 'function')
+      ? await getToken()
+      : getToken
 
     const payload = this.createStoragePayload (
       folderId, filename)
@@ -252,8 +312,12 @@ export default class DMSvc extends BaseSvc {
   // Creates new Item
   //
   /////////////////////////////////////////////////////////////////
-  createItem (
-    token, projectId, folderId, objectId, filename, displayName = null) {
+  async createItem (
+    getToken, projectId, folderId, objectId, filename, displayName = null) {
+
+    const token = (typeof getToken == 'function')
+      ? await getToken()
+      : getToken
 
     const payload = this.createItemPayload(
       folderId, objectId, filename, displayName)
@@ -267,8 +331,12 @@ export default class DMSvc extends BaseSvc {
   // Creates new Version
   //
   /////////////////////////////////////////////////////////////////
-  createVersion (
-    token, projectId, itemId, objectId, filename) {
+  async createVersion (
+    getToken, projectId, itemId, objectId, filename) {
+
+    const token = (typeof getToken == 'function')
+      ? await getToken()
+      : getToken
 
     const payload = this.createVersionPayload(
       itemId, objectId, filename)
@@ -282,8 +350,12 @@ export default class DMSvc extends BaseSvc {
   // Get Item relationship References
   //
   /////////////////////////////////////////////////////////////////
-  getItemRelationshipsRefs (
-    token, projectId, itemId, opts = {}) {
+  async getItemRelationshipsRefs (
+    getToken, projectId, itemId, opts = {}) {
+
+    const token = (typeof getToken == 'function')
+      ? await getToken()
+      : getToken
 
     return this._itemsAPI.getItemRelationshipsRefs(
       projectId, itemId, opts,
@@ -294,8 +366,12 @@ export default class DMSvc extends BaseSvc {
   // Create Item relationship reference
   //
   /////////////////////////////////////////////////////////////////
-  createItemRelationshipRef (
-    token, projectId, targetItemId, refVersionId) {
+  async createItemRelationshipRef (
+    getToken, projectId, targetItemId, refVersionId) {
+
+    const token = (typeof getToken == 'function')
+      ? await getToken()
+      : getToken
 
     const payload = this.createItemRelationshipRefPayload(
       refVersionId)
@@ -309,8 +385,12 @@ export default class DMSvc extends BaseSvc {
   // Get Version relationship references
   //
   /////////////////////////////////////////////////////////////////
-  getVersionRelationshipsRefs (
-    token, projectId, versionId, opts = {}) {
+  async getVersionRelationshipsRefs (
+    getToken, projectId, versionId, opts = {}) {
+
+    const token = (typeof getToken == 'function')
+      ? await getToken()
+      : getToken
 
     return this._versionsAPI.getVersionRelationshipsRefs(
       projectId, versionId, opts,
@@ -321,8 +401,12 @@ export default class DMSvc extends BaseSvc {
   // Create Version relationship reference
   //
   /////////////////////////////////////////////////////////////////
-  createVersionRelationshipRef (
-    token, projectId, targetVersionId, refVersionId) {
+  async createVersionRelationshipRef (
+    getToken, projectId, targetVersionId, refVersionId) {
+
+    const token = (typeof getToken == 'function')
+      ? await getToken()
+      : getToken
 
     const payload = this.createVersionRelationshipRefPayload(
       refVersionId)
@@ -336,8 +420,12 @@ export default class DMSvc extends BaseSvc {
   // Create new folder
   //
   /////////////////////////////////////////////////////////////////
-  createFolder (
-    token, projectId, parentFolderId, folderName) {
+  async createFolder (
+    getToken, projectId, parentFolderId, folderName) {
+
+    const token = (typeof getToken == 'function')
+      ? await getToken()
+      : getToken
 
     const url =
       `${DMSvc.SERVICE_BASE_URL}/projects/` +
@@ -365,7 +453,11 @@ export default class DMSvc extends BaseSvc {
   // Search folder
   //
   /////////////////////////////////////////////////////////////////
-  searchFolder (token, projectId, folderId, filter) {
+  async searchFolder (getToken, projectId, folderId, filter) {
+
+    const token = (typeof getToken == 'function')
+      ? await getToken()
+      : getToken
 
     const url =
       `${DMSvc.SERVICE_BASE_URL}/projects/` +
@@ -388,30 +480,33 @@ export default class DMSvc extends BaseSvc {
   // Upload file to create new item or new version
   //
   /////////////////////////////////////////////////////////////////
-  upload (token, projectId, folderId, file) {
+  upload (getToken, projectId, folderId, file, opts) {
 
     return new Promise(async(resolve, reject) => {
 
       try {
 
-        var displayName = file.originalname
+        const displayName = file.originalname
 
-        var storageRes = await this.createStorage(
-          token, projectId, folderId, displayName)
+        const storageRes = await this.createStorage(
+          getToken, projectId, folderId, displayName)
 
-        var ossSvc = ServiceManager.getService('OssSvc')
+        const ossSvc = ServiceManager.getService(
+          'OssSvc')
 
-        var objectId = ossSvc.parseObjectId(storageRes.body.data.id)
+        const objectId = ossSvc.parseObjectId(
+          storageRes.body.data.id)
 
-        var object = await ossSvc.uploadObject(
-          token,
-          objectId.bucketKey,
-          objectId.objectKey,
-          file)
+        const upload =
+          await ossSvc.uploadObjectChunked (
+            getToken,
+            objectId.bucketKey,
+            objectId.objectKey,
+            file, opts)
 
         // look for items with the same displayName
-        var items = await this.findItemsWithAttributes(
-          token,
+        const items = await this.findItemsWithAttributes(
+          getToken,
           projectId,
           folderId, {
             displayName
@@ -422,7 +517,7 @@ export default class DMSvc extends BaseSvc {
           const item = items[0]
 
           const versionRes = await this.createVersion(
-            token,
+            getToken,
             projectId,
             item.id,
             storageRes.body.data.id,
@@ -432,7 +527,7 @@ export default class DMSvc extends BaseSvc {
             version: versionRes.body.data,
             storage: versionRes.body.data,
             item: item,
-            object
+            upload
           }
 
           resolve(response)
@@ -440,18 +535,18 @@ export default class DMSvc extends BaseSvc {
         } else {
 
           const itemRes = await this.createItem(
-            token, projectId, folderId,
+            getToken, projectId, folderId,
             storageRes.body.data.id,
             displayName)
 
           const versions = await this.getItemVersions(
-            token, projectId, itemRes.body.data.id)
+            getToken(), projectId, itemRes.body.data.id)
 
           const response = {
             version: versions.body.data[0],
             storage: storageRes.body.data,
             item: itemRes.body.data,
-            object
+            upload
           }
 
           resolve(response)
@@ -469,18 +564,22 @@ export default class DMSvc extends BaseSvc {
   //
   /////////////////////////////////////////////////////////////////
   findItemsWithAttributes (
-    token, projectId, folderId, attributes, recursive = false) {
+    getToken, projectId, folderId, attributes, recursive = false) {
 
     return new Promise(async(resolve, reject) => {
 
       try {
 
-        var folderItems = await this.getFolderContent(
+        const token = (typeof getToken == 'function')
+          ? await getToken()
+          : getToken
+
+        const folderItems = await this.getFolderContent(
           token, projectId, folderId)
 
-        var tasks = folderItems.body.data.map((folderItem) => {
+        const tasks = folderItems.body.data.map((folderItem) => {
 
-          if(folderItem.type === 'items') {
+          if (folderItem.type === 'items') {
 
             var match = true
 
@@ -492,7 +591,7 @@ export default class DMSvc extends BaseSvc {
               }
             }
 
-            if(match) {
+            if (match) {
 
               return Promise.resolve(folderItem)
 
@@ -515,13 +614,13 @@ export default class DMSvc extends BaseSvc {
           }
         })
 
-        var items = await Promise.all(tasks)
+        const items = await Promise.all(tasks)
 
-        items = items.filter((item) => {
+        const filteredItems = items.filter((item) => {
           return item !== null
         })
 
-        resolve(items)
+        resolve(filteredItems)
 
       } catch (ex) {
 

@@ -54,7 +54,7 @@ var app = express()
 app.set('trust proxy', 1)
 
 app.use(session({
-  secret: 'autodeskforge',
+  secret: 'forge-dm',
   cookie: {
     secure: (process.env.NODE_ENV === 'production'), //requires https
     maxAge: 1000 * 60 * 60 * 24 // 24h session
@@ -166,10 +166,10 @@ function runServer() {
           ' reason: ', reason)
       })
 
-      var server = app.listen(
+      const server = app.listen(
         process.env.PORT || config.port || 3000, () => {
 
-          var socketSvc = new SocketSvc({
+          const socketSvc = new SocketSvc({
             session,
             server
           })

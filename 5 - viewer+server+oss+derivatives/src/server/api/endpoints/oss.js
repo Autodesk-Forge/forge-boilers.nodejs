@@ -234,10 +234,25 @@ module.exports = function() {
       const objectKey = file.originalname
 
       const opts = {
-        chunkSize: file.size, //100 * 1024,
-        concurrentUploads: 1,
-        onProgress: (chunkIndex) => {
+        chunkSize: 5 * 1024 * 1024,
+        concurrentUploads: 3,
+        onProgress: (info) => {
 
+          const socketId = req.body.socketId
+
+          if (socketId) {
+
+            const socketSvc = ServiceManager.getService(
+              'SocketSvc')
+
+            const msg = Object.assign({}, info, {
+              bucketKey,
+              objectKey
+            })
+
+            socketSvc.broadcast (
+              'progress', msg, socketId)
+          }
         }
       }
 

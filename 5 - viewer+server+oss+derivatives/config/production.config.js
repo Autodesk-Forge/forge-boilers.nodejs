@@ -3,9 +3,23 @@
 // PRODUCTION configuration
 //
 /////////////////////////////////////////////////////////////////////
+const HOST_URL = 'https://oss.autodesk.io'
+const PORT = 443
+
 module.exports = {
 
-  port: 3000,
+  env: 'production',
+
+  port: PORT,
+
+  client: {
+    // this the public host name of your server for the
+    // client socket to connect.
+    // eg. https://myforgeapp.mydomain.com
+    host: `${HOST_URL}`,
+    env: 'production',
+    port: PORT
+  },
 
   forge: {
 

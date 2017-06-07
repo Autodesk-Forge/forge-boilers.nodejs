@@ -194,8 +194,6 @@ export default class OssSvc extends BaseSvc {
 
       const nbChunks = Math.ceil(file.size / chunkSize)
 
-      console.log('nbChunks: ' + nbChunks)
-
       const chunksMap = Array.from({
         length: nbChunks
       }, (e, i) => i)
@@ -210,8 +208,6 @@ export default class OssSvc extends BaseSvc {
             file.size, (chunkIdx + 1) * chunkSize) - 1
 
         const range = `bytes ${start}-${end}/${file.size}`
-
-        console.log('range: ' + range)
 
         const length = end - start + 1
 
@@ -237,6 +233,8 @@ export default class OssSvc extends BaseSvc {
         }
       })
 
+      let progress = 0
+
       eachLimit(uploadTasks, opts.concurrentUploads || 1,
         (task, callback) => {
 
@@ -244,7 +242,12 @@ export default class OssSvc extends BaseSvc {
 
             if (opts.onProgress) {
 
-              opts.onProgress (task.chunkIndex)
+              progress += 100.0 / nbChunks
+
+              opts.onProgress ({
+                progress: Math.round(progress * 100) / 100,
+                chunkIndex: task.chunkIndex
+              })
             }
 
             callback ()
