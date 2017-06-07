@@ -668,7 +668,8 @@ class OSSTreeDelegate extends BaseTreeDelegate {
 
           dropzone.on('uploadprogress', (file, progress) => {
             console.log('upload client -> server: ')
-            console.log('progress: ' + progress)
+            const rprogress = Math.round(progress * 100) / 100
+            console.log('progress: ' + rprogress)
           })
         },
         sending: (file, xhr, formData) => {
