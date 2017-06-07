@@ -2,7 +2,7 @@
 // PRODUCTION configuration
 //
 /////////////////////////////////////////////////////////////////////
-const HOST_URL = 'https://oss.autodesk.io'
+const HOST_URL = process.env.HOST_URL  || 'https://oss.autodesk.io'
 const PORT = 443
 
 module.exports = {
@@ -30,7 +30,7 @@ module.exports = {
 
     oauth: {
 
-      redirectUri: `${process.env.HOST_URL}/api/forge/callback/oauth`,
+      redirectUri: `${HOST_URL}/api/forge/callback/oauth`,
       authenticationUri: '/authentication/v1/authenticate',
       refreshTokenUri: '/authentication/v1/refreshtoken',
       authorizationUri: '/authentication/v1/authorize',

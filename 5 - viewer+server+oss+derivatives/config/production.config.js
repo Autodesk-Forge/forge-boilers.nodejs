@@ -3,7 +3,7 @@
 // PRODUCTION configuration
 //
 /////////////////////////////////////////////////////////////////////
-const HOST_URL = 'https://oss.autodesk.io'
+const HOST_URL = process.env.HOST_URL || 'https://oss.autodesk.io'
 const PORT = 443
 
 module.exports = {
