@@ -12,7 +12,7 @@ module.exports = {
   env: 'production',
 
   port: PORT,
-  
+
   client: {
     // this the public host name of your server for the
     // client socket to connect.
