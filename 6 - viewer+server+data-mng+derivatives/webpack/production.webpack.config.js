@@ -180,7 +180,7 @@ module.exports = {
       style: config.forge.viewer.style,
 
       template: path.resolve(__dirname, '../src/client/layouts/index.ejs'),
-      title: 'Forge | Boiler',
+      title: 'Forge | DM',
       filename: 'index.html',
       bundle: 'bundle.min.js',
       minify: {

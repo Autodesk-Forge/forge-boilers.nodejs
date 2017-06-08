@@ -10,20 +10,20 @@
   ],
   "license": "MIT",
   "scripts": {
-    "start": "npm start --prefix ./6\\ -\\ viewer+server+data-mng+derivatives",
-    "start5": "npm start --prefix ./5\\ -\\ viewer+server+oss+derivatives",
-    "start6": "npm start --prefix ./6\\ -\\ viewer+server+data-mng+derivatives",
+
     "install-boiler3": "npm install --prefix ./3\\ -\\ viewer+server",
     "install-boiler4": "npm install --prefix ./4\\ -\\ viewer+server+oss",
     "install-boiler5": "npm install --prefix ./5\\ -\\ viewer+server+oss+derivatives",
     "install-boiler6": "npm install --prefix ./6\\ -\\ viewer+server+data-mng+derivatives",
-    "postinstall": "npm run install-boiler6"
+
+    "start5": "npm start --prefix ./5\\ -\\ viewer+server+oss+derivatives",
+    "start6": "npm start --prefix ./6\\ -\\ viewer+server+data-mng+derivatives",
+
+    "postinstall": "npm run install-boiler5",
+    "start": "npm run start5"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/Developer-Autodesk/forge-boilers.nodejs"
-  },
-  "dependencies": {
-
   }
 }

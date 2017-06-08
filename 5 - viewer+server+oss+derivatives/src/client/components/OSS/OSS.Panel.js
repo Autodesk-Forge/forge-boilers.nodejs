@@ -21,6 +21,7 @@ import RegionPanel from './RegionPanel/RegionPanel'
 import {API as DerivativesAPI} from 'Derivatives'
 import ToolPanelModal from 'ToolPanelModal'
 import ContextMenu from './OSS.ContextMenu'
+import {client as config} from 'c0nfig'
 import ServiceManager from 'SvcManager'
 import UIComponent from 'UIComponent'
 import Dropzone from 'dropzone'
@@ -171,6 +172,13 @@ export default class OSSPanel extends UIComponent {
 
     this.contextMenu.on('context.oss.bucket.delete', (data) =>{
 
+      if (config.readOnlyBuckets.includes(data.node.bucketKey)) {
+
+        return this.showCannotModifyBucket(
+          data.node.bucketKey,
+          appContainer)
+      }
+
       const dlg = new ToolPanelModal(appContainer, {
         title: 'Delete bucket ...'
       })
@@ -204,6 +212,13 @@ export default class OSSPanel extends UIComponent {
     })
 
     this.contextMenu.on('context.oss.object.delete', async(data) =>{
+
+      if (config.readOnlyBuckets.includes(data.node.bucketKey)) {
+
+        return this.showCannotModifyBucket(
+          data.node.bucketKey,
+          appContainer)
+      }
 
       console.log('Deleting object: ' + data.node.objectKey)
 
@@ -304,6 +319,29 @@ export default class OSSPanel extends UIComponent {
     })
 
     this.loadStorage (domContainer)
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////
+  showCannotModifyBucket (bucketKey, appContainer) {
+
+    const dlg = new ToolPanelModal(appContainer, {
+      title: 'Read-only bucket ...'
+    })
+
+    dlg.bodyContent(
+      `<div class="confirm-delete">
+          This operation is not allowed on the demo bucket
+          <br/>
+          <b>
+            ${bucketKey}.
+          </b>
+        </div>
+        `)
+
+    dlg.setVisible(true)
   }
 
   ///////////////////////////////////////////////////////////////////
@@ -632,7 +670,7 @@ class OSSTreeDelegate extends BaseTreeDelegate {
 
       $(parent).dropzone({
         clickable: `.btn.c${parent.id}`,
-        url: `/api/upload/oss/${node.name}`,
+        url: `/api/oss/buckets/${node.name}`,
         dictDefaultMessage: ' - upload',
         previewTemplate: '<div></div>',
         parallelUploads: 20,
@@ -661,16 +699,24 @@ class OSSTreeDelegate extends BaseTreeDelegate {
           })
 
           dropzone.on('addedfile', (file) => {
+            console.log('Initialize upload client -> server: ')
             console.log(file)
             node.showLoader(true)
           })
 
           dropzone.on('uploadprogress', (file, progress) => {
-
+            console.log('upload client -> server: ')
+            const rprogress = Math.round(progress * 100) / 100
+            console.log('progress: ' + rprogress)
           })
+        },
+        sending: (file, xhr, formData) => {
+          const socketSvc = ServiceManager.getService('SocketSvc')
+          formData.append('socketId', socketSvc.socketId)
         },
         success: (file, response) => {
 
+          console.log('upload complete: ')
           console.log(response)
 
           const id = response.bucketKey + '-' + response.objectKey
@@ -699,7 +745,12 @@ class OSSTreeDelegate extends BaseTreeDelegate {
 
               node.showLoader(false)
             })
-          }
+        },
+        error: (err) => {
+
+          node.showLoader(false)
+          console.log(err)
+        }
       })
 
     } else if (node.type === 'oss.object') {

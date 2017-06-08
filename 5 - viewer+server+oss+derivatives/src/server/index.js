@@ -29,7 +29,7 @@ import path from 'path'
 //Endpoints
 import DerivativesAPI from './api/endpoints/derivatives'
 import LMVProxy from './api/endpoints/lmv-proxy'
-import UploadAPI from './api/endpoints/upload'
+import SocketSvc from './api/services/SocketSvc'
 import ForgeAPI from './api/endpoints/forge'
 import OssAPI from './api/endpoints/oss'
 
@@ -37,6 +37,7 @@ import OssAPI from './api/endpoints/oss'
 import SVFDownloaderSvc from './api/services/SVFDownloaderSvc'
 import DerivativesSvc from './api/services/DerivativesSvc'
 import ServiceManager from './api/services/SvcManager'
+import UploadSvc from './api/services/UploadSvc'
 import ForgeSvc from './api/services/ForgeSvc'
 import OssSvc from './api/services/OssSvc'
 
@@ -49,7 +50,7 @@ var app = express()
 app.set('trust proxy', 1)
 
 app.use(session({
-  secret: 'autodeskforge',
+  secret: 'forge-oss',
   cookie: {
     secure: (process.env.NODE_ENV === 'production'), //requires https
     maxAge: 1000 * 60 * 60 * 24 // 24h session
@@ -65,11 +66,32 @@ app.use(cookieParser())
 app.use(helmet())
 
 /////////////////////////////////////////////////////////////////////
+// Services setup
+//
+/////////////////////////////////////////////////////////////////////
+const uploadSvc = new UploadSvc({
+  tempStorage: path.join(__dirname, '/../../TMP')
+})
+
+const svfDownloaderSvc = new SVFDownloaderSvc()
+
+const forgeSvc = new ForgeSvc(config.forge)
+
+const derivativesSvc = new DerivativesSvc()
+
+const ossSvc = new OssSvc()
+
+ServiceManager.registerService(svfDownloaderSvc)
+ServiceManager.registerService(derivativesSvc)
+ServiceManager.registerService(uploadSvc)
+ServiceManager.registerService(forgeSvc)
+ServiceManager.registerService(ossSvc)
+
+/////////////////////////////////////////////////////////////////////
 // Routes setup
 //
 /////////////////////////////////////////////////////////////////////
 app.use('/api/derivatives', DerivativesAPI())
-app.use('/api/upload', UploadAPI())
 app.use('/api/forge', ForgeAPI())
 app.use('/api/oss', OssAPI())
 
@@ -133,26 +155,19 @@ function runServer() {
               ' reason: ', reason)
         })
 
-
-      const svfDownloaderSvc = new SVFDownloaderSvc()
-
-      const forgeSvc = new ForgeSvc(config.forge)
-
-      const derivativesSvc = new DerivativesSvc()
-
-      const ossSvc = new OssSvc()
-
-      ServiceManager.registerService(svfDownloaderSvc)
-      ServiceManager.registerService(derivativesSvc)
-      ServiceManager.registerService(forgeSvc)
-      ServiceManager.registerService(ossSvc)
-
       const server = app.listen(
         process.env.PORT || config.port || 3000, () => {
 
-        console.log('Server listening on: ')
-        console.log(server.address())
-        console.log('ENV: ' + process.env.NODE_ENV)
+          const socketSvc = new SocketSvc({
+            session,
+            server
+          })
+
+          ServiceManager.registerService(socketSvc)
+
+          console.log('Server listening on: ')
+          console.log(server.address())
+          console.log('ENV: ' + process.env.NODE_ENV)
       })
 
     } catch (ex) {

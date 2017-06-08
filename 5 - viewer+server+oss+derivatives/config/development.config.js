@@ -3,30 +3,42 @@
 // DEVELOPMENT configuration
 //
 /////////////////////////////////////////////////////////////////////
+const HOST_URL = 'http://localhost'
+const PORT = 3000
+
 module.exports = {
 
-    port: 3000,
+  env: 'development',
 
-    forge: {
+  port: PORT,
 
-      viewer: {
-        viewer3D: 'https://developer.api.autodesk.com/viewingservice/v1/viewers/viewer3D.js?v=2.14',
-        threeJS:  'https://developer.api.autodesk.com/viewingservice/v1/viewers/three.js?v=2.14',
-        style:    'https://developer.api.autodesk.com/viewingservice/v1/viewers/style.css?v=2.14'
-      },
+  client: {
+    readOnlyBuckets:[],
+    host: `${HOST_URL}`,
+    env: 'development',
+    port: PORT
+  },
 
-      oauth: {
-        clientSecret: process.env.FORGE_DEV_CLIENT_SECRET,
-        clientId: process.env.FORGE_DEV_CLIENT_ID,
+  forge: {
 
-        scope: [
-          'data:read',
-          'data:write',
-          'data:create',
-          'bucket:read',
-          'bucket:create',
-          'bucket:delete'
-        ]
-      }
+    viewer: {
+      viewer3D: 'https://autodeskviewer.com/viewers/2.14/viewer3D.js',
+      threeJS:  'https://autodeskviewer.com/viewers/2.14/three.js',
+      style:    'https://autodeskviewer.com/viewers/2.14/style.css'
+    },
+
+    oauth: {
+      clientSecret: process.env.FORGE_DEV_CLIENT_SECRET,
+      clientId: process.env.FORGE_DEV_CLIENT_ID,
+
+      scope: [
+        'data:read',
+        'data:write',
+        'data:create',
+        'bucket:read',
+        'bucket:create',
+        'bucket:delete'
+      ]
+    }
   }
 }

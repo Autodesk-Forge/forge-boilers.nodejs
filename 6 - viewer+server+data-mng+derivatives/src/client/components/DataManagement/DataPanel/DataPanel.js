@@ -862,7 +862,7 @@ class DMTreeDelegate extends BaseTreeDelegate {
       let container = this.container
 
       $(parent).dropzone({
-        url: `/api/upload/dm/` +
+        url: `/api/dm/` +
           `projects/${node.projectId}/` +
           `folders/${node.folderId}`,
         clickable: `.btn.c${parent.id}`,

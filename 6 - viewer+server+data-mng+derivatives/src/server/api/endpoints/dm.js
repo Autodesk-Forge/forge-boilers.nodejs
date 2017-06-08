@@ -6,33 +6,9 @@ import fs from 'fs'
 
 module.exports = function() {
 
+  const uploadSvc = ServiceManager.getService('UploadSvc')
+
   var router = express.Router()
-
-  /////////////////////////////////////////////////////////////////////////////
-  // GET /user
-  // Get current user
-  //
-  /////////////////////////////////////////////////////////////////////////////
-  router.get('/user', async (req, res) => {
-
-    try {
-
-      const forgeSvc = ServiceManager.getService('ForgeSvc')
-
-      const token = await forgeSvc.get3LeggedTokenMaster(req.session)
-
-      const dmSvc = ServiceManager.getService('DMSvc')
-
-      const response = await dmSvc.getUser(token)
-
-      res.json(response)
-
-    } catch (ex) {
-
-      res.status(ex.status || 500)
-      res.json(ex)
-    }
-  })
 
   /////////////////////////////////////////////////////////////////////////////
   // GET /hubs
@@ -50,6 +26,36 @@ module.exports = function() {
       const dmSvc = ServiceManager.getService('DMSvc')
 
       const response = await dmSvc.getHubs(token)
+
+      res.json(response)
+
+    } catch (ex) {
+
+      console.log(ex)
+
+      res.status(ex.status || 500)
+      res.json(ex)
+    }
+  })
+
+  /////////////////////////////////////////////////////////////////////////////
+  // GET /hubs/{hubId}
+  // Get hub by id
+  //
+  /////////////////////////////////////////////////////////////////////////////
+  router.get('/hubs/:hubId', async (req, res) => {
+
+    try {
+
+      const hubId = req.params.hubId
+
+      const forgeSvc = ServiceManager.getService('ForgeSvc')
+
+      const token = await forgeSvc.get3LeggedTokenMaster(req.session)
+
+      const dmSvc = ServiceManager.getService('DMSvc')
+
+      const response = await dmSvc.getHub(token, hubId)
 
       res.json(response)
 
@@ -332,6 +338,67 @@ module.exports = function() {
 
       const response = await dmSvc.getItemTip(
         token, projectId, itemId)
+
+      res.json(response)
+
+    } catch (ex) {
+
+      res.status(ex.status || 500)
+      res.json(ex)
+    }
+  })
+
+  /////////////////////////////////////////////////////////////////////////////
+  // POST /dm/projects/:projectId/folders/:folderId
+  // Upload file to DataManagement
+  //
+  /////////////////////////////////////////////////////////////////////////////
+  router.post('/projects/:projectId/folders/:folderId',
+    uploadSvc.uploader.any(), async (req, res) => {
+
+    try {
+
+      const forgeSvc = ServiceManager.getService('ForgeSvc')
+
+      const dmSvc = ServiceManager.getService('DMSvc')
+
+      const projectId = req.params.projectId
+
+      const folderId = req.params.folderId
+
+      const file = req.files[0]
+
+      const opts = {
+        chunkSize: 5 * 1024 * 1024,
+        concurrentUploads: 3,
+        onProgress: (info) => {
+
+          const socketId = req.body.socketId
+
+          if (socketId) {
+
+            const socketSvc = ServiceManager.getService(
+              'SocketSvc')
+
+            const msg = Object.assign({}, info, {
+              filename: file.originalname,
+              projectId,
+              folderId
+            })
+
+            socketSvc.broadcast (
+              'progress', msg, socketId)
+          }
+        }
+      }
+
+      const getToken =
+        () => forgeSvc.get3LeggedTokenMaster(
+          req.session)
+
+      const response = await dmSvc.upload(
+        getToken,
+        projectId, folderId, file, opts)
 
       res.json(response)
 

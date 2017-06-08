@@ -3,16 +3,35 @@
 // PRODUCTION configuration
 //
 /////////////////////////////////////////////////////////////////////
+const HOST_URL = process.env.HOST_URL || 'https://oss.autodesk.io'
+const PORT = 443
+
 module.exports = {
 
-  port: 3000,
+  port: process.env.PORT,
+
+  env: 'production',
+
+  client: {
+    // this the public host name of your server for the
+    // client socket to connect.
+    // eg. https://myforgeapp.mydomain.com
+    readOnlyBuckets:[
+      'leefsmp-temp-forge',
+      'demo-bucket-emea',
+      'demo-bucket-us',
+      ],
+    host: `${HOST_URL}`,
+    env: 'production',
+    port: PORT
+  },
 
   forge: {
 
     viewer: {
-      viewer3D: 'https://developer.api.autodesk.com/viewingservice/v1/viewers/viewer3D.min.js?v=2.14',
-      threeJS:  'https://developer.api.autodesk.com/viewingservice/v1/viewers/three.min.js?v=2.14',
-      style:    'https://developer.api.autodesk.com/viewingservice/v1/viewers/style.min.css?v=2.14'
+      viewer3D: 'https://autodeskviewer.com/viewers/2.14/viewer3D.min.js',
+      threeJS:  'https://autodeskviewer.com/viewers/2.14/three.min.js',
+      style:    'https://autodeskviewer.com/viewers/2.14/style.min.css'
     },
 
     oauth: {

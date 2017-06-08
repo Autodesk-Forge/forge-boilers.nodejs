@@ -22,35 +22,14 @@ import config from 'c0nfig'
 
 module.exports = function() {
 
-  var router = express.Router()
+  const router = express.Router()
 
-  ///////////////////////////////////////////////////////////////////////////
-  // 2-legged client token: exposes a 'data:read' only token to client App
-  //
-  ///////////////////////////////////////////////////////////////////////////
-  router.get('/token/2legged', async(req, res) => {
-
-    try {
-
-      var forgeSvc = ServiceManager.getService('ForgeSvc')
-
-      var token = await forgeSvc.request2LeggedToken('data:read')
-
-      res.json(token)
-
-    } catch (error) {
-
-      res.status(error.statusCode || 404)
-      res.json(error)
-    }
-  })
-
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   // Initialize OAuth library
   //
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
 
-  var oauth2 = new OAuth2(
+  const oauth2 = new OAuth2(
     config.forge.oauth.clientId,
     config.forge.oauth.clientSecret,
     config.forge.oauth.baseUri,
@@ -58,13 +37,15 @@ module.exports = function() {
     config.forge.oauth.accessTokenUri,
     null)
 
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   // login endpoint
   //
-  /////////////////////////////////////////////////////////////////////////////
-  router.post('/login', function (req, res) {
+  /////////////////////////////////////////////////////////
+  router.post('/login', (req, res) => {
 
-    var authURL = oauth2.getAuthorizeUrl({
+    req.session.redirect = req.body.origin || '/'
+
+    const authURL = oauth2.getAuthorizeUrl({
       redirect_uri: config.forge.oauth.redirectUri,
       scope: config.forge.oauth.scope.join(' ')
     })
@@ -72,13 +53,13 @@ module.exports = function() {
     res.json(authURL + '&response_type=code')
   })
 
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   // logout endpoint
   //
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   router.post('/logout', (req, res) => {
 
-    var forgeSvc = ServiceManager.getService(
+    const forgeSvc = ServiceManager.getService(
       'ForgeSvc')
 
     forgeSvc.delete3LeggedToken(req.session)
@@ -86,42 +67,56 @@ module.exports = function() {
     res.json('success')
   })
 
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
+  // GET /user
+  // Get current user
+  //
+  /////////////////////////////////////////////////////////
+  router.get('/user', async (req, res) => {
+
+    try {
+
+      const forgeSvc = ServiceManager.getService(
+        'ForgeSvc')
+
+      const token =
+        await forgeSvc.get3LeggedTokenMaster(
+          req.session)
+
+      const response = await forgeSvc.getUser(token)
+
+      res.json(response)
+
+    } catch (ex) {
+
+      res.status(ex.status || 500)
+      res.json(ex)
+    }
+  })
+
+  /////////////////////////////////////////////////////////
   // Reply looks as follow:
   //
-  //  access_token: "fk7dd21P4FAhJWl6MptumGkXIuei",
-  //  refresh_token: "TSJpg3xSXxUEAtevo3lIPEmjQUxXbcqNT9AZHRKYM3",
+  //  access_token: "...",
+  //  refresh_token: "...",
   //  results: {
   //    token_type: "Bearer",
   //    expires_in: 86399,
-  //    access_token: "fk7dd21P4FAhJWl6MptumGkXIuei"
+  //    access_token: "..."
   //  }
   //
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   router.get('/callback/oauth', (req, res) => {
-
-    var socketSvc = ServiceManager.getService(
-      'SocketSvc')
 
     // filter out errors (access_denied, ...)
     if (req.query && req.query.error) {
 
-      if (req.session.socketId) {
-
-        socketSvc.broadcast(
-          'callback', req.query.error,
-          req.session.socketId)
-      }
-
-      res.json(req.query.error)
-      return
+      return res.redirect(req.session.redirect)
     }
 
-    if(!req.query || !req.query.code) {
+    if (!req.query || !req.query.code) {
 
-      res.status(401)
-      res.json('invalid request')
-      return
+      return res.redirect(req.session.redirect)
     }
 
     oauth2.getOAuthAccessToken(
@@ -129,9 +124,14 @@ module.exports = function() {
         grant_type: 'authorization_code',
         redirect_uri: config.forge.oauth.redirectUri
       },
-      function (err, access_token, refresh_token, results) {
+      (err, access_token, refresh_token, results) => {
 
         try {
+
+          if (err) {
+
+            return res.redirect(req.session.redirect)
+          }
 
           var forgeSvc = ServiceManager.getService(
             'ForgeSvc')
@@ -146,52 +146,30 @@ module.exports = function() {
           forgeSvc.set3LeggedTokenMaster(
             req.session, token)
 
-          if(req.session.socketId) {
-
-            socketSvc.broadcast(
-              'callback',
-              'success',
-              req.session.socketId)
-          }
-
-          res.end('success')
+          return res.redirect(req.session.redirect)
 
         } catch (ex) {
 
-          res.status(500)
-          res.end(ex)
+          return res.redirect(req.session.redirect)
         }
-      }
-    )
+      })
   })
 
-  /////////////////////////////////////////////////////////////////////////////
-  // logout route
+  /////////////////////////////////////////////////////////
+  // reduced scope token
+  // Not needed here because of proxy use
   //
-  /////////////////////////////////////////////////////////////////////////////
-  router.post('/logout', (req, res) => {
-
-    var forgeSvc = ServiceManager.getService(
-      'ForgeSvc')
-
-    forgeSvc.logout(req.session)
-
-    res.json('success')
-  })
-
-  ///////////////////////////////////////////////////////////////////////////
-  // 3-legged client token: exposes a 'data:read' only token to client App
-  //
-  ///////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   //router.get('/token/3legged', async (req, res) => {
   //
-  //  var forgeSvc = ServiceManager.getService(
+  //  const forgeSvc = ServiceManager.getService(
   //    'ForgeSvc')
   //
   //  try {
   //
-  //    var token = await forgeSvc.get3LeggedTokenClient(
-  //      req.session)
+  //    const token = await forgeSvc.get3LeggedTokenClient(
+  //      req.session,
+  //      'viewable:read')
   //
   //    res.json({
   //      expires_in: forgeSvc.getExpiry(token),
@@ -201,7 +179,7 @@ module.exports = function() {
   //
   //  } catch (error) {
   //
-  //    forgeSvc.logout(req.session)
+  //    forgeSvc.delete3LeggedToken(req.session)
   //
   //    res.status(error.statusCode || 404)
   //    res.json(error)

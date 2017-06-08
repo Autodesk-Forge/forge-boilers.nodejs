@@ -1,28 +1,36 @@
-
 /////////////////////////////////////////////////////////////////////
 // PRODUCTION configuration
 //
 /////////////////////////////////////////////////////////////////////
+const HOST_URL = process.env.HOST_URL  || 'https://oss.autodesk.io'
+const PORT = 443
+
 module.exports = {
 
-  client: {
-    host: process.env.HOST_URL || 'https://dm.autodesk.io',
-    port: 443
-  },
+  port:  process.env.PORT,
 
-  port: 3000,
+  env: 'production',
+
+  client: {
+    // this the public host name of your server for the
+    // client socket to connect.
+    // eg. https://myforgeapp.mydomain.com
+    host: `${HOST_URL}`,
+    env: 'production',
+    port: PORT
+  },
 
   forge: {
 
     viewer: {
-      viewer3D: 'https://developer.api.autodesk.com/viewingservice/v1/viewers/viewer3D.min.js?v=2.14',
-      threeJS:  'https://developer.api.autodesk.com/viewingservice/v1/viewers/three.min.js?v=2.14',
-      style:    'https://developer.api.autodesk.com/viewingservice/v1/viewers/style.min.css?v=2.14'
+      viewer3D: 'https://autodeskviewer.com/viewers/2.14/viewer3D.min.js',
+      threeJS:  'https://autodeskviewer.com/viewers/2.14/three.min.js',
+      style:    'https://autodeskviewer.com/viewers/2.14/style.min.css'
     },
 
     oauth: {
 
-      redirectUri: `${process.env.HOST_URL}/api/forge/callback/oauth`,
+      redirectUri: `${HOST_URL}/api/forge/callback/oauth`,
       authenticationUri: '/authentication/v1/authenticate',
       refreshTokenUri: '/authentication/v1/refreshtoken',
       authorizationUri: '/authentication/v1/authorize',
