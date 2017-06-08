@@ -7,10 +7,17 @@ const PORT = 443
 
 module.exports = {
 
+<<<<<<< HEAD
   port:  process.env.PORT,
 
   env: 'production',
 
+=======
+  env: 'production',
+
+  port: PORT,
+
+>>>>>>> 2b94ae11a55fb3ec906764d3cbddf21e68b5b9d0
   client: {
     // this the public host name of your server for the
     // client socket to connect.

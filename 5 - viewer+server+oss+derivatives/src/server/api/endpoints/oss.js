@@ -234,7 +234,11 @@ module.exports = function() {
       const objectKey = file.originalname
 
       const opts = {
+<<<<<<< HEAD
         chunkSize: 5 * 1024 * 1024, //5MB chunks
+=======
+        chunkSize: 5 * 1024 * 1024,
+>>>>>>> 2b94ae11a55fb3ec906764d3cbddf21e68b5b9d0
         concurrentUploads: 3,
         onProgress: (info) => {
 

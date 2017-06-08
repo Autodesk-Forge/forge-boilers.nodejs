@@ -28,6 +28,10 @@ import Dropzone from 'dropzone'
 import OSSAPI from './OSS.API'
 import './OSS.Panel.scss'
 
+const bucketsWhiteList = [
+
+]
+
 export default class OSSPanel extends UIComponent {
 
   constructor () {

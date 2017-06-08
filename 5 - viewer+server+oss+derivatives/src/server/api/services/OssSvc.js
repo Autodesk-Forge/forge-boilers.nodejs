@@ -182,7 +182,11 @@ export default class OssSvc extends BaseSvc {
   }
 
   /////////////////////////////////////////////////////////
+<<<<<<< HEAD
   // Uploads object to bucket using resumable endpoint
+=======
+  // Uploads object to bucket
+>>>>>>> 2b94ae11a55fb3ec906764d3cbddf21e68b5b9d0
   //
   /////////////////////////////////////////////////////////
   uploadObjectChunked (getToken, bucketKey, objectKey,
@@ -190,7 +194,11 @@ export default class OssSvc extends BaseSvc {
 
     return new Promise((resolve, reject) => {
 
+<<<<<<< HEAD
       const chunkSize = opts.chunkSize || 5 * 1024 * 1024
+=======
+      const chunkSize = opts.chunkSize || 250 * 1024
+>>>>>>> 2b94ae11a55fb3ec906764d3cbddf21e68b5b9d0
 
       const nbChunks = Math.ceil(file.size / chunkSize)
 
@@ -198,10 +206,15 @@ export default class OssSvc extends BaseSvc {
         length: nbChunks
       }, (e, i) => i)
 
+<<<<<<< HEAD
       // generates uniques session ID
       const sessionId = this.guid()
 
       // prepare the upload tasks
+=======
+      const sessionId = this.guid()
+
+>>>>>>> 2b94ae11a55fb3ec906764d3cbddf21e68b5b9d0
       const uploadTasks = chunksMap.map((chunkIdx) => {
 
         const start = chunkIdx * chunkSize
@@ -215,7 +228,11 @@ export default class OssSvc extends BaseSvc {
 
         const readStream =
           fs.createReadStream(file.path, {
+<<<<<<< HEAD
             start, end
+=======
+            start, end: end
+>>>>>>> 2b94ae11a55fb3ec906764d3cbddf21e68b5b9d0
           })
 
         const run = async () => {
@@ -237,10 +254,14 @@ export default class OssSvc extends BaseSvc {
 
       let progress = 0
 
+<<<<<<< HEAD
       // runs asynchronously in parallel the upload tasks
       // number of simultaneous uploads is defined by
       // opts.concurrentUploads
       eachLimit(uploadTasks, opts.concurrentUploads || 3,
+=======
+      eachLimit(uploadTasks, opts.concurrentUploads || 1,
+>>>>>>> 2b94ae11a55fb3ec906764d3cbddf21e68b5b9d0
         (task, callback) => {
 
           task.run().then((res) => {

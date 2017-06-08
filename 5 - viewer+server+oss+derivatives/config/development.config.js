@@ -13,7 +13,10 @@ module.exports = {
   port: PORT,
 
   client: {
+<<<<<<< HEAD
     readOnlyBuckets:[],
+=======
+>>>>>>> 2b94ae11a55fb3ec906764d3cbddf21e68b5b9d0
     host: `${HOST_URL}`,
     env: 'development',
     port: PORT
