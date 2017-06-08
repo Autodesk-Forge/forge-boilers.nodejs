@@ -8,29 +8,19 @@ const PORT = 443
 
 module.exports = {
 
-<<<<<<< HEAD
   port: process.env.PORT,
 
   env: 'production',
 
-=======
-  env: 'production',
-
-  port: PORT,
-
->>>>>>> 2b94ae11a55fb3ec906764d3cbddf21e68b5b9d0
   client: {
     // this the public host name of your server for the
     // client socket to connect.
     // eg. https://myforgeapp.mydomain.com
-<<<<<<< HEAD
     readOnlyBuckets:[
       'leefsmp-temp-forge',
       'demo-bucket-emea',
       'demo-bucket-us',
       ],
-=======
->>>>>>> 2b94ae11a55fb3ec906764d3cbddf21e68b5b9d0
     host: `${HOST_URL}`,
     env: 'production',
     port: PORT
