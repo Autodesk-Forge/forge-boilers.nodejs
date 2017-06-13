@@ -33,7 +33,7 @@ module.exports = function() {
 
       const response =
         await ossSvc.getBuckets(
-          token, options)
+        token, options)
 
       res.json(response)
 
@@ -54,13 +54,13 @@ module.exports = function() {
 
     try {
 
-      const bucketKey = req.params.bucketKey
-
       const forgeSvc = ServiceManager.getService('ForgeSvc')
+
+      const ossSvc = ServiceManager.getService('OssSvc')
 
       const token = await forgeSvc.get2LeggedToken()
 
-      const ossSvc = ServiceManager.getService('OssSvc')
+      const bucketKey = req.params.bucketKey
 
       const response = await ossSvc.getBucketDetails(
         token, bucketKey)
@@ -100,7 +100,7 @@ module.exports = function() {
 
       const response =
         await ossSvc.getObjects(
-          token, bucketKey, options)
+        token, bucketKey, options)
 
       res.send(response)
 
@@ -135,7 +135,7 @@ module.exports = function() {
 
       const response =
         await ossSvc.getObjectDetails(
-          token, bucketKey, objectKey)
+        token, bucketKey, objectKey)
 
       res.json(response)
 
@@ -168,7 +168,7 @@ module.exports = function() {
 
       const object =
         await ossSvc.getObject(
-          token, bucketKey, objectKey)
+        token, bucketKey, objectKey)
 
       res.end(object)
 
@@ -201,8 +201,8 @@ module.exports = function() {
 
       const response =
         await ossSvc.createBucket(
-          token, bucketCreationData,
-          options)
+        token, bucketCreationData,
+        options)
 
       res.json(response)
 
@@ -234,7 +234,7 @@ module.exports = function() {
       const objectKey = file.originalname
 
       const opts = {
-        chunkSize: 5 * 1024 * 1024,
+        chunkSize: 5 * 1024 * 1024, //5MB chunks
         concurrentUploads: 3,
         onProgress: (info) => {
 
@@ -258,10 +258,10 @@ module.exports = function() {
 
       const response =
         await ossSvc.uploadObjectChunked (
-          () => forgeSvc.get2LeggedToken(),
-          bucketKey,
-          objectKey,
-          file, opts)
+        () => forgeSvc.get2LeggedToken(),
+        bucketKey,
+        objectKey,
+        file, opts)
 
       res.json(response)
 
@@ -293,7 +293,7 @@ module.exports = function() {
 
       const response =
         await ossSvc.deleteBucket(
-          token, bucketKey)
+        token, bucketKey)
 
       res.json(response)
 
@@ -326,7 +326,7 @@ module.exports = function() {
 
       const response =
         await ossSvc.deleteObject(
-          token, bucketKey, objectKey)
+        token, bucketKey, objectKey)
 
       res.json(response)
 
@@ -339,3 +339,4 @@ module.exports = function() {
 
   return router
 }
+

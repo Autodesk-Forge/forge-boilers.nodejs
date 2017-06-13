@@ -21,6 +21,7 @@ import RegionPanel from './RegionPanel/RegionPanel'
 import {API as DerivativesAPI} from 'Derivatives'
 import ToolPanelModal from 'ToolPanelModal'
 import ContextMenu from './OSS.ContextMenu'
+import {client as config} from 'c0nfig'
 import ServiceManager from 'SvcManager'
 import UIComponent from 'UIComponent'
 import Dropzone from 'dropzone'
@@ -175,6 +176,13 @@ export default class OSSPanel extends UIComponent {
 
     this.contextMenu.on('context.oss.bucket.delete', (data) =>{
 
+      if (config.readOnlyBuckets.includes(data.node.bucketKey)) {
+
+        return this.showCannotModifyBucket(
+          data.node.bucketKey,
+          appContainer)
+      }
+
       const dlg = new ToolPanelModal(appContainer, {
         title: 'Delete bucket ...'
       })
@@ -208,6 +216,13 @@ export default class OSSPanel extends UIComponent {
     })
 
     this.contextMenu.on('context.oss.object.delete', async(data) =>{
+
+      if (config.readOnlyBuckets.includes(data.node.bucketKey)) {
+
+        return this.showCannotModifyBucket(
+          data.node.bucketKey,
+          appContainer)
+      }
 
       console.log('Deleting object: ' + data.node.objectKey)
 
@@ -308,6 +323,29 @@ export default class OSSPanel extends UIComponent {
     })
 
     this.loadStorage (domContainer)
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////
+  showCannotModifyBucket (bucketKey, appContainer) {
+
+    const dlg = new ToolPanelModal(appContainer, {
+      title: 'Read-only bucket ...'
+    })
+
+    dlg.bodyContent(
+      `<div class="confirm-delete">
+          This operation is not allowed on the demo bucket
+          <br/>
+          <b>
+            ${bucketKey}.
+          </b>
+        </div>
+        `)
+
+    dlg.setVisible(true)
   }
 
   ///////////////////////////////////////////////////////////////////

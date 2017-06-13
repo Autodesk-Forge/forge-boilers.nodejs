@@ -182,7 +182,7 @@ export default class OssSvc extends BaseSvc {
   }
 
   /////////////////////////////////////////////////////////
-  // Uploads object to bucket
+  // Uploads object to bucket using resumable endpoint
   //
   /////////////////////////////////////////////////////////
   uploadObjectChunked (getToken, bucketKey, objectKey,
@@ -190,7 +190,7 @@ export default class OssSvc extends BaseSvc {
 
     return new Promise((resolve, reject) => {
 
-      const chunkSize = opts.chunkSize || 250 * 1024
+      const chunkSize = opts.chunkSize || 5 * 1024 * 1024
 
       const nbChunks = Math.ceil(file.size / chunkSize)
 
@@ -198,8 +198,10 @@ export default class OssSvc extends BaseSvc {
         length: nbChunks
       }, (e, i) => i)
 
+      // generates uniques session ID
       const sessionId = this.guid()
 
+      // prepare the upload tasks
       const uploadTasks = chunksMap.map((chunkIdx) => {
 
         const start = chunkIdx * chunkSize
@@ -213,7 +215,7 @@ export default class OssSvc extends BaseSvc {
 
         const readStream =
           fs.createReadStream(file.path, {
-            start, end: end
+            start, end
           })
 
         const run = async () => {
@@ -235,7 +237,10 @@ export default class OssSvc extends BaseSvc {
 
       let progress = 0
 
-      eachLimit(uploadTasks, opts.concurrentUploads || 1,
+      // runs asynchronously in parallel the upload tasks
+      // number of simultaneous uploads is defined by
+      // opts.concurrentUploads
+      eachLimit(uploadTasks, opts.concurrentUploads || 3,
         (task, callback) => {
 
           task.run().then((res) => {

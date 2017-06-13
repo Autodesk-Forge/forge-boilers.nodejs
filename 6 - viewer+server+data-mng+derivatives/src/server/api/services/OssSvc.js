@@ -190,7 +190,7 @@ export default class OssSvc extends BaseSvc {
 
     return new Promise((resolve, reject) => {
 
-      const chunkSize = opts.chunkSize || 250 * 1024
+      const chunkSize = opts.chunkSize || 5 * 1024 * 1024
 
       const nbChunks = Math.ceil(file.size / chunkSize)
 
@@ -213,7 +213,7 @@ export default class OssSvc extends BaseSvc {
 
         const readStream =
           fs.createReadStream(file.path, {
-            start, end: end
+            start, end
           })
 
         const run = async () => {
