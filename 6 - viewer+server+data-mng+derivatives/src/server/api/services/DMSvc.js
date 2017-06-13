@@ -66,14 +66,8 @@ export default class DMSvc extends BaseSvc {
       ? await getToken()
       : getToken
 
-    return requestAsync({
-      url: 'https://developer.api.autodesk.com/project/v1/hubs',
-      token: token.access_token,
-      json: true
-    })
-
-    //return this._hubsAPI.getHubs (
-    //  opts, {autoRefresh:false}, token)
+    return this._hubsAPI.getHubs (
+      opts, {autoRefresh:false}, token)
   }
 
   /////////////////////////////////////////////////////////////////
