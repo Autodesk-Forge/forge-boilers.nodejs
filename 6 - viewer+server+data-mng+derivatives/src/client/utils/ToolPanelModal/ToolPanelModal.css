@@ -1,7 +1,7 @@
 
 .tool-panel-modal {
     overflow: visible;
-    height: 150px;
+    height: auto;
     width: 450px;
     resize: none;
     z-index: 1000;

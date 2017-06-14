@@ -26,7 +26,7 @@ import 'jquery-ui/ui/widgets/resizable'
 import {client as config} from 'c0nfig'
 import ServiceManager from 'SvcManager'
 import SocketSvc from 'SocketSvc'
-import UserSvc from 'UserSvc'
+import ForgeSvc from 'ForgeSvc'
 import 'font-awesome-webpack'
 import 'bootstrap-webpack'
 import 'jquery-ui'
@@ -71,7 +71,7 @@ export default class App {
       console.log(info)
     })
 
-    this.userSvc = new UserSvc({
+    this.forgeSvc = new ForgeSvc({
         apiUrl: '/api/forge' 
     })
   }
@@ -218,7 +218,7 @@ export default class App {
               return this.onLoadItemDetails (node)
             })
 
-            this.userSvc.getUser().then((user) => {
+            this.forgeSvc.getUser().then((user) => {
 
               if (user) {
 
@@ -385,13 +385,13 @@ export default class App {
 
       this.viewerPanel.onResize()
 
-      this.userSvc.logout()
+      this.forgeSvc.logout()
 
       this.user = null
 
     } else {
 
-      this.userSvc.login().then((user) => {
+      this.forgeSvc.login().then((user) => {
 
         if (user) {
 
@@ -414,13 +414,17 @@ export default class App {
       })
 
     aboutDlg.bodyContent (`
-      <div>
+      <div class="about">
         <br>
         Written by <a href="https://twitter.com/F3lipek"
           target="_blank">
           Philippe Leefsma
         </a>, November 2016
         <hr class="about"/>
+        This App Forge ClientID:
+        <p class="client-id">
+          ${this.forgeSvc.clientId}
+        </p>
         Source on
         <a href="https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/master/6%20-%20viewer%2Bserver%2Bdata-mng%2Bderivatives"
           target="_blank">
