@@ -318,7 +318,7 @@ export default class OSSPanel extends UIComponent {
       const search = $('#' + searchInputId).val()
 
       this.filterNode(
-        rootNode,
+        this.rootNode,
         search.toLowerCase())
     })
 
@@ -378,7 +378,7 @@ export default class OSSPanel extends UIComponent {
 
     const region = this.storageSettings.region
 
-    const rootNode = {
+    this.rootNode = {
       id: this.guid(),
       name: `Root Storage [Region: ${region}]`,
       type: 'oss.root',
@@ -386,7 +386,7 @@ export default class OSSPanel extends UIComponent {
     }
 
     this.storageTree = new Autodesk.Viewing.UI.Tree(
-      delegate, rootNode, domContainer, {
+      delegate, this.rootNode, domContainer, {
         excludeRoot: false
       })
   }
