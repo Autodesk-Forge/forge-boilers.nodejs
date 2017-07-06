@@ -170,9 +170,12 @@ module.exports = function() {
       const object =
         await ossSvc.getObject(
         token, bucketKey, objectKey)
+<<<<<<< HEAD
 
       const tmp = path.resolve(__dirname,
         `../../../../TMP/${bucketKey}-${objectKey}`)
+=======
+>>>>>>> 5ef984a767e806bb488e896ac011953127467da2
 
       const wstream = fs.createWriteStream(tmp)
 
