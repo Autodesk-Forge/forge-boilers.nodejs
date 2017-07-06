@@ -397,8 +397,7 @@ export default class OSSPanel extends UIComponent {
   ///////////////////////////////////////////////////////////////////
   onObjectNodeAdded (node) {
 
-    const bucketKey = encodeURIComponent(node.bucketKey)
-    const objectKey = encodeURIComponent(node.objectKey)
+    const { bucketKey, objectKey } = node
 
     const objectId = `urn:adsk.objects:os.object:` +
       `${bucketKey}/${objectKey}`

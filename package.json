@@ -19,8 +19,8 @@
     "start5": "npm start --prefix ./5\\ -\\ viewer+server+oss+derivatives",
     "start6": "npm start --prefix ./6\\ -\\ viewer+server+data-mng+derivatives",
 
-    "postinstall": "npm run install-boiler6",
-    "start": "npm run start6"
+    "postinstall": "npm run install-boiler5",
+    "start": "npm run start5"
   },
   "repository": {
     "type": "git",
