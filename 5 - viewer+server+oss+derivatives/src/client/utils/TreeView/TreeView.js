@@ -64,7 +64,7 @@ export class BaseTreeDelegate extends
   ///////////////////////////////////////////////////////////////////
   nodeClickSelector (event) {
 
-    const selector = ['HEADER', 'LABEL']
+    const selector = ['LMVHEADER', 'LABEL']
 
     return (selector.indexOf(event.target.nodeName) > -1)
   }

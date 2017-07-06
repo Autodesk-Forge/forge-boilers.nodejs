@@ -20,9 +20,9 @@ module.exports = {
   forge: {
 
     viewer: {
-      viewer3D: 'https://autodeskviewer.com/viewers/2.14/viewer3D.js',
-      threeJS:  'https://autodeskviewer.com/viewers/2.14/three.js',
-      style:    'https://autodeskviewer.com/viewers/2.14/style.css'
+      viewer3D: 'https://autodeskviewer.com/viewers/2.15/viewer3D.js',
+      threeJS:  'https://autodeskviewer.com/viewers/2.15/three.js',
+      style:    'https://autodeskviewer.com/viewers/2.15/style.css'
     },
 
     oauth: {

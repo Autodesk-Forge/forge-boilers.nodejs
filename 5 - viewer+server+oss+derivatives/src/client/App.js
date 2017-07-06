@@ -167,16 +167,13 @@ export default class App {
 
       const viewer = this.viewerPanel.viewer
 
-      viewer.loadExtension(ModelTransformerExtension, {
-        parentControl: 'modelTools',
-        autoLoad: false
-      })
+      const extInstance =  await viewer.loadExtension(
+        ModelTransformerExtension, {
+          parentControl: 'modelTools',
+          autoLoad: false
+        })
 
       const path = this.viewerPanel.getDefaultViewablePath(doc)
-
-      //  builds placementTransform based on model extension
-      const extInstance = viewer.getExtension(
-        ModelTransformerExtension)
 
       const loadOptions = {
         placementTransform:

@@ -308,24 +308,28 @@ module.exports = function() {
       const forgeSvc = ServiceManager.getService(
         'ForgeSvc')
 
-      var token = await forgeSvc.get3LeggedTokenMaster(
+      const getToken = () => forgeSvc.get3LeggedTokenMaster(
         req.session)
 
-      const svfDownloaderSvc = ServiceManager.getService(
-        'SVFDownloaderSvc')
+      const extractorSvc = ServiceManager.getService(
+        'ExtractorSvc')
 
       const dir = path.resolve(__dirname,
         `../../../../TMP/${name}`)
 
-      const files = await svfDownloaderSvc.download(
-        token.access_token, payload.urn, dir)
+      const files = await extractorSvc.download(
+        getToken, payload.urn, dir)
 
-      await svfDownloaderSvc.createZip(
-        dir, files, dir + '.zip')
+      const zipfile = dir + '.zip'
+
+      await extractorSvc.createZip(
+        dir, zipfile + '.tmp', name, files)
+
+      mzfs.rename(zipfile + '.tmp', zipfile)
 
       rmdir(dir)
 
-      res.json('ok')
+      res.json('done')
 
     } catch (ex) {
 
@@ -349,7 +353,7 @@ module.exports = function() {
 
       await mzfs.stat(filename)
 
-      res.json('ok')
+      res.json('found')
 
     } catch (ex) {
 
@@ -373,13 +377,7 @@ module.exports = function() {
 
       await mzfs.stat(filename)
 
-      res.set('Content-Type', 'application/octet-stream')
-
-      const stream = mzfs.createReadStream(filename, {
-        bufferSize: 64 * 64 * 1024
-      })
-
-      stream.pipe(res)
+      res.download(filename)
 
     } catch (ex) {
 

@@ -68,6 +68,29 @@ module.exports = function() {
   })
 
   /////////////////////////////////////////////////////////
+  // GET /clientId
+  // Get Forge app clientId
+  //
+  /////////////////////////////////////////////////////////
+  router.get('/clientId', async (req, res) => {
+
+    try {
+
+      const forgeSvc = ServiceManager.getService(
+        'ForgeSvc')
+
+      res.json({
+        clientId: forgeSvc.clientId
+      })
+
+    } catch (ex) {
+
+      res.status(ex.status || 500)
+      res.json(ex)
+    }
+  })
+
+  /////////////////////////////////////////////////////////
   // GET /user
   // Get current user
   //

@@ -2,7 +2,7 @@
 // PRODUCTION configuration
 //
 /////////////////////////////////////////////////////////////////////
-const HOST_URL = process.env.HOST_URL  || 'https://oss.autodesk.io'
+const HOST_URL = process.env.HOST_URL  || 'https://dm.autodesk.io'
 const PORT = 443
 
 module.exports = {
@@ -25,9 +25,9 @@ module.exports = {
   forge: {
 
     viewer: {
-      viewer3D: 'https://autodeskviewer.com/viewers/2.14/viewer3D.min.js',
-      threeJS:  'https://autodeskviewer.com/viewers/2.14/three.min.js',
-      style:    'https://autodeskviewer.com/viewers/2.14/style.min.css'
+      viewer3D: 'https://autodeskviewer.com/viewers/2.15/viewer3D.min.js',
+      threeJS:  'https://autodeskviewer.com/viewers/2.15/three.min.js',
+      style:    'https://autodeskviewer.com/viewers/2.15/style.min.css'
     },
 
     oauth: {

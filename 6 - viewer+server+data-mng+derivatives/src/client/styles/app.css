@@ -198,6 +198,19 @@ html, body {
     color: black;
 }
 
+.about {
+    height: 180px;
+}
+
+.about .client-id {
+    border: 1px solid #a5a5a5;
+    background: #f8f8f8;
+    border-radius: 4px;
+    user-select: text;
+    margin-top: 6px;
+    padding: 4px;
+}
+
 hr.about {
     visibility: hidden;
     height: 6px;

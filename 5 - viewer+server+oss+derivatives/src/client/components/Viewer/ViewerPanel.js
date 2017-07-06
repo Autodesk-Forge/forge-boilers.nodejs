@@ -53,6 +53,8 @@ export default class ViewerPanel {
   ///////////////////////////////////////////////////////////////////
   loadDocument (documentId) {
 
+    console.log(documentId)
+
     $('.progressbg').show()
 
     return new Promise((resolve, reject) => {

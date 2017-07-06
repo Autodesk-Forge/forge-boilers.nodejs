@@ -6,32 +6,30 @@ import rmdir from 'rmdir'
 import mzfs from 'mz/fs'
 import path from 'path'
 
-var admZip = require('adm-zip')
-
 module.exports = function() {
 
   var router = express.Router()
 
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   // POST /job
   // Post a derivative job - generic
   //
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   router.post('/job', async (req, res) => {
 
     try {
 
-      var payload = JSON.parse(req.body.payload)
+      const payload = JSON.parse(req.body.payload)
 
-      var forgeSvc = ServiceManager.getService(
+      const forgeSvc = ServiceManager.getService(
         'ForgeSvc')
 
-      var token = await forgeSvc.get2LeggedToken()
+      const token = await forgeSvc.get2LeggedToken()
 
-      var derivativesSvc = ServiceManager.getService(
+      const derivativesSvc = ServiceManager.getService(
         'DerivativesSvc')
 
-      var response = await derivativesSvc.postJob(
+      const response = await derivativesSvc.postJob(
         token, payload)
 
       res.json(response)
@@ -43,22 +41,25 @@ module.exports = function() {
     }
   })
 
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   // GET /formats
   // Get supported formats
   //
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   router.get('/formats', async (req, res) => {
 
     try {
 
-      var forgeSvc = ServiceManager.getService('ForgeSvc')
+      const forgeSvc = ServiceManager.getService(
+        'ForgeSvc')
 
-      var token = await forgeSvc.get2LeggedToken()
+      const token = await forgeSvc.get2LeggedToken()
 
-      var derivativesSvc = ServiceManager.getService('DerivativesSvc')
+      const derivativesSvc = ServiceManager.getService(
+        'DerivativesSvc')
 
-      var response = await derivativesSvc.getFormats(token)
+      const response =
+        await derivativesSvc.getFormats(token)
 
       res.json(response)
 
@@ -69,24 +70,27 @@ module.exports = function() {
     }
   })
 
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   // GET /metadata/{urn}
   // Get design metadata
   //
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   router.get('/metadata/:urn', async (req, res) => {
 
     try {
 
-      var urn = req.params.urn
+      const urn = req.params.urn
 
-      var forgeSvc = ServiceManager.getService('ForgeSvc')
+      const forgeSvc = ServiceManager.getService(
+        'ForgeSvc')
 
-      var token = await forgeSvc.get2LeggedToken()
+      const token = await forgeSvc.get2LeggedToken()
 
-      var derivativesSvc = ServiceManager.getService('DerivativesSvc')
+      const derivativesSvc = ServiceManager.getService(
+        'DerivativesSvc')
 
-      var response = await derivativesSvc.getMetadata(token, urn)
+      const response = await derivativesSvc.getMetadata(
+        token, urn)
 
       res.json(response)
 
@@ -97,24 +101,27 @@ module.exports = function() {
     }
   })
 
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   // GET /manifest/{urn}
   // Get design manifest
   //
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   router.get('/manifest/:urn', async (req, res) => {
 
     try {
 
-      var urn = req.params.urn
+      const urn = req.params.urn
 
-      var forgeSvc = ServiceManager.getService('ForgeSvc')
+      const forgeSvc = ServiceManager.getService(
+        'ForgeSvc')
 
-      var token = await forgeSvc.get2LeggedToken()
+      const token = await forgeSvc.get2LeggedToken()
 
-      var derivativesSvc = ServiceManager.getService('DerivativesSvc')
+      const derivativesSvc = ServiceManager.getService(
+        'DerivativesSvc')
 
-      var response = await derivativesSvc.getManifest(token, urn)
+      const response = await derivativesSvc.getManifest(
+        token, urn)
 
       res.json(response)
 
@@ -125,26 +132,29 @@ module.exports = function() {
     }
   })
 
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   // GET /hierarchy/{urn}/{guid}
   // Get hierarchy for design
   //
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   router.get('/hierarchy/:urn/:guid', async (req, res) => {
 
     try {
 
-      var urn = req.params.urn
+      const urn = req.params.urn
 
-      var guid = req.params.guid
+      const guid = req.params.guid
 
-      var forgeSvc = ServiceManager.getService('ForgeSvc')
+      const forgeSvc = ServiceManager.getService(
+        'ForgeSvc')
 
-      var token = await forgeSvc.get2LeggedToken()
+      const token = await forgeSvc.get2LeggedToken()
 
-      var derivativesSvc = ServiceManager.getService('DerivativesSvc')
+      const derivativesSvc = ServiceManager.getService(
+        'DerivativesSvc')
 
-      var response = await derivativesSvc.getHierarchy(token, urn, guid)
+      const response = await derivativesSvc.getHierarchy(
+        token, urn, guid)
 
       res.json(response)
 
@@ -157,26 +167,29 @@ module.exports = function() {
     }
   })
 
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   // GET /properties/{urn}/{guid}
   // Get properties for design
   //
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   router.get('/properties/:urn/:guid', async (req, res) => {
 
     try {
 
-      var urn = req.params.urn
+      const urn = req.params.urn
 
-      var guid = req.params.guid
+      const guid = req.params.guid
 
-      var forgeSvc = ServiceManager.getService('ForgeSvc')
+      const forgeSvc = ServiceManager.getService(
+        'ForgeSvc')
 
-      var token = await forgeSvc.get2LeggedToken()
+      const token = await forgeSvc.get2LeggedToken()
 
-      var derivativesSvc = ServiceManager.getService('DerivativesSvc')
+      const derivativesSvc = ServiceManager.getService(
+        'DerivativesSvc')
 
-      var response = await derivativesSvc.getProperties(token, urn, guid)
+      const response = await derivativesSvc.getProperties(
+        token, urn, guid)
 
       res.json(response)
 
@@ -187,25 +200,27 @@ module.exports = function() {
     }
   })
 
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   // DELETE /manifest/{urn}
   // Delete design manifest
   //
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   router.delete('/manifest/:urn', async (req, res) => {
 
     try {
 
-      var urn = req.params.urn
+      const urn = req.params.urn
 
-      var forgeSvc = ServiceManager.getService(
+      const forgeSvc = ServiceManager.getService(
         'ForgeSvc')
 
-      var token = await forgeSvc.get2LeggedToken()
+      const token = await forgeSvc.get2LeggedToken()
 
-      var derivativesSvc = ServiceManager.getService('DerivativesSvc')
+      const derivativesSvc = ServiceManager.getService(
+        'DerivativesSvc')
 
-      var response = await derivativesSvc.deleteManifest(token, urn)
+      const response = await derivativesSvc.deleteManifest(
+        token, urn)
 
       res.json(response)
 
@@ -216,30 +231,32 @@ module.exports = function() {
     }
   })
 
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   // GET /download
   // Get download uri for derivative resource
   //
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   router.get('/download', async (req, res) => {
 
     try {
 
-      var filename = req.query.filename || 'download'
+      const filename = req.query.filename || 'download'
 
-      var derivativeUrn = req.query.derivativeUrn
+      const derivativeUrn = req.query.derivativeUrn
 
-      var base64 = req.query.base64
+      const base64 = req.query.base64
 
-      var urn = req.query.urn
+      const urn = req.query.urn
 
-      var forgeSvc = ServiceManager.getService('ForgeSvc')
+      const forgeSvc = ServiceManager.getService(
+        'ForgeSvc')
 
-      var token = await forgeSvc.get2LeggedToken()
+      const token = await forgeSvc.get2LeggedToken()
 
-      var derivativesSvc = ServiceManager.getService('DerivativesSvc')
+      const derivativesSvc = ServiceManager.getService(
+        'DerivativesSvc')
 
-      var response = await derivativesSvc.download(
+      const response = await derivativesSvc.download(
         token, urn, derivativeUrn, {
           base64: base64
         })
@@ -258,29 +275,31 @@ module.exports = function() {
     }
   })
 
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   // GET /thumbnail/{urn}
   // Get design thumbnail
   //
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   router.get('/thumbnails/:urn', async (req, res) => {
 
     try {
 
-      var urn = req.params.urn
+      const urn = req.params.urn
 
-      var options = {
+      const options = {
         width: req.query.width || 100,
         height: req.query.height || 100
       }
 
-      var forgeSvc = ServiceManager.getService('ForgeSvc')
+      const forgeSvc = ServiceManager.getService(
+        'ForgeSvc')
 
-      var token = await forgeSvc.get2LeggedToken()
+      const token = await forgeSvc.get2LeggedToken()
 
-      var derivativesSvc = ServiceManager.getService('DerivativesSvc')
+      const derivativesSvc = ServiceManager.getService(
+        'DerivativesSvc')
 
-      var response = await derivativesSvc.getThumbnail(
+      const response = await derivativesSvc.getThumbnail(
         token, urn, options)
 
       res.end(response)
@@ -292,10 +311,10 @@ module.exports = function() {
     }
   })
 
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   // POST /svf/extract
   //
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   router.post('/svf/extract', async (req, res) => {
 
     try {
@@ -306,26 +325,30 @@ module.exports = function() {
 
       const urn = payload.urn
 
-      const forgeSvc = ServiceManager.getService('ForgeSvc')
+      const forgeSvc = ServiceManager.getService(
+        'ForgeSvc')
 
-      const token = await forgeSvc.get2LeggedToken()
+      const getToken = () => forgeSvc.get2LeggedToken()
 
-      const svfDownloaderSvc = ServiceManager.getService(
-        'SVFDownloaderSvc')
+      const extractorSvc = ServiceManager.getService(
+        'ExtractorSvc')
 
       const dir = path.resolve(__dirname,
         `../../../../TMP/${name}`)
 
-      const files = await svfDownloaderSvc.download(
-        token.access_token,
-        payload.urn, dir)
+      const files = await extractorSvc.download(
+        getToken, payload.urn, dir)
 
-      await svfDownloaderSvc.createZip(
-        dir, files, dir + '.zip')
+      const zipfile = dir + '.zip'
+
+      await extractorSvc.createZip(
+        dir, zipfile + '.tmp', name, files)
+
+      mzfs.rename(zipfile + '.tmp', zipfile)
 
       rmdir(dir)
 
-      res.json('ok')
+      res.json('done')
 
     } catch (ex) {
 
@@ -334,10 +357,10 @@ module.exports = function() {
     }
   })
 
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   // GET /svf/status/:name
   //
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   router.get('/svf/status/:name', async (req, res) => {
 
     try {
@@ -358,10 +381,10 @@ module.exports = function() {
     }
   })
 
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   // GET /svf/download/:name
   //
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   router.get('/svf/download/:name', async (req, res) => {
 
     try {
@@ -373,13 +396,15 @@ module.exports = function() {
 
       await mzfs.stat(filename)
 
-      res.set('Content-Type', 'application/octet-stream')
+      res.download(filename)
 
-      const stream = mzfs.createReadStream(filename, {
-        bufferSize: 64 * 64 * 1024
-      })
-
-      stream.pipe(res)
+      //res.set('Content-Type', 'application/octet-stream')
+      //
+      //const stream = mzfs.createReadStream(filename, {
+      //  bufferSize: 64 * 64 * 1024
+      //})
+      //
+      //stream.pipe(res)
 
     } catch (ex) {
 
@@ -387,30 +412,6 @@ module.exports = function() {
       res.json(ex)
     }
   })
-
-  //router.get('/svf/test', async (req, res) => {
-  //
-  //  console.log('/svf/test')
-  //
-  //  const svf = path.resolve(__dirname,
-  //    `../../../../TMP/0.svf`)
-  //
-  //  console.log('path: ' + svf)
-  //
-  //  var zip = new admZip(svf)
-  //
-  //  var entries = zip.getEntries()
-  //
-  //  entries.forEach((entry) => {
-  //
-  //    console.log('Entry: ')
-  //    console.log(entry.name)
-  //    console.log(entry.entryName)
-  //    //console.log (entry)
-  //  })
-  //
-  //  res.json('OK')
-  //})
 
   return router
 }

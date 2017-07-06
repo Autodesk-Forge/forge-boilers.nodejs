@@ -2,6 +2,7 @@
 import ServiceManager from '../services/SvcManager'
 import express from 'express'
 import config from 'c0nfig'
+import path from 'path'
 import fs from 'fs'
 
 module.exports = function() {
@@ -33,7 +34,7 @@ module.exports = function() {
 
       const response =
         await ossSvc.getBuckets(
-          token, options)
+        token, options)
 
       res.json(response)
 
@@ -54,13 +55,13 @@ module.exports = function() {
 
     try {
 
-      const bucketKey = req.params.bucketKey
-
       const forgeSvc = ServiceManager.getService('ForgeSvc')
+
+      const ossSvc = ServiceManager.getService('OssSvc')
 
       const token = await forgeSvc.get2LeggedToken()
 
-      const ossSvc = ServiceManager.getService('OssSvc')
+      const bucketKey = req.params.bucketKey
 
       const response = await ossSvc.getBucketDetails(
         token, bucketKey)
@@ -100,7 +101,7 @@ module.exports = function() {
 
       const response =
         await ossSvc.getObjects(
-          token, bucketKey, options)
+        token, bucketKey, options)
 
       res.send(response)
 
@@ -135,7 +136,7 @@ module.exports = function() {
 
       const response =
         await ossSvc.getObjectDetails(
-          token, bucketKey, objectKey)
+        token, bucketKey, objectKey)
 
       res.json(response)
 
@@ -168,9 +169,23 @@ module.exports = function() {
 
       const object =
         await ossSvc.getObject(
-          token, bucketKey, objectKey)
+        token, bucketKey, objectKey)
 
-      res.end(object)
+      const tmp = path.resolve(__dirname,
+        `../../../../TMP/${bucketKey}-${objectKey}`)
+
+      const wstream = fs.createWriteStream(tmp)
+
+      wstream.on('finish', () => {
+
+        res.download(tmp, objectKey)
+      })
+
+      wstream.write(object)
+
+      wstream.end()
+
+      //res.end(object)
 
     } catch(ex) {
 
@@ -201,8 +216,8 @@ module.exports = function() {
 
       const response =
         await ossSvc.createBucket(
-          token, bucketCreationData,
-          options)
+        token, bucketCreationData,
+        options)
 
       res.json(response)
 
@@ -258,10 +273,10 @@ module.exports = function() {
 
       const response =
         await ossSvc.uploadObjectChunked (
-          () => forgeSvc.get2LeggedToken(),
-          bucketKey,
-          objectKey,
-          file, opts)
+        () => forgeSvc.get2LeggedToken(),
+        bucketKey,
+        objectKey,
+        file, opts)
 
       res.json(response)
 
@@ -293,7 +308,7 @@ module.exports = function() {
 
       const response =
         await ossSvc.deleteBucket(
-          token, bucketKey)
+        token, bucketKey)
 
       res.json(response)
 
@@ -326,7 +341,7 @@ module.exports = function() {
 
       const response =
         await ossSvc.deleteObject(
-          token, bucketKey, objectKey)
+        token, bucketKey, objectKey)
 
       res.json(response)
 

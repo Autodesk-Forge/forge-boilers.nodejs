@@ -32,12 +32,12 @@ export default class UploadSvc extends BaseSvc {
 
     // start cleanup task to remove uploaded temp files
     setInterval(() => {
-      this.clean(config.tempStorage, 60 * 60 * 1000)
-    }, 60 * 60 * 1000)
+      this.clean(config.tempStorage, 60 * 60)
+    }, 1000 * 60 * 60)
 
     setTimeout(() => {
       this.clean(config.tempStorage)
-    }, 30 * 1000)
+    }, 5 * 1000)
   }
 
   /////////////////////////////////////////////////////////
@@ -62,7 +62,9 @@ export default class UploadSvc extends BaseSvc {
   //
   //
   /////////////////////////////////////////////////////////
-  clean(dir, age = 0) {
+  clean (dir, maxAge = 0) {
+
+    console.log(`Cleaning Dir: ${dir}`)
 
     fs.readdir(dir, (err, files) => {
 
@@ -80,19 +82,17 @@ export default class UploadSvc extends BaseSvc {
             return console.error(err)
           }
 
-          const now = new Date().getTime()
+          const now = new Date()
 
-          const endTime = new Date(stat.ctime).getTime() + age
+          const age = (now - new Date(stat.ctime)) / 1000
 
-          if (now > endTime) {
+          if (age > maxAge) {
 
             return rimraf(filePath, (err) => {
 
               if (err) {
                 return console.error(err);
               }
-
-              console.log(`${dir} cleaned`);
             })
           }
         })

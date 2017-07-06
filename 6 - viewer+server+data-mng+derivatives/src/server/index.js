@@ -36,9 +36,9 @@ import AppAPI from './api/endpoints/app'
 import DMAPI from './api/endpoints/dm'
 
 //Services
-import SVFDownloaderSvc from './api/services/SVFDownloaderSvc'
 import DerivativesSvc from './api/services/DerivativesSvc'
 import ServiceManager from './api/services/SvcManager'
+import ExtractorSvc from './api/services/ExtractorSvc'
 import SocketSvc from './api/services/SocketSvc'
 import UploadSvc from './api/services/UploadSvc'
 import ForgeSvc from './api/services/ForgeSvc'
@@ -77,18 +77,18 @@ const uploadSvc = new UploadSvc({
   tempStorage: path.join(__dirname, '/../../TMP')
 })
 
-const svfDownloaderSvc = new SVFDownloaderSvc()
-
 const forgeSvc = new ForgeSvc(config.forge)
 
 const derivativesSvc = new DerivativesSvc()
+
+const extractorSvc = new ExtractorSvc()
 
 const ossSvc = new OssSvc()
 
 const dmSvc = new DMSvc()
 
-ServiceManager.registerService(svfDownloaderSvc)
 ServiceManager.registerService(derivativesSvc)
+ServiceManager.registerService(extractorSvc)
 ServiceManager.registerService(uploadSvc)
 ServiceManager.registerService(forgeSvc)
 ServiceManager.registerService(ossSvc)

@@ -34,9 +34,9 @@ import ForgeAPI from './api/endpoints/forge'
 import OssAPI from './api/endpoints/oss'
 
 //Services
-import SVFDownloaderSvc from './api/services/SVFDownloaderSvc'
 import DerivativesSvc from './api/services/DerivativesSvc'
 import ServiceManager from './api/services/SvcManager'
+import ExtractorSvc from './api/services/ExtractorSvc'
 import UploadSvc from './api/services/UploadSvc'
 import ForgeSvc from './api/services/ForgeSvc'
 import OssSvc from './api/services/OssSvc'
@@ -73,16 +73,16 @@ const uploadSvc = new UploadSvc({
   tempStorage: path.join(__dirname, '/../../TMP')
 })
 
-const svfDownloaderSvc = new SVFDownloaderSvc()
-
 const forgeSvc = new ForgeSvc(config.forge)
 
 const derivativesSvc = new DerivativesSvc()
 
+const extractorSvc = new ExtractorSvc()
+
 const ossSvc = new OssSvc()
 
-ServiceManager.registerService(svfDownloaderSvc)
 ServiceManager.registerService(derivativesSvc)
+ServiceManager.registerService(extractorSvc)
 ServiceManager.registerService(uploadSvc)
 ServiceManager.registerService(forgeSvc)
 ServiceManager.registerService(ossSvc)
