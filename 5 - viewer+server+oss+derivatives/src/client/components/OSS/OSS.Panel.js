@@ -397,12 +397,13 @@ export default class OSSPanel extends UIComponent {
   ///////////////////////////////////////////////////////////////////
   onObjectNodeAdded (node) {
 
-    const { bucketKey, objectKey } = node
+    const bucketKey = encodeURIComponent(node.bucketKey)
+    const objectKey = encodeURIComponent(node.objectKey)
 
-    const objectId = `urn:adsk.objects:os.object:` +
-      `${bucketKey}/${objectKey}`
+    const fileId = (
+      `urn:adsk.objects:os.object:${bucketKey}/${objectKey}`)
 
-    const urn = window.btoa(objectId).replace(
+    const urn = window.btoa(fileId).replace(
       new RegExp('=', 'g'), '')
 
     node.manifest = null
