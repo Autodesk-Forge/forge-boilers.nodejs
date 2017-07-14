@@ -405,7 +405,7 @@ export default class OSSPanel extends UIComponent {
 
     const urn = window.btoa(fileId).replace(
       new RegExp('=', 'g'), '')
-
+    
     node.manifest = null
 
     node.showLoader(true)
