@@ -27,23 +27,25 @@ module.exports = function() {
   // 2-legged client token: exposes a 'data:read' only token to client App
   //
   ///////////////////////////////////////////////////////////////////////////
-  //router.get('/token/2legged', async(req, res) => {
-  //
-  //  try {
-  //
-  //    var forgeSvc = ServiceManager.getService(
-  //      'ForgeSvc')
-  //
-  //    var token = await forgeSvc.request2LeggedToken(['data:read'])
-  //
-  //    res.json(token)
-  //  }
-  //  catch (error) {
-  //
-  //    res.status(error.statusCode || 404)
-  //    res.json(error)
-  //  }
-  //})
+  router.get('/token/2legged', async(req, res) => {
+
+    try {
+
+      var forgeSvc = ServiceManager.getService(
+        'ForgeSvc')
+
+      var token = await forgeSvc.request2LeggedToken([
+        'viewables:read'
+      ])
+
+      res.json(token)
+    }
+    catch (error) {
+
+      res.status(error.statusCode || 404)
+      res.json(error)
+    }
+  })
 
   return router
 }

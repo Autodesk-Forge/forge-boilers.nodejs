@@ -689,8 +689,16 @@ module.exports = function() {
 
       const token = await forgeSvc.get3LeggedTokenMaster(req.session)
 
+      const details =
+        await ossSvc.getObjectDetails(
+        token, bucketKey, objectKey)
+
+      const size = details.body.size
+
       const object = await ossSvc.getObject(
         token, bucketKey, objectKey)
+
+      res.set('Content-Length', size)
 
       res.end(object)
 

@@ -254,6 +254,30 @@ export default class OSSPanel extends UIComponent {
       })
     })
 
+    const isCompressedUrn = (objectKey) => {
+
+      return new Promise ((resolve) => {
+
+        const dlg = new ToolPanelModal(appContainer, {
+          title: 'Assembly Model'
+        })
+
+        dlg.bodyContent(
+          `<div class="confirm-delete">
+              Is <b>${objectKey}</b>
+              an assembly model?
+            </div>
+            `)
+
+        dlg.setVisible(true)
+
+        dlg.on('close', (event) => {
+
+          resolve(event.result === 'OK')
+        })
+      })
+    }
+
     this.contextMenu.on('context.viewable.create', async(data) => {
 
       try {
@@ -278,11 +302,13 @@ export default class OSSPanel extends UIComponent {
 
         if (data.node.details.objectKey.endsWith('.zip')) {
 
+          job.input.compressedUrn =
+            await isCompressedUrn(
+              data.node.details.objectKey)
+
           job.input.rootFilename =
             data.node.details.objectKey.replace(
               new RegExp('.zip', 'g'), '')
-
-          job.input.compressedUrn = true
         }
 
         await this.derivativesAPI.postJobWithProgress(
@@ -405,7 +431,7 @@ export default class OSSPanel extends UIComponent {
 
     const urn = window.btoa(fileId).replace(
       new RegExp('=', 'g'), '')
-    
+
     node.manifest = null
 
     node.showLoader(true)
@@ -912,54 +938,56 @@ class OSSTreeDelegate extends BaseTreeDelegate {
 
       case 'oss.bucket':
 
+        const query = this.storageSettings
+
         this.ossAPI.getObjects(
           node.bucketKey,
-          this.storageSettings).then((response) => {
+          query).then((response) => {
 
-          node.children = []
+            node.children = []
 
-          const items = _.sortBy(response.items,
-            (objectDetails) => {
-              return objectDetails.objectKey.toLowerCase()
-            })
-
-          let itemTasks = items.map((item) => {
-
-            return new Promise((resolve, reject) => {
-
-              let objectNode = new TreeNode({
-                id: node.bucketKey + '-' + item.objectKey,
-                objectKey: item.objectKey,
-                name: item.objectKey,
-                bucketKey: node.bucketKey,
-                type: 'oss.object',
-                tooltip: true,
-                group: true
+            const items = _.sortBy(response.items,
+              (objectDetails) => {
+                return objectDetails.objectKey.toLowerCase()
               })
 
-              node.children.push(objectNode)
+            let itemTasks = items.map((item) => {
 
-              addChildCallback(objectNode)
+              return new Promise((resolve, reject) => {
 
-              this.emit('objectNodeAdded', objectNode)
-
-              objectNode.showLoader(true)
-
-              this.ossAPI.getObjectDetails(
-                node.bucketKey, item.objectKey).then((objectDetails) => {
-
-                  objectNode.details = objectDetails
-
-                  resolve()
+                let objectNode = new TreeNode({
+                  id: node.bucketKey + '-' + item.objectKey,
+                  objectKey: item.objectKey,
+                  name: item.objectKey,
+                  bucketKey: node.bucketKey,
+                  type: 'oss.object',
+                  tooltip: true,
+                  group: true
                 })
+
+                node.children.push(objectNode)
+
+                addChildCallback(objectNode)
+
+                this.emit('objectNodeAdded', objectNode)
+
+                objectNode.showLoader(true)
+
+                this.ossAPI.getObjectDetails(
+                  node.bucketKey, item.objectKey).then((objectDetails) => {
+
+                    objectNode.details = objectDetails
+
+                    resolve()
+                  })
+              })
+            })
+
+            Promise.all(itemTasks).then(() => {
+
+              node.emit('childrenLoaded', response.items)
             })
           })
-
-          Promise.all(itemTasks).then(() => {
-
-            node.emit('childrenLoaded', response.items)
-          })
-        })
 
         break
     }

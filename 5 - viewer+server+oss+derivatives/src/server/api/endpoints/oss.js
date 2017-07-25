@@ -94,8 +94,9 @@ module.exports = function() {
       const bucketKey = req.params.bucketKey
 
       const options = {
+        beginsWith: req.query.beginsWith || undefined,
+        startAt: req.query.startAt || undefined,
         region: req.query.region || 'US',
-        startAt: req.query.startAt || 0,
         limit: req.query.limit || 100
       }
 
@@ -167,25 +168,19 @@ module.exports = function() {
 
       const objectKey = req.params.objectKey
 
+      const details =
+        await ossSvc.getObjectDetails(
+          token, bucketKey, objectKey)
+
+      const size = details.body.size
+
       const object =
         await ossSvc.getObject(
         token, bucketKey, objectKey)
 
-      const tmp = path.resolve(__dirname,
-        `../../../../TMP/${bucketKey}-${objectKey}`)
+      res.set('Content-Length', size)
 
-      const wstream = fs.createWriteStream(tmp)
-
-      wstream.on('finish', () => {
-
-        res.download(tmp, objectKey)
-      })
-
-      wstream.write(object)
-
-      wstream.end()
-
-      //res.end(object)
+      res.end(object)
 
     } catch(ex) {
 

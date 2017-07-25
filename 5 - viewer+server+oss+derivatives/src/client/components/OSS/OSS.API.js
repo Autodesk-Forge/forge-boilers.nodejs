@@ -43,6 +43,45 @@ export default class OSSAPI extends ClientAPI {
   }
 
   ///////////////////////////////////////////////////////////////////
+  // GET /buckets/:bucketKey/objects
+  //
+  ///////////////////////////////////////////////////////////////////
+  getAllObjects (bucketKey, query = null) {
+
+    let lastObjectKey = undefined
+
+    let items = []
+
+    const getObjectsRec = async(_query) => {
+
+      try {
+
+        const __query = Object.assign({},
+          _query, query, {
+            limit: 100
+          })
+
+        const response = await this.getObjects(
+          bucketKey, __query)
+
+        items = [...items, response.items]
+
+        return (response.items.length === 100)
+          ? getObjectsRec ({
+            startAt: response.items[99].objectKey
+          })
+          : items
+
+      } catch (ex) {
+
+        return ex
+      }
+    }
+
+    return getObjectsRec()
+  }
+
+  ///////////////////////////////////////////////////////////////////
   // GET /buckets/:bucketKey/details
   //
   ///////////////////////////////////////////////////////////////////
