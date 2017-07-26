@@ -130,6 +130,10 @@ To load a design in the viewer:
  * Upon successful upload, the file appears in the bucket, right-click and select <b>Generate viewable</b>
  * Upon successful translation of the design, double-click the file and it will get loaded in the viewer
 
+### Live Demo
+
+[https://oss.autodesk.io](https://oss.autodesk.io)
+
  ![Project5](resources/img/Project5.png)
 
 ## Project #6 - viewer+server+data-mng+derivatives
@@ -178,6 +182,10 @@ To load a design in the viewer:
  * Upload a design file to a folder (supports file selection dialog or drag & drop)
  * Upon successful upload, the file appears under the parent node in the tree, right-click and select <b>Generate viewable</b>
  * Upon successful translation of the design, double-click the file and it will get loaded in the viewer
+
+### Live Demo
+
+[https://dm.autodesk.io](https://dm.autodesk.io)
 
  ![Project6](resources/img/Project6.png)
 
