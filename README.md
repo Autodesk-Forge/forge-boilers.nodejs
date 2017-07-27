@@ -92,15 +92,17 @@ Navigate with a command shell or terminal to the project you want to run and typ
 Mac OSX/Linux (Terminal)
 
     > npm install
-    > export FORGE_CLIENT_ID=<<YOUR CLIENT ID FROM DEVELOPER PORTAL>
-    > export FORGE_CLIENT_SECRET=<<YOUR CLIENT SECRET>
+    > export NODE_ENV=development
+    > export FORGE_DEV_CLIENT_ID=<<YOUR CLIENT ID FROM DEVELOPER PORTAL>
+    > export FORGE_DEV_CLIENT_SECRET=<<YOUR CLIENT SECRET>
     > npm start (builds the client dynamically in memory using webpack dev server)
 
 Windows (use <b>Node.js command line</b> from Start menu)
 
     > npm install
-    > set FORGE_CLIENT_ID=<<YOUR CLIENT ID FROM DEVELOPER PORTAL>
-    > set FORGE_CLIENT_SECRET=<<YOUR CLIENT SECRET>
+    > set NODE_ENV=development
+    > set FORGE_DEV_CLIENT_ID=<<YOUR CLIENT ID FROM DEVELOPER PORTAL>
+    > set FORGE_DEV_CLIENT_SECRET=<<YOUR CLIENT SECRET>
     > npm start (builds the client dynamically in memory using webpack dev server)
 
 Open your browser at:
@@ -150,6 +152,7 @@ To run the project locally (using the DEV API keys):
 Run the following commands (mind the DEV!):
 
     > npm install
+    > npm set NODE_ENV=development
     > set FORGE_DEV_CLIENT_ID=<<YOUR DEV CLIENT ID FROM DEVELOPER PORTAL>
     > set FORGE_DEV_CLIENT_SECRET=<<YOUR DEV CLIENT SECRET>
     > npm start (builds the client dynamically in memory using webpack dev server)
@@ -159,6 +162,7 @@ To run in production, the callback url defined in your Forge App needs to match 
 
     > npm install
     > set HOST_URL=https://mydomain.com
+    > npm set NODE_ENV=production
     > set FORGE_CLIENT_ID=<<YOUR CLIENT ID FROM DEVELOPER PORTAL>
     > set FORGE_CLIENT_SECRET=<<YOUR CLIENT SECRET>
     > npm start (builds the client dynamically on disk or use npm run build before)
