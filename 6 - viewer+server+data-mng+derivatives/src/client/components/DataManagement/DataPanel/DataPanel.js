@@ -869,6 +869,7 @@ class DMTreeDelegate extends BaseTreeDelegate {
         dictDefaultMessage: ' - upload',
         previewTemplate: '<div></div>',
         parallelUploads: 20,
+        maxFilesize: 5000,
         autoQueue: true,
         init: function() {
 
