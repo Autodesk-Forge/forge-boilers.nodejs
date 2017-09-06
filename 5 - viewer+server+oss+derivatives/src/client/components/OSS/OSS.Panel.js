@@ -118,14 +118,14 @@ export default class OSSPanel extends UIComponent {
         switch(data.node.type) {
 
           case 'oss.bucket':
-            this.showPayload(
-              `api/oss/buckets/${data.node.bucketKey}/details`)
+            this.showPayload(`api/oss/buckets/` +
+              `${encodeURIComponent(data.node.bucketKey)}/details`)
             break
 
           case 'oss.object':
-            this.showPayload(
-              `api/oss/buckets/${data.node.bucketKey}/objects/` +
-                `${data.node.objectKey}/details`)
+            this.showPayload(`api/oss/buckets/` +
+              `${encodeURIComponent(data.node.bucketKey)}/objects/` +
+              `${encodeURIComponent(data.node.objectKey)}/details`)
             break
         }
       }
@@ -142,8 +142,8 @@ export default class OSSPanel extends UIComponent {
         if (event.result === 'OK') {
 
           const bucketCreationData = {
-            policyKey: dlg.PolicyKey,
-            bucketKey: dlg.BucketKey
+            bucketKey: encodeURIComponent(dlg.BucketKey),
+            policyKey: dlg.PolicyKey
             //allow:[{
             //  authId: 'AYVir4YpIiobKbt7peqr0Y85uGuFdUj7',
             //  access: 'full'

@@ -33,8 +33,10 @@ export default class OSSAPI extends ClientAPI {
   ///////////////////////////////////////////////////////////////////
   getObjects (bucketKey, query = null) {
 
-    var url = `${this.apiUrl}/buckets/${bucketKey}/objects`
-      + this.toQueryString(query)
+    var url =
+      `${this.apiUrl}/buckets/` +
+      `${encodeURIComponent(bucketKey)}/objects` +
+      this.toQueryString(query)
 
     return this.ajax({
       rawBody: true,
@@ -87,7 +89,9 @@ export default class OSSAPI extends ClientAPI {
   ///////////////////////////////////////////////////////////////////
   getBucketDetails (bucketKey) {
 
-    var url = `${this.apiUrl}/buckets/${bucketKey}/details`
+    var url =
+      `${this.apiUrl}/buckets/` +
+      `${encodeURIComponent(bucketKey)}/details`
 
     return this.ajax({
       rawBody: true,
@@ -101,7 +105,8 @@ export default class OSSAPI extends ClientAPI {
   ///////////////////////////////////////////////////////////////////
   deleteBucket (bucketKey) {
 
-    var url = `${this.apiUrl}/buckets/${bucketKey}`
+    var url = `${this.apiUrl}/buckets/` +
+      `${encodeURIComponent(bucketKey)}`
 
     return this.ajax({
       type: 'DELETE',
@@ -116,8 +121,8 @@ export default class OSSAPI extends ClientAPI {
   getObjectDetails (bucketKey, objectKey) {
 
     var url = `${this.apiUrl}/buckets/` +
-      `${bucketKey}/objects/` +
-      `${objectKey}/details`
+      `${encodeURIComponent(bucketKey)}/objects/` +
+      `${encodeURIComponent(objectKey)}/details`
 
     return this.ajax({
       rawBody: true,
@@ -132,8 +137,8 @@ export default class OSSAPI extends ClientAPI {
   deleteObject (bucketKey, objectKey) {
 
     var url = `${this.apiUrl}/buckets/` +
-      `${bucketKey}/objects/` +
-      `${objectKey}`
+      `${encodeURIComponent(bucketKey)}/objects/` +
+      `${encodeURIComponent(objectKey)}`
 
     return this.ajax({
       type: 'DELETE',
@@ -173,7 +178,8 @@ export default class OSSAPI extends ClientAPI {
   download (bucketKey, objectKey, filename = null) {
 
     var uri = `${this.apiUrl}/buckets/` +
-      `${bucketKey}/objects/${objectKey}`
+      `${encodeURIComponent(bucketKey)}/objects/` +
+      `${encodeURIComponent(objectKey)}`
 
     var link = document.createElement("a")
     link.download = filename || objectKey
