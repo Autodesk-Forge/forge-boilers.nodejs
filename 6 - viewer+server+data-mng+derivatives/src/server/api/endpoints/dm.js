@@ -366,14 +366,14 @@ module.exports = function() {
 
       const folderId = req.params.folderId
 
+      const socketId = req.body.socketId
+
       const file = req.files[0]
 
       const opts = {
         chunkSize: 5 * 1024 * 1024,
         concurrentUploads: 3,
         onProgress: (info) => {
-
-          const socketId = req.body.socketId
 
           if (socketId) {
 
@@ -387,7 +387,29 @@ module.exports = function() {
             })
 
             socketSvc.broadcast (
-              'progress', msg, socketId)
+              'upload.progress', msg, socketId)
+          }
+        },
+        onError: (error) => {
+
+          if (socketId) {
+
+            const socketSvc = ServiceManager.getService(
+              'SocketSvc')
+
+            socketSvc.broadcast(
+              'upload.error', error, socketId)
+          }
+        },
+        onComplete: (msg) => {
+
+          if (socketId) {
+
+            const socketSvc = ServiceManager.getService(
+              'SocketSvc')
+
+            socketSvc.broadcast(
+              'upload.complete', msg, socketId)
           }
         }
       }

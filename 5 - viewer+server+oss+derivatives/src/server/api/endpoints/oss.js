@@ -243,12 +243,14 @@ module.exports = function() {
 
       const objectKey = file.originalname
 
+      const socketId = req.body.socketId
+
+      const nodeId = req.body.nodeId
+
       const opts = {
         chunkSize: 5 * 1024 * 1024, //5MB chunks
         concurrentUploads: 3,
         onProgress: (info) => {
-
-          const socketId = req.body.socketId
 
           if (socketId) {
 
@@ -257,11 +259,40 @@ module.exports = function() {
 
             const msg = Object.assign({}, info, {
               bucketKey,
-              objectKey
+              objectKey,
+              nodeId
             })
 
             socketSvc.broadcast (
-              'progress', msg, socketId)
+              'upload.progress', msg, socketId)
+          }
+        },
+        onComplete: () => {
+
+          if (socketId) {
+
+            const socketSvc = ServiceManager.getService(
+              'SocketSvc')
+
+            const msg = {
+              bucketKey,
+              objectKey,
+              nodeId
+            }
+
+            socketSvc.broadcast (
+              'upload.complete', msg, socketId)
+          }
+        },
+        onError: (error) => {
+
+          if (socketId) {
+
+            const socketSvc = ServiceManager.getService(
+              'SocketSvc')
+
+            socketSvc.broadcast (
+              'upload.error', error, socketId)
           }
         }
       }

@@ -149,6 +149,7 @@ export class TreeNode extends EventsEmitter {
     Object.assign(this, properties)
   }
 }
+
 /////////////////////////////////////////////////////////////////////
 //
 //

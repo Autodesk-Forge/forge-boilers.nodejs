@@ -35,39 +35,43 @@ import ServiceManager from 'SvcManager'
 import StorageSvc from 'StorageSvc'
 
 // ========================================================
-// Services Initialization
-// ========================================================
-const socketSvc = new SocketSvc({
-  host: config.host,
-  port: config.port
-})
-
-socketSvc.connect().then((socket) => {
-  console.log(`${config.host}:${config.port}`)
-  console.log('Client socket connected: ' + socket.id)
-})
-
-socketSvc.on('progress', (info) => {
-  console.log('upload server -> forge: ')
-  console.log(info)
-})
-
-const storageSvc = new StorageSvc({
-  storageKey: 'forge.oss.settings'
-})
-
-// ========================================================
-// Services Registration
-// ========================================================
-ServiceManager.registerService(storageSvc)
-ServiceManager.registerService(socketSvc)
-
-// ========================================================
 // App
 // ========================================================
 export default class App {
 
   constructor() {
+
+    this.socketSvc = new SocketSvc({
+      host: config.host,
+      port: config.port
+    })
+
+    this.socketSvc.connect().then((socket) => {
+      console.log(`${config.host}:${config.port}`)
+      console.log('Client socket connected: ' + socket.id)
+    })
+
+    this.socketSvc.on('upload.progress', (info) => {
+      console.log('upload server -> forge: ')
+      console.log(info)
+    })
+
+    this.socketSvc.on('upload.complete', (data) => {
+
+      this.ossPanel.onFileUploaded(data)
+    })
+
+    this.socketSvc.on('upload.error', (error) => {
+      console.log('upload error: ')
+      console.log(error)
+    })
+
+    this.storageSvc = new StorageSvc({
+      storageKey: 'forge.oss.settings'
+    })
+
+    ServiceManager.registerService(this.storageSvc)
+    ServiceManager.registerService(this.socketSvc)
 
     this.derivativesPanel = new DerivativesManagerPanel()
 

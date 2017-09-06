@@ -28,10 +28,6 @@ import Dropzone from 'dropzone'
 import OSSAPI from './OSS.API'
 import './OSS.Panel.scss'
 
-const bucketsWhiteList = [
-
-]
-
 export default class OSSPanel extends UIComponent {
 
   constructor () {
@@ -421,6 +417,45 @@ export default class OSSPanel extends UIComponent {
   //
   //
   ///////////////////////////////////////////////////////////////////
+  onFileUploaded (data) {
+
+    const node = this.storageTree.nodeIdToNode[data.nodeId]
+
+    if (node) {
+
+      const id = data.bucketKey + '-' + data.objectKey
+
+      this.ossAPI.getObjectDetails(
+        data.bucketKey,
+        data.objectKey).then((objectDetails) => {
+
+          if(!this.storageTree.nodeIdToNode[id]) {
+
+            const objectNode = new TreeNode({
+              id: data.bucketKey + '-' + data.objectKey,
+              objectKey: data.objectKey,
+              bucketKey: data.bucketKey,
+              name: data.objectKey,
+              details: objectDetails,
+              type: 'oss.object',
+              tooltip: true,
+              group: true
+            })
+
+            node.insert(objectNode)
+
+            this.onObjectNodeAdded(objectNode)
+          }
+
+          node.showLoader(false)
+        })
+    }
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////
   onObjectNodeAdded (node) {
 
     const bucketKey = encodeURIComponent(node.bucketKey)
@@ -744,38 +779,12 @@ class OSSTreeDelegate extends BaseTreeDelegate {
         sending: (file, xhr, formData) => {
           const socketSvc = ServiceManager.getService('SocketSvc')
           formData.append('socketId', socketSvc.socketId)
+          formData.append('nodeId', node.id)
         },
         success: (file, response) => {
 
-          console.log('upload complete: ')
+          console.log('upload response: ')
           console.log(response)
-
-          const id = response.bucketKey + '-' + response.objectKey
-          
-          this.ossAPI.getObjectDetails(
-            response.bucketKey,
-            response.objectKey).then((objectDetails) => {
-
-              if($(container).find(`group[lmv-nodeid='${id}']`).length === 0) {
-
-                const objectNode = new TreeNode({
-                  id: response.bucketKey + '-' + response.objectKey,
-                  objectKey: response.objectKey,
-                  bucketKey: response.bucketKey,
-                  name: response.objectKey,
-                  details: objectDetails,
-                  type: 'oss.object',
-                  tooltip: true,
-                  group: true
-                })
-
-                node.insert(objectNode)
-
-                this.emit('objectNodeAdded', objectNode)
-              }
-
-              node.showLoader(false)
-            })
         },
         error: (err) => {
 
@@ -954,7 +963,7 @@ class OSSTreeDelegate extends BaseTreeDelegate {
 
             let itemTasks = items.map((item) => {
 
-              return new Promise((resolve, reject) => {
+              return new Promise((resolve) => {
 
                 let objectNode = new TreeNode({
                   id: node.bucketKey + '-' + item.objectKey,
@@ -978,6 +987,10 @@ class OSSTreeDelegate extends BaseTreeDelegate {
                   node.bucketKey, item.objectKey).then((objectDetails) => {
 
                     objectNode.details = objectDetails
+
+                    resolve()
+
+                  }, () => {
 
                     resolve()
                   })

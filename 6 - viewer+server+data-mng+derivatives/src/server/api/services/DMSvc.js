@@ -497,60 +497,67 @@ export default class DMSvc extends BaseSvc {
         const objectId = ossSvc.parseObjectId(
           storageRes.body.data.id)
 
-        const upload =
+        const dmOpts = Object.assign({}, opts, {
+          onComplete: (upload) => {
+
+            // look for items with the same displayName
+            const items = await this.findItemsWithAttributes(
+              getToken,
+              projectId,
+              folderId, {
+                displayName
+              })
+
+            if (items.length > 0) {
+
+              const item = items[0]
+
+              const versionRes = await this.createVersion(
+                getToken,
+                projectId,
+                item.id,
+                storageRes.body.data.id,
+                displayName)
+
+              const response = {
+                version: versionRes.body.data,
+                storage: versionRes.body.data,
+                item: item,
+                upload
+              }
+
+              opts.onComplete(response)
+
+            } else {
+
+              const itemRes = await this.createItem(
+                getToken, projectId, folderId,
+                storageRes.body.data.id,
+                displayName)
+
+              const versions = await this.getItemVersions(
+                getToken(), projectId, itemRes.body.data.id)
+
+              const response = {
+                version: versions.body.data[0],
+                storage: storageRes.body.data,
+                item: itemRes.body.data,
+                upload
+              }
+
+              opts.onComplete(response)
+            }
+          }
+        })
+
+        const uploadRes =
           await ossSvc.uploadObjectChunked (
             getToken,
             objectId.bucketKey,
             objectId.objectKey,
-            file, opts)
+            file, dmOpts)
 
-        // look for items with the same displayName
-        const items = await this.findItemsWithAttributes(
-          getToken,
-          projectId,
-          folderId, {
-            displayName
-          })
-
-        if (items.length > 0) {
-
-          const item = items[0]
-
-          const versionRes = await this.createVersion(
-            getToken,
-            projectId,
-            item.id,
-            storageRes.body.data.id,
-            displayName)
-
-          const response = {
-            version: versionRes.body.data,
-            storage: versionRes.body.data,
-            item: item,
-            upload
-          }
-
-          resolve(response)
-
-        } else {
-
-          const itemRes = await this.createItem(
-            getToken, projectId, folderId,
-            storageRes.body.data.id,
-            displayName)
-
-          const versions = await this.getItemVersions(
-            getToken(), projectId, itemRes.body.data.id)
-
-          const response = {
-            version: versions.body.data[0],
-            storage: storageRes.body.data,
-            item: itemRes.body.data,
-            upload
-          }
-
-          resolve(response)
-        }
+        resolve(uploadRes)
 
       } catch (ex) {
 

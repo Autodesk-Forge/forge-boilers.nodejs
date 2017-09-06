@@ -198,8 +198,10 @@ export default class OssSvc extends BaseSvc {
         length: nbChunks
       }, (e, i) => i)
 
+      // generates uniques session ID
       const sessionId = this.guid()
 
+      // prepare the upload tasks
       const uploadTasks = chunksMap.map((chunkIdx) => {
 
         const start = chunkIdx * chunkSize
@@ -235,14 +237,17 @@ export default class OssSvc extends BaseSvc {
 
       let progress = 0
 
-      eachLimit(uploadTasks, opts.concurrentUploads || 1,
+      // runs asynchronously in parallel the upload tasks
+      // number of simultaneous uploads is defined by
+      // opts.concurrentUploads
+      eachLimit(uploadTasks, opts.concurrentUploads || 3,
         (task, callback) => {
 
           task.run().then((res) => {
 
-            if (opts.onProgress) {
+            progress += 100.0 / nbChunks
 
-              progress += 100.0 / nbChunks
+            if (opts.onProgress) {
 
               opts.onProgress ({
                 progress: Math.round(progress * 100) / 100,
@@ -254,25 +259,27 @@ export default class OssSvc extends BaseSvc {
 
           }, (err) => {
 
-            console.log('error')
-            console.log(err)
+            if (opts.onError) {
+
+              opts.onError(err)
+            }
 
             callback(err)
           })
 
-      }, (err) => {
+        }, (err) => {
 
-          if (err) {
+          if (!err && opts.onComplete) {
 
-            return reject(err)
+            opts.onComplete ()
           }
+        })
 
-          return resolve({
-            fileSize: file.size,
-            bucketKey,
-            objectKey,
-            nbChunks
-          })
+      resolve({
+        fileSize: file.size,
+        bucketKey,
+        objectKey,
+        nbChunks
       })
     })
   }
