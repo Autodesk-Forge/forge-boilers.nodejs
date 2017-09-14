@@ -498,7 +498,7 @@ export default class DMSvc extends BaseSvc {
           storageRes.body.data.id)
 
         const dmOpts = Object.assign({}, opts, {
-          onComplete: (upload) => {
+          onComplete: async(upload) => {
 
             // look for items with the same displayName
             const items = await this.findItemsWithAttributes(
