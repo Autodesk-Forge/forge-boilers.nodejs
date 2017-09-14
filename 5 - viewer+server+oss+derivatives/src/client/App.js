@@ -203,8 +203,6 @@ export default class App {
 
     return new Promise((resolve, reject) => {
 
-      console.log(node)
-
       const urn = window.btoa(node.details.objectId).replace(
         new RegExp('=', 'g'), '')
 

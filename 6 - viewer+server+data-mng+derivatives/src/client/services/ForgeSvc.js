@@ -1,0 +1,111 @@
+
+import ClientAPI from 'ClientAPI'
+import BaseSvc from './BaseSvc'
+
+export default class ForgeSvc extends BaseSvc {
+
+  /////////////////////////////////////////////////////////////////
+  //
+  //
+  /////////////////////////////////////////////////////////////////
+  constructor (config) {
+
+    super (config)
+
+    this.api = new ClientAPI(config.apiUrl)
+
+    this.api.ajax(`${this._config.apiUrl}/clientId`).then(
+      (res) => {
+
+        this._clientId = res.clientId
+      })
+  }
+
+  /////////////////////////////////////////////////////////////////
+  //
+  //
+  /////////////////////////////////////////////////////////////////
+  name() {
+
+    return 'ForgeSvc'
+  }
+
+  /////////////////////////////////////////////////////////////////
+  //
+  //
+  /////////////////////////////////////////////////////////////////
+  get clientId() {
+
+    return this._clientId
+  }
+
+  /////////////////////////////////////////////////////////////////
+  //
+  //
+  /////////////////////////////////////////////////////////////////
+  async login () {
+
+    try {
+
+      const user = await this.getUser()
+
+      return user
+
+    } catch (ex) {
+
+      const url = await this.getLoginURL()
+
+      window.location.assign(url)
+
+      return null
+    }
+  }
+
+  /////////////////////////////////////////////////////////////////
+  //
+  //
+  /////////////////////////////////////////////////////////////////
+  logout () {
+
+    const url = `${this._config.apiUrl}/logout`
+
+    return this.api.ajax({
+      contentType: 'application/json',
+      dataType: 'json',
+      type: 'POST',
+      url
+    })
+  }
+
+  /////////////////////////////////////////////////////////////////
+  //
+  //
+  /////////////////////////////////////////////////////////////////
+  getUser () {
+
+    const url = `${this._config.apiUrl}/user`
+
+    return this.api.ajax(url)
+  }
+
+  /////////////////////////////////////////////////////////////////
+  //
+  //
+  /////////////////////////////////////////////////////////////////
+  getLoginURL () {
+
+    const url = `${this._config.apiUrl}/login`
+
+    const payload = {
+      origin: window.location.href
+    }
+
+    return this.api.ajax({
+      contentType: 'application/json',
+      data: JSON.stringify(payload),
+      dataType: 'json',
+      type: 'POST',
+      url
+    })
+  }
+}

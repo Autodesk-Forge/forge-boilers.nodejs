@@ -1,0 +1,111 @@
+<!--/////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) Autodesk, Inc. All rights reserved
+// Written by Philippe Leefsma 2016 - ADN/Developer Technical Services
+//
+// Permission to use, copy, modify, and distribute this software in
+// object code form for any purpose and without fee is hereby granted,
+// provided that the above copyright notice appears in all copies and
+// that both that copyright notice and the limited warranty and
+// restricted rights notice below appear in all supporting
+// documentation.
+//
+// AUTODESK PROVIDES THIS PROGRAM "AS IS" AND WITH ALL FAULTS.
+// AUTODESK SPECIFICALLY DISCLAIMS ANY IMPLIED WARRANTY OF
+// MERCHANTABILITY OR FITNESS FOR A PARTICULAR USE.  AUTODESK, INC.
+// DOES NOT WARRANT THAT THE OPERATION OF THE PROGRAM WILL BE
+// UNINTERRUPTED OR ERROR FREE.
+////////////////////////////////////////////////////////////////////////////////-->
+<html>
+    <head>
+      <meta name="viewport" content="width=device-width, height=device-height, minimal-ui, minimum-scale=1.0, initial-scale=1, user-scalable=no"/>
+      <link rel="stylesheet" href="<%=htmlWebpackPlugin.options.style%>" type="text/css"/>
+      <link rel="shortcut icon" href="/resources/img/forge.png" type="image/x-icon"/>
+      <meta name="apple-mobile-web-app-capable" content="yes">
+      <title><%=htmlWebpackPlugin.options.title%></title>
+      <script src="<%=htmlWebpackPlugin.options.threeJS%>"></script>
+      <script src="<%=htmlWebpackPlugin.options.viewer3D%>"></script>
+      <%=htmlWebpackPlugin.files.webpackManifest%>
+    </head>
+
+    <body>
+
+        <nav class="navbar navbar-default navbar-static-top">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle collapsed"
+                      data-toggle="collapse"
+                      data-target="#navbar"
+                      aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand-forge" href="https://forge.autodesk.com" target="_blank">
+                <img src="/resources/img/forge-logo.png" height="30" class="app-logo">
+              </a>
+            </div>
+
+            <div class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li id="oss-toggle" class="active">
+                    <a href="#">
+                        <span class="forge-span fa fa-database"></span>
+                        &nbsp;Storage
+                    </a>
+                </li>
+              </ul>
+              <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle"
+                     data-toggle="dropdown"
+                     role="button" aria-haspopup="true"
+                     aria-expanded="false">
+                     <span class="forge-span fa fa-gear"></span>
+                      &nbsp;Settings
+                      <span class="caret"></span>
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li class="dropdown-header">Storage</li>
+                    <li><a href="#" id="region">Region</a></li>
+                  </ul>
+                </li>
+                <li id="about">
+                    <a href="#">
+                        <span class="forge-span fa fa-question-circle"></span>
+                        &nbsp;About
+                    </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+
+        <div id="app-panel" class="ui-panel app-panel">
+            <div class="ui-panel left-panel data-panel">
+                <div class="ui-panel top-panel">
+                    <div id="oss-panel" class="ui-panel storage">
+                    </div>
+                </div>
+                <div class="horizontal-splitter">
+                </div>
+                <div class="derivatives model-name">
+                    Model Derivatives:&nbsp;
+                    <label id="model-name">
+                        Select a model ...
+                    </label>
+                </div>
+                <div id="derivatives-panel" class="ui-panel bottom-panel derivatives">
+                </div>
+            </div>
+            <div class="vertical-splitter">
+            </div>
+            <div class="ui-panel right-panel">
+              <div id="viewer-panel" class="ui-panel viewer-panel">
+              </div>
+            </div>
+        </div>
+    </body>
+</html>
+
+

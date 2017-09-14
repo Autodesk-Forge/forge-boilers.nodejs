@@ -1,0 +1,23 @@
+{
+  "name": "forge-boiler.nodejs",
+  "description": "Forge boiler: viewer + server + oss + derivatives",
+  "repository": "https://github.com/Autodesk-Forge/forge-boilers.nodejs",
+  "logo": "https://autodesk-forge.github.io/forge-boilers.nodejs/img/forge.png",
+  "keywords": ["autodesk", "forge", "node", "express"],
+  "env": {
+    "NODE_ENV": {
+      "description": "Environment, defaulted to production",
+      "value": "production"
+    },
+    "NPM_CONFIG_PRODUCTION": {
+      "description": "This forces Heroku to install devDependencies, needed to build the App. Must be false!",
+      "value": "false"
+    },
+    "FORGE_CLIENT_ID": {
+      "description": "Your Forge Client ID API Key"
+    },
+    "FORGE_CLIENT_SECRET": {
+      "description": "Your Forge Client Secret API Key"
+    }
+  }
+}
