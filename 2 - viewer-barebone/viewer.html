@@ -19,7 +19,7 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width, height=device-height, minimal-ui, minimum-scale=1.0, initial-scale=1, user-scalable=no"/>
-  <link rel="stylesheet" href="https://autodeskviewer.com/viewers/2.9/style.min.css" type="text/css"/>
+  <link rel="stylesheet" href="https://autodeskviewer.com/viewers/2.15/style.min.css" type="text/css"/>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <title>Viewer</title>
 
@@ -41,8 +41,8 @@
 
 <body>
 
-  <script src="https://autodeskviewer.com/viewers/2.10/three.min.js"></script>
-  <script src="https://autodeskviewer.com/viewers/2.10/viewer3D.min.js"></script>
+  <script src="https://autodeskviewer.com/viewers/2.15/three.min.js"></script>
+  <script src="https://autodeskviewer.com/viewers/2.15/viewer3D.min.js"></script>
 
   <div id="viewer" class="viewer"></div>
 
@@ -62,9 +62,19 @@
       documentId: urn,
       env: 'AutodeskProduction',
       getAccessToken: function( onGetAccessToken) {
-        return token;
+        return token
       }
     }
+
+    // typically getAccessToken would look like below
+    // where /api/forge/token is a REST endpoint
+    // on your own server that return a valid forge token
+    //
+    //getAccessToken: function(onGetAccessToken) {
+    //  $.get('/api/forge/token', function(token) {
+    //    onGetAccessToken(token.access_token)
+    //  })
+    //}
 
     /////////////////////////////////////////////////////////////////
     // Document Loaded Handler
@@ -74,20 +84,13 @@
 
       var rootItem = doc.getRootItem()
 
-      // Grab all 3D items
-      var geometryItems3d =
+      // Grab all geometry items
+      var geometryItems =
         Autodesk.Viewing.Document.getSubItemsWithProperties(
-          rootItem, { 'type': 'geometry', 'role': '3d' }, true)
+          rootItem, { 'type': 'geometry' }, true)
 
-      // Grab all 2D items
-      var geometryItems2d =
-          Autodesk.Viewing.Document.getSubItemsWithProperties(
-          rootItem, { 'type': 'geometry', 'role': '2d' }, true)
-
-      // Pick the first 3D item otherwise first 2D item
-      var selectedItem = (geometryItems3d.length ?
-              geometryItems3d[0] :
-              geometryItems2d[0])
+      // Pick the first item by default
+      var selectedItem = geometryItems[0]
 
       var domContainer = document.getElementById('viewer')
 

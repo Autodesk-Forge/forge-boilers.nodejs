@@ -92,15 +92,17 @@ Navigate with a command shell or terminal to the project you want to run and typ
 Mac OSX/Linux (Terminal)
 
     > npm install
-    > export FORGE_CLIENT_ID=<<YOUR CLIENT ID FROM DEVELOPER PORTAL>
-    > export FORGE_CLIENT_SECRET=<<YOUR CLIENT SECRET>
+    > export NODE_ENV=development
+    > export FORGE_DEV_CLIENT_ID=<YOUR CLIENT ID FROM DEVELOPER PORTAL>
+    > export FORGE_DEV_CLIENT_SECRET=<YOUR CLIENT SECRET>
     > npm start (builds the client dynamically in memory using webpack dev server)
 
 Windows (use <b>Node.js command line</b> from Start menu)
 
     > npm install
-    > set FORGE_CLIENT_ID=<<YOUR CLIENT ID FROM DEVELOPER PORTAL>
-    > set FORGE_CLIENT_SECRET=<<YOUR CLIENT SECRET>
+    > set NODE_ENV=development
+    > set FORGE_DEV_CLIENT_ID=<YOUR CLIENT ID FROM DEVELOPER PORTAL>
+    > set FORGE_DEV_CLIENT_SECRET=<YOUR CLIENT SECRET>
     > npm start (builds the client dynamically in memory using webpack dev server)
 
 Open your browser at:
@@ -130,6 +132,10 @@ To load a design in the viewer:
  * Upon successful upload, the file appears in the bucket, right-click and select <b>Generate viewable</b>
  * Upon successful translation of the design, double-click the file and it will get loaded in the viewer
 
+### Live Demo
+
+[https://oss.autodesk.io](https://oss.autodesk.io)
+
  ![Project5](resources/img/Project5.png)
 
 ## Project #6 - viewer+server+data-mng+derivatives
@@ -146,8 +152,9 @@ To run the project locally (using the DEV API keys):
 Run the following commands (mind the DEV!):
 
     > npm install
-    > set FORGE_DEV_CLIENT_ID=<<YOUR DEV CLIENT ID FROM DEVELOPER PORTAL>
-    > set FORGE_DEV_CLIENT_SECRET=<<YOUR DEV CLIENT SECRET>
+    > npm set NODE_ENV=development
+    > set FORGE_DEV_CLIENT_ID=<YOUR DEV CLIENT ID FROM DEVELOPER PORTAL>
+    > set FORGE_DEV_CLIENT_SECRET=<YOUR DEV CLIENT SECRET>
     > npm start (builds the client dynamically in memory using webpack dev server)
 
 
@@ -155,8 +162,9 @@ To run in production, the callback url defined in your Forge App needs to match 
 
     > npm install
     > set HOST_URL=https://mydomain.com
-    > set FORGE_CLIENT_ID=<<YOUR CLIENT ID FROM DEVELOPER PORTAL>
-    > set FORGE_CLIENT_SECRET=<<YOUR CLIENT SECRET>
+    > npm set NODE_ENV=production
+    > set FORGE_CLIENT_ID=<YOUR CLIENT ID FROM DEVELOPER PORTAL>
+    > set FORGE_CLIENT_SECRET=<YOUR CLIENT SECRET>
     > npm start (builds the client dynamically on disk or use npm run build before)
 
 ### Deploy Project #6 on Heroku
@@ -178,6 +186,10 @@ To load a design in the viewer:
  * Upload a design file to a folder (supports file selection dialog or drag & drop)
  * Upon successful upload, the file appears under the parent node in the tree, right-click and select <b>Generate viewable</b>
  * Upon successful translation of the design, double-click the file and it will get loaded in the viewer
+
+### Live Demo
+
+[https://dm.autodesk.io](https://dm.autodesk.io)
 
  ![Project6](resources/img/Project6.png)
 
