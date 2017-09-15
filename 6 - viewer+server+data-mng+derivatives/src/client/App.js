@@ -56,24 +56,40 @@ export default class App {
       this.onAbout(e)
     })
 
-    const socketSvc = new SocketSvc({
+    this.socketSvc = new SocketSvc({
       host: config.host,
       port: config.port
     })
 
-    socketSvc.connect().then((socket) => {
+    this.socketSvc.connect().then((socket) => {
       console.log(`${config.host}:${config.port}`)
       console.log('Client socket connected: ' + socket.id)
     })
 
-    socketSvc.on('progress', (info) => {
+    this.socketSvc.on('upload.progress', (info) => {
       console.log('upload server -> forge: ')
       console.log(info)
+    })
+
+    this.socketSvc.on('upload.complete', (data) => {
+
+      console.log('upload.complete')
+      console.log(data)
+
+      this.dataPanel.onFileUploaded(data)
+    })
+
+    this.socketSvc.on('upload.error', (error) => {
+      console.log('upload error: ')
+      console.log(error)
     })
 
     this.forgeSvc = new ForgeSvc({
         apiUrl: '/api/forge' 
     })
+
+    ServiceManager.registerService(this.socketSvc)
+    ServiceManager.registerService(this.forgeSvc)
   }
 
   //////////////////////////////////////////////////////////////////////////

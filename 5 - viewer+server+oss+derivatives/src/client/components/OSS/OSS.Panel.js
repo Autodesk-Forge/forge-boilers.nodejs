@@ -846,7 +846,7 @@ class OSSTreeDelegate extends BaseTreeDelegate {
 
       $group.find('> group').each(function(idx) {
 
-        if ($(this).find('header').hasClass('object')) {
+        if ($(this).find('lmvheader').hasClass('object')) {
 
           const name =
             $(this).find('.label-container').text().

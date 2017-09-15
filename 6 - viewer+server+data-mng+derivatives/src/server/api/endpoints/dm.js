@@ -368,6 +368,10 @@ module.exports = function() {
 
       const socketId = req.body.socketId
 
+      const nodeId = req.body.nodeId
+
+      const hubId = req.body.hubId
+
       const file = req.files[0]
 
       const opts = {
@@ -397,8 +401,13 @@ module.exports = function() {
             const socketSvc = ServiceManager.getService(
               'SocketSvc')
 
+            const dmError = Object.assign({}, error, {
+              nodeId,
+              hubId
+            })
+
             socketSvc.broadcast(
-              'upload.error', error, socketId)
+              'upload.error', dmError, socketId)
           }
         },
         onComplete: (msg) => {
@@ -408,8 +417,13 @@ module.exports = function() {
             const socketSvc = ServiceManager.getService(
               'SocketSvc')
 
+            const dmMsg = Object.assign({}, msg, {
+              nodeId,
+              hubId
+            })
+
             socketSvc.broadcast(
-              'upload.complete', msg, socketId)
+              'upload.complete', dmMsg, socketId)
           }
         }
       }

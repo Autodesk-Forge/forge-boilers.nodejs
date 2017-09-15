@@ -8,6 +8,7 @@ import CreateFolderPanel from './CreateFolderPanel'
 import {API as DerivativesAPI} from 'Derivatives'
 import ToolPanelModal from 'ToolPanelModal'
 import ContextMenu from './DataContextMenu'
+import ServiceManager from 'SvcManager'
 import UIComponent from 'UIComponent'
 import TabManager from 'TabManager'
 import Dropzone from 'dropzone'
@@ -297,6 +298,30 @@ export default class DataPanel extends UIComponent {
         }
       })
     })
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  //
+  //
+  ///////////////////////////////////////////////////////////////////
+  onFileUploaded (data) {
+
+    const tree = this.treeMap[data.hubId]
+
+    const node = tree.nodeIdToNode[data.nodeId]
+
+    if (node) {
+
+      node.showLoader(false)
+
+      const itemNode = this.onCreateItemNode (
+        tree, Object.assign({}, data, {
+          insert: true,
+          parent: node
+        }))
+
+      node.children.push(itemNode)
+    }
   }
 
   ///////////////////////////////////////////////////////////////////
@@ -905,19 +930,21 @@ class DMTreeDelegate extends BaseTreeDelegate {
 
           })
         },
+        sending: (file, xhr, formData) => {
+          const socketSvc = ServiceManager.getService('SocketSvc')
+          formData.append('socketId', socketSvc.socketId)
+          formData.append('hubId', node.hubId)
+          formData.append('nodeId', node.id)
+        },
         success: (file, response) => {
 
+          console.log('upload response: ')
           console.log(response)
+        },
+        error: (err) => {
 
           node.showLoader(false)
-
-          const itemNode = this.createItemNode(
-            node,
-            response.item,
-            response.version,
-            true)
-
-          node.children.push(itemNode)
+          console.log(err)
         }
       })
 
@@ -1030,7 +1057,7 @@ class DMTreeDelegate extends BaseTreeDelegate {
 
       $group.find('> group').each(function(idx) {
 
-        if ($(this).find('header').hasClass(child.type)) {
+        if ($(this).find('lmvheader').hasClass(child.type)) {
 
           const name =
             $(this).find('.label-container').text().
