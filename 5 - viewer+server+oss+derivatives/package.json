@@ -70,6 +70,7 @@
     "cross-env": "^3.1.4",
     "css-loader": "^0.16.0",
     "cssnano": "^3.10.0",
+    "dompurify": "^1.0.2",
     "dragula": "3.7.2",
     "dropzone": "4.3.0",
     "es5-shim": "~4.1.10",

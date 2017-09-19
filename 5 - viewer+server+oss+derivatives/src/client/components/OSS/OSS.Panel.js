@@ -24,6 +24,7 @@ import ContextMenu from './OSS.ContextMenu'
 import {client as config} from 'c0nfig'
 import ServiceManager from 'SvcManager'
 import UIComponent from 'UIComponent'
+import DOMPurify from 'dompurify'
 import Dropzone from 'dropzone'
 import OSSAPI from './OSS.API'
 import './OSS.Panel.scss'
@@ -155,8 +156,8 @@ export default class OSSPanel extends UIComponent {
             this.storageSettings)
 
           const bucketNode = new TreeNode({
+            name: DOMPurify.sanitize(dlg.BucketKey),
             bucketKey: dlg.BucketKey,
-            name: dlg.BucketKey,
             id: dlg.BucketKey,
             type: 'oss.bucket',
             group: true
@@ -433,9 +434,9 @@ export default class OSSPanel extends UIComponent {
 
             const objectNode = new TreeNode({
               id: data.bucketKey + '-' + data.objectKey,
+              name: DOMPurify.sanitize(data.objectKey),
               objectKey: data.objectKey,
               bucketKey: data.bucketKey,
-              name: data.objectKey,
               details: objectDetails,
               type: 'oss.object',
               tooltip: true,
@@ -916,8 +917,8 @@ class OSSTreeDelegate extends BaseTreeDelegate {
             buckets.forEach((bucket) => {
 
               let bucketNode = new TreeNode({
+                name: DOMPurify.sanitize(bucket.bucketKey),
                 bucketKey: bucket.bucketKey,
-                name: bucket.bucketKey,
                 id: bucket.bucketKey,
                 type: 'oss.bucket',
                 group: true
@@ -967,8 +968,8 @@ class OSSTreeDelegate extends BaseTreeDelegate {
 
                 let objectNode = new TreeNode({
                   id: node.bucketKey + '-' + item.objectKey,
+                  name: DOMPurify.sanitize(item.objectKey),
                   objectKey: item.objectKey,
-                  name: item.objectKey,
                   bucketKey: node.bucketKey,
                   type: 'oss.object',
                   tooltip: true,
