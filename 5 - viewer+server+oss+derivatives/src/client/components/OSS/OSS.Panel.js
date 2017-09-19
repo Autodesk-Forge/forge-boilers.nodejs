@@ -667,7 +667,7 @@ class OSSTreeDelegate extends BaseTreeDelegate {
     if (node.tooltip) {
 
       const html = `
-        <div class="label-container">
+        <div class="label-container click-trigger">
             <label id="${labelId}"
               class="tooltip-container ${node.type}"
               ${options && options.localize?"data-i18n=" + text : ''}
@@ -702,7 +702,7 @@ class OSSTreeDelegate extends BaseTreeDelegate {
     } else {
 
       let label = `
-        <div class="label-container">
+        <div class="label-container click-trigger">
             <label class="${node.type}" id="${labelId}"
               ${options && options.localize?"data-i18n=" + text : ''}>
               ${text}

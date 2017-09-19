@@ -147,8 +147,8 @@ module.exports = {
          {
             loader: 'babel-loader',
             options: {
-              presets: ['es2015', 'stage-0'],
-              plugins: ['transform-runtime']
+              plugins: ['transform-runtime'],
+              presets: ['env']
             }
         }]
       },

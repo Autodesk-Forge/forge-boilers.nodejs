@@ -66,7 +66,19 @@ export class BaseTreeDelegate extends
 
     const selector = ['LMVHEADER', 'LABEL']
 
-    return (selector.indexOf(event.target.nodeName) > -1)
+    if (selector.indexOf(event.target.nodeName) > -1) {
+
+      return true
+    }
+
+    const className = event.target.className
+
+    if (className.toLowerCase().indexOf('click-trigger') > -1) {
+      
+      return true
+    }
+
+    return false
   }
 
   ///////////////////////////////////////////////////////////////////
