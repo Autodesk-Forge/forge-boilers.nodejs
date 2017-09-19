@@ -966,12 +966,14 @@ class OSSTreeDelegate extends BaseTreeDelegate {
 
               return new Promise((resolve) => {
 
-                let objectNode = new TreeNode({
-                  id: node.bucketKey + '-' + item.objectKey,
-                  name: DOMPurify.sanitize(item.objectKey),
-                  objectKey: item.objectKey,
+                const objectKey = DOMPurify.sanitize(item.objectKey)
+
+                const objectNode = new TreeNode({
+                  id: node.bucketKey + '-' + objectKey,
                   bucketKey: node.bucketKey,
+                  objectKey: objectKey,
                   type: 'oss.object',
+                  name: objectKey,
                   tooltip: true,
                   group: true
                 })
