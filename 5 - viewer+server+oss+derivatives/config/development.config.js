@@ -28,8 +28,8 @@ module.exports = {
     },
 
     oauth: {
-      clientSecret: 'ZQgDGvUMQGA4Vmb3', //process.env.FORGE_DEV_CLIENT_SECRET,
-      clientId: '9FIzRYnObJlHUAGlKXHBcRmlVLV1G6bX', //process.env.FORGE_DEV_CLIENT_ID,
+      clientSecret: process.env.FORGE_DEV_CLIENT_SECRET,
+      clientId: process.env.FORGE_DEV_CLIENT_ID,
 
       scope: [
         'data:read',

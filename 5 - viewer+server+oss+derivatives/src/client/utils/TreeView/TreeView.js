@@ -74,7 +74,7 @@ export class BaseTreeDelegate extends
     const className = event.target.className
 
     if (className.toLowerCase().indexOf('click-trigger') > -1) {
-      
+
       return true
     }
 
