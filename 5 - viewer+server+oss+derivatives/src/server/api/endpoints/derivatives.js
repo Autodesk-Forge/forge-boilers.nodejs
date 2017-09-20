@@ -389,6 +389,11 @@ module.exports = function() {
 
     try {
 
+      // TMP
+      res.status(401)
+      return res.json('unauthorized')
+
+
       const name = req.params.name
 
       const filename = path.resolve(__dirname,

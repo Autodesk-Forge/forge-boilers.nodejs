@@ -332,6 +332,10 @@ module.exports = function() {
 
     try {
 
+      // TMP
+      res.status(401)
+      return res.json('unauthorized')
+
       const forgeSvc = ServiceManager.getService('ForgeSvc')
 
       const ossSvc = ServiceManager.getService('OssSvc')
@@ -363,6 +367,10 @@ module.exports = function() {
 
     try {
 
+      // TMP
+      res.status(401)
+      return res.json('unauthorized')
+      
       const forgeSvc = ServiceManager.getService('ForgeSvc')
 
       const ossSvc = ServiceManager.getService('OssSvc')
