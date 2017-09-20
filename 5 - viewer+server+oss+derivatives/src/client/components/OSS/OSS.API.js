@@ -186,4 +186,22 @@ export default class OSSAPI extends ClientAPI {
     link.href = uri
     link.click()
   }
+
+  /////////////////////////////////////////////////////////////////
+  //
+  //
+  /////////////////////////////////////////////////////////////////
+  parseObjectId (objectId) {
+
+    const parts = objectId.split('/')
+
+    const bucketKey = parts[0].split(':').pop()
+
+    const objectKey = parts[1]
+
+    return {
+      bucketKey: decodeURIComponent(bucketKey),
+      objectKey: decodeURIComponent(objectKey)
+    }
+  }
 }

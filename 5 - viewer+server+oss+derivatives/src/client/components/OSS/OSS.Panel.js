@@ -156,8 +156,8 @@ export default class OSSPanel extends UIComponent {
             this.storageSettings)
 
           const bucketNode = new TreeNode({
-            name: DOMPurify.sanitize(dlg.BucketKey),
             bucketKey: dlg.BucketKey,
+            name: dlg.BucketKey,
             id: dlg.BucketKey,
             type: 'oss.bucket',
             group: true
@@ -225,9 +225,11 @@ export default class OSSPanel extends UIComponent {
 
       data.node.showLoader(true)
 
+      const {bucketKey, objectKey} = this.ossAPI.parseObjectId(
+        data.node.details.objectId)
+
       const response = await this.ossAPI.deleteObject(
-        data.node.bucketKey,
-        data.node.objectKey)
+        bucketKey, objectKey)
 
       console.log(response)
 
@@ -432,13 +434,15 @@ export default class OSSPanel extends UIComponent {
 
           if(!this.storageTree.nodeIdToNode[id]) {
 
+            const objectKey = DOMPurify.sanitize(data.objectKey)
+
             const objectNode = new TreeNode({
-              id: data.bucketKey + '-' + data.objectKey,
-              name: DOMPurify.sanitize(data.objectKey),
-              objectKey: data.objectKey,
+              id: data.bucketKey + '-' + objectKey,
               bucketKey: data.bucketKey,
               details: objectDetails,
+              objectKey: objectKey,
               type: 'oss.object',
+              name: objectKey,
               tooltip: true,
               group: true
             })
@@ -916,9 +920,9 @@ class OSSTreeDelegate extends BaseTreeDelegate {
 
             buckets.forEach((bucket) => {
 
-              let bucketNode = new TreeNode({
-                name: DOMPurify.sanitize(bucket.bucketKey),
+              const bucketNode = new TreeNode({
                 bucketKey: bucket.bucketKey,
+                name: bucket.bucketKey,
                 id: bucket.bucketKey,
                 type: 'oss.bucket',
                 group: true

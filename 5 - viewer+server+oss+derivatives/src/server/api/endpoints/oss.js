@@ -247,6 +247,16 @@ module.exports = function() {
 
       const nodeId = req.body.nodeId
 
+      const ext = path.extname(file.originalname)
+
+      if (config.unauthorizedFileTypes.indexOf(ext) > -1) {
+
+        res.status(401)
+
+        return res.json(
+          'unauthorized file extension: ' + ext)
+      }
+
       const opts = {
         chunkSize: 5 * 1024 * 1024, //5MB chunks
         concurrentUploads: 3,
@@ -307,8 +317,6 @@ module.exports = function() {
       res.json(response)
 
     } catch (error) {
-
-      console.log(error)
 
       res.status(error.statusCode || 500)
       res.json(error)

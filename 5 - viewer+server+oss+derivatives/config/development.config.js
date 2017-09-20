@@ -19,6 +19,10 @@ module.exports = {
     port: PORT
   },
 
+  unauthorizedFileTypes: [
+    '.html'
+  ],
+
   forge: {
 
     viewer: {

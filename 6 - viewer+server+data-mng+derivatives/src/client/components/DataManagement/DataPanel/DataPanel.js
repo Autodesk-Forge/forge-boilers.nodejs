@@ -11,6 +11,7 @@ import ContextMenu from './DataContextMenu'
 import ServiceManager from 'SvcManager'
 import UIComponent from 'UIComponent'
 import TabManager from 'TabManager'
+import DOMPurify from 'dompurify'
 import Dropzone from 'dropzone'
 import DMAPI from '../API'
 import './DataPanel.scss'
@@ -370,7 +371,7 @@ export default class DataPanel extends UIComponent {
     if (!node) {
 
       node = new TreeNode({
-        name: item.attributes.displayName,
+        name: DOMPurify.sanitize(item.attributes.displayName),
         projectId: parent.projectId,
         folderId: parent.folderId,
         hubId: parent.hubId,
@@ -1155,7 +1156,7 @@ class DMTreeDelegate extends BaseTreeDelegate {
                 let rootId = project.relationships.rootFolder.data.id
 
                 let child = new TreeNode({
-                  name: project.attributes.name,
+                  name: DOMPurify.sanitize(project.attributes.name),
                   projectId: project.id,
                   type: project.type,
                   details: project,
@@ -1237,7 +1238,7 @@ class DMTreeDelegate extends BaseTreeDelegate {
                 return new Promise((resolve) => {
 
                   let child = new TreeNode({
-                    name: folder.attributes.displayName,
+                    name: DOMPurify.sanitize(folder.attributes.displayName),
                     projectId: folder.projectId,
                     folderId: folder.id,
                     type: folder.type,
@@ -1348,7 +1349,7 @@ class DMTreeDelegate extends BaseTreeDelegate {
               return new Promise((resolve) => {
 
                 let child = new TreeNode({
-                  name: folder.attributes.displayName,
+                  name: DOMPurify.sanitize(folder.attributes.displayName),
                   projectId: node.projectId,
                   folderId: folder.id,
                   type: folder.type,
@@ -1480,7 +1481,7 @@ class DMTreeDelegate extends BaseTreeDelegate {
               return new Promise((resolve) => {
 
                 let child = new TreeNode({
-                  name: folder.attributes.displayName,
+                  name: DOMPurify.sanitize(folder.attributes.displayName),
                   projectId: node.projectId,
                   folderId: folder.id,
                   type: folder.type,
