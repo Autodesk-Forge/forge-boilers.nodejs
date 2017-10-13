@@ -19,6 +19,11 @@ Those samples illustrates how to use the following Forge npm packages:
  * [forge.model.derivative-js](https://github.com/Autodesk-Forge/forge.model.derivative-js)
  * [forge.data.management-js](https://github.com/Autodesk-Forge/forge.data.management-js)
 
+### Thumbnail
+
+![thumbnail](resources/img/FB_thumbnail.png)
+
+
 ## Prerequisites
 
 To run those samples, you need your own Forge API credentials:
