@@ -60,7 +60,8 @@ although you may want to serve the .html page to get around security restriction
     * [Engine](https://autodesk-forge.github.io/forge-boilers.nodejs/1%20-%20viewer-offline/viewer-offline.html)
     * [Copter](https://autodesk-forge.github.io/forge-boilers.nodejs/1%20-%20viewer-offline/viewer-offline.html?path=./copter/0.svf)
 
-![Project1](resources/img/Project1.png)
+### Thumbnail
+![thumbnail](resources/img/Project1.png)
 
 ## Project #2 - viewer-barebone
 
