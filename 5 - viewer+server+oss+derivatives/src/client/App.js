@@ -127,7 +127,7 @@ export default class App {
 
             this.ossPanel.initialize(
               this.panelContainers.oss,
-              this.panelContainers.app,
+              document.body,
               this.panelContainers.viewer)
 
             this.ossPanel.on('loadObject', (item) => {

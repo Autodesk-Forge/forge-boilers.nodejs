@@ -18,8 +18,8 @@ module.exports = {
     // eg. https://myforgeapp.mydomain.com
     readOnlyBuckets:[
       'leefsmp-temp-forge',
-      'demo-bucket-emea',
-      'demo-bucket-us',
+      //'demo-bucket-emea',
+      //'demo-bucket-us',
       ],
     host: `${HOST_URL}`,
     env: 'production',
@@ -33,9 +33,9 @@ module.exports = {
   forge: {
 
     viewer: {
-      viewer3D: 'https://developer.api.autodesk.com/derivativeservice/v2/viewers/viewer3D.min.js?v=v2.17',
-      threeJS:  'https://developer.api.autodesk.com/derivativeservice/v2/viewers/three.min.js?v=v2.17',
-      style:    'https://developer.api.autodesk.com/derivativeservice/v2/viewers/style.css?v=v2.17'
+      viewer3D: 'https://developer.api.autodesk.com/derivativeservice/v2/viewers/viewer3D.min.js?v=3.3',
+      threeJS:  'https://developer.api.autodesk.com/derivativeservice/v2/viewers/three.min.js?v=3.3',
+      style:    'https://developer.api.autodesk.com/derivativeservice/v2/viewers/style.css?v=3.3'
     },
 
     oauth: {

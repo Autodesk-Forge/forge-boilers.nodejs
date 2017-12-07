@@ -30,7 +30,7 @@ export default class ItemContextMenu extends
 
         menu.push({
           title: 'Show item versions details',
-          className: 'fa fa-clone',
+          icon: 'fa fa-clone',
           target: () => {
             this.emit('context.details', {
               event, node, title: 'Version Details'
@@ -44,7 +44,7 @@ export default class ItemContextMenu extends
 
         menu.push({
           title: 'Show version details',
-          className: 'fa fa-clock-o',
+          icon: 'fa fa-clock-o',
           target: () => {
             this.emit('context.details', {
               event, node, title: 'Version Details'
@@ -54,7 +54,7 @@ export default class ItemContextMenu extends
 
         menu.push({
           title: 'Set as Active version',
-          className: 'fa fa-check',
+          icon: 'fa fa-check',
           target: () => {
             this.emit('context.setActiveVersion', {
               event, node
@@ -70,7 +70,7 @@ export default class ItemContextMenu extends
 
           menu.push({
             title: 'Re-generate viewable',
-            className: 'fa fa-refresh',
+            icon: 'fa fa-refresh',
             target: () => {
               this.emit('context.viewable.create', {
                 event, node
@@ -80,7 +80,7 @@ export default class ItemContextMenu extends
 
           menu.push({
             title: 'Delete viewable',
-            className: 'fa fa-times',
+            icon: 'fa fa-times',
             target: () => {
               this.emit('context.viewable.delete', {
                 event, node
@@ -94,7 +94,7 @@ export default class ItemContextMenu extends
 
             menu.push({
               title: 'Generate viewable',
-              className: 'fa fa-cog',
+              icon: 'fa fa-cog',
               target: () => {
                 this.emit('context.viewable.create', {
                   event, node
@@ -110,7 +110,7 @@ export default class ItemContextMenu extends
 
         menu.push({
           title: 'Show attachments details',
-          className: 'fa fa-paperclip',
+          icon: 'fa fa-paperclip',
           target: () => {
             this.emit('context.details', {
               event, node, title: 'Attachments Details'
@@ -120,7 +120,7 @@ export default class ItemContextMenu extends
 
         menu.push({
           title: 'Attach by version Id',
-          className: 'fa fa-link',
+          icon: 'fa fa-link',
           target: () => {
             this.emit('context.attachment.addById', {
               event, node

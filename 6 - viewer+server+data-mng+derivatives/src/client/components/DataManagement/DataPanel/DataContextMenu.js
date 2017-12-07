@@ -30,10 +30,10 @@ export default class DataContextMenu extends
 
           menu.push({
             title: 'Show details',
-            className: 'fa fa-share',
+            icon: 'fa fa-share',
             target: [{
               title: 'Hub details',
-              className: 'fa fa-cloud',
+              icon: 'fa fa-cloud',
               target: () => {
                 this.emit('context.details', {
                   event, node, type: 'hubs'
@@ -41,7 +41,7 @@ export default class DataContextMenu extends
               }
             }, {
               title: 'Projects details',
-              className: 'fa fa-folder',
+              icon: 'fa fa-folder',
               target: () => {
                 this.emit('context.details', {
                   event, node, type: 'hubs.projects'
@@ -50,26 +50,16 @@ export default class DataContextMenu extends
             }]
           })
 
-          //menu.push({
-          //  title: 'Refresh',
-          //  className: 'fa fa-refresh',
-          //  target: () => {
-          //    this.emit('context.refresh', {
-          //      event, node
-          //    })
-          //  }
-          //})
-
           break
 
       case 'projects':
 
         menu.push({
           title: 'Show details',
-          className: 'fa fa-share',
+          icon: 'fa fa-share',
           target: [{
               title: 'Project details',
-              className: 'fa fa-clone',
+              icon: 'fa fa-clone',
               target: () => {
                 this.emit('context.details', {
                   event, node, type: 'projects'
@@ -77,7 +67,7 @@ export default class DataContextMenu extends
               }
             }, {
               title: 'Root folder details',
-              className: 'fa fa-folder',
+              icon: 'fa fa-folder',
               target: () => {
                 this.emit('context.details', {
                   event, node, type: 'folders'
@@ -85,7 +75,7 @@ export default class DataContextMenu extends
               }
             }, {
               title: 'Root folder content',
-              className: 'fa fa-folder-open',
+              icon: 'fa fa-folder-open',
               target: () => {
                 this.emit('context.details', {
                   event, node, type: 'folders.content'
@@ -93,7 +83,7 @@ export default class DataContextMenu extends
               }
             },{
               title: 'Top folder content',
-              className: 'fa fa-folder-open',
+              icon: 'fa fa-folder-open',
               target: () => {
                 this.emit('context.details', {
                   event, node, type: 'top.folders.content'
@@ -104,7 +94,7 @@ export default class DataContextMenu extends
 
         menu.push({
           title: 'Create new folder',
-          className: 'fa fa-plus',
+          icon: 'fa fa-plus',
           target: () => {
             this.emit('context.folder.create', {
               event, node
@@ -112,26 +102,16 @@ export default class DataContextMenu extends
           }
         })
 
-        //menu.push({
-        //  title: 'Refresh',
-        //  className: 'fa fa-refresh',
-        //  target: () => {
-        //    this.emit('context.refresh', {
-        //      event, node
-        //    })
-        //  }
-        //})
-
         break
 
       case 'folders':
 
         menu.push({
           title: 'Show details',
-          className: 'fa fa-share',
+          icon: 'fa fa-share',
           target: [{
             title: 'Folder details',
-            className: 'fa fa-folder',
+            icon: 'fa fa-folder',
             target: () => {
               this.emit('context.details', {
                 event, node, type: 'folders'
@@ -139,7 +119,7 @@ export default class DataContextMenu extends
             }
           }, {
             title: 'Folder content',
-            className: 'fa fa-folder-open',
+            icon: 'fa fa-folder-open',
             target: () => {
               this.emit('context.details', {
                 event, node, type: 'folders.content'
@@ -150,7 +130,7 @@ export default class DataContextMenu extends
 
         menu.push({
           title: 'Search folder',
-          className: 'fa fa-search',
+          icon: 'fa fa-search',
           target: () => {
             this.emit('context.folder.search', {
               event, node
@@ -160,7 +140,7 @@ export default class DataContextMenu extends
 
         menu.push({
           title: 'Create new folder',
-          className: 'fa fa-plus',
+          icon: 'fa fa-plus',
           target: () => {
             this.emit('context.folder.create', {
               event, node
@@ -168,23 +148,13 @@ export default class DataContextMenu extends
           }
         })
 
-        //menu.push({
-        //  title: 'Refresh',
-        //  className: 'fa fa-refresh',
-        //  target: () => {
-        //    this.emit('context.refresh', {
-        //      event, node
-        //    })
-        //  }
-        //})
-
         break
 
       case 'items':
 
         menu.push({
           title: 'Show item details',
-          className: 'fa fa-file-text',
+          icon: 'fa fa-file-text',
           target: () => {
             this.emit('context.details', {
               event, node, type: 'items'
@@ -196,7 +166,7 @@ export default class DataContextMenu extends
 
           menu.push({
             title: 'Re-generate viewable',
-            className: 'fa fa-refresh',
+            icon: 'fa fa-refresh',
             target: () => {
               this.emit('context.viewable.create', {
                 event, node
@@ -206,7 +176,7 @@ export default class DataContextMenu extends
 
           menu.push({
             title: 'Delete viewable',
-            className: 'fa fa-times',
+            icon: 'fa fa-times',
             target: () => {
               this.emit('context.viewable.delete', {
                 event, node
@@ -220,7 +190,7 @@ export default class DataContextMenu extends
 
             menu.push({
               title: 'Generate viewable',
-              className: 'fa fa-cog',
+              icon: 'fa fa-cog',
               target: () => {
                 this.emit('context.viewable.create', {
                   event, node
@@ -230,21 +200,11 @@ export default class DataContextMenu extends
           }
         }
 
-        //menu.push({
-        //  title: 'Refresh',
-        //  className: 'fa fa-refresh',
-        //  target: () => {
-        //    this.emit('context.refresh', {
-        //      event, node
-        //    })
-        //  }
-        //})
-
         if(node.activeVersion.relationships.storage) {
 
           menu.push({
             title: 'Delete item',
-            className: 'fa fa-times-circle',
+            icon: 'fa fa-times-circle',
             target: () => {
               this.emit('context.item.delete', {
                 event, node

@@ -4,12 +4,33 @@
 /////////////////////////////////////////////////////////////
 import './ContextMenu.scss'
 
-export default class ContextMenu
-  extends Autodesk.Viewing.Private.ContextMenu {
+export default class ContextMenu {
 
-  constructor (opts) {
+  constructor (viewer) {
 
-    super (opts)
+    this.viewer = viewer;
+    this.menus = [];
+    this.container = null;
+    this.open = false;
+  }
+
+  addCallbackToMenuItem (menuItem, target) {
+    var that = this;
+
+    menuItem.addEventListener('click', function (event) {
+      that.hide();
+      target();
+      event.preventDefault();
+      return false;
+    }, false);
+  }
+
+  addSubmenuCallbackToMenuItem (menuItem, menu, x, y) {
+    var that = this;
+
+    menuItem.addEventListener('click', function () {
+      that.showMenu(menu, x, y);
+    }, false);
   }
 
   /////////////////////////////////////////////////////////////////
@@ -140,7 +161,7 @@ export default class ContextMenu
 
     $(parentItem).append(`
       <div id="${menuItemId}" class="menuItem" data-i18n=${text}>
-        <span class="${menuItemDef.className || ''}">
+        <span class="${menuItemDef.icon || ''}">
         </span>
         ${Autodesk.Viewing.i18n.translate(text)}
       </div>

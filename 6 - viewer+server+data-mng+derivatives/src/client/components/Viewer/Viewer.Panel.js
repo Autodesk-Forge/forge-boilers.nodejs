@@ -31,8 +31,7 @@ export default class ViewerPanel {
 
       Autodesk.Viewing.Initializer(options, () => {
 
-        //2.14
-        Autodesk.Viewing.setEndpointAndApi(
+        Autodesk.Viewing.endpoint.setEndpointAndApi (
           window.location.origin + '/lmv-proxy',
           'modelDerivativeV2')
 

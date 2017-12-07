@@ -65,7 +65,7 @@ export default class DataPanel extends UIComponent {
       domContainer)
 
     this.contextMenu = new ContextMenu({
-      container: domContainer
+      container: appContainer
     })
 
     this.contextMenu.on('context.details', (data) => {

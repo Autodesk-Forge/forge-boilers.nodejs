@@ -233,7 +233,7 @@ module.exports = function() {
 
   /////////////////////////////////////////////////////////
   // GET /download
-  // Get download uri for derivative resource
+  // Download derivative resource
   //
   /////////////////////////////////////////////////////////
   router.get('/download', async (req, res) => {

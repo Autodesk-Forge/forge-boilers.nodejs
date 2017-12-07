@@ -107,7 +107,7 @@ export default class OSSPanel extends UIComponent {
     })
 
     this.contextMenu = new ContextMenu({
-      container: domContainer
+      container: appContainer
     })
 
     this.contextMenu.on('context.oss.details', (data) => {

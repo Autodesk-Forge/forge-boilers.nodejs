@@ -216,7 +216,7 @@ export default class App {
 
             this.dataPanel.initialize(
               this.panelContainers.dm,
-              this.panelContainers.app,
+              document.body,
               this.panelContainers.viewer)
 
             this.dataPanel.on('loadVersion', (version) => {
