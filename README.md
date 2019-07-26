@@ -1,3 +1,7 @@
+# This package is now deprecated
+
+For boilerplate projects for node.js and other languages, please see http://learnforge.autodesk.io and its source code https://github.com/Autodesk-Forge/learn.forge.viewmodels.
+
 # Forge Node.js Boilers
 
 [![Node.js](https://img.shields.io/badge/Node.js-4.4.3-blue.svg)](https://nodejs.org/)
